@@ -39,7 +39,8 @@ interface TableRowActionsProps {
     subRow: SubRowData;
 }
 
-export function TableRowActions({ subRow }: { subRow: any }) {
+export function TableRowActions(subRow: { subRow: any }) {
+	console.log("subRow:", subRow);
     const { refreshData, yearData, callExcelMethod } = useExcel();
 
     const [openView, setOpenView] = React.useState(false);

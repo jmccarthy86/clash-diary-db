@@ -24,6 +24,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
   const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
 
   const rows = yearData.Dates[selectedDate] || {};
+  console.log("Rows:", rows);
 
   if (loading) {
     return <p>Loading bookings...</p>;
@@ -65,11 +66,11 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
       {Object.keys(rows).length === 0 ? (
         <p>No bookings for this date.</p>
       ) : (
-        Object.entries(rows).map(([rowRange, rowData]) => {
+        Object.entries(rows.bookings).map((rowRange, rowData) => {
           return (
             <BookingDetail
               key={rowRange}
-              rowRange={rowRange}
+              rowRange={rows.booking}
               rowData={rowData}
               currentSelectedDate={currentSelectedDate}
               allowEdit={allowEdit}

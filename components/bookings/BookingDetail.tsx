@@ -71,6 +71,8 @@ export default function BookingDetail({
     allowEdit,
 }: BookingDetailProps) {
 
+	console.log( rowData )
+
     const { refreshData, callExcelMethod, yearData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
@@ -122,7 +124,7 @@ export default function BookingDetail({
 			data-relation={UserId || undefined}
 		>
 			<CardContent className="grid gap-1">
-				{Object.entries(otherDetails).map( ([key, value]) =>
+				{Object.entries(otherDetails).map( (key, value) =>
 					value &&
 					!hiddenValues.includes(key) && (
 						<div key={key} className="flex-1 space-y-1">
