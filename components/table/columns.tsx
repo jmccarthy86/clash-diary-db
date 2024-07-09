@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { parse } from "date-fns"
+import { enGB } from "date-fns/locale";
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown, ChevronDown, ChevronUp, CalendarCheck } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
@@ -14,7 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import CreateBooking from "../bookings/CreateBooking"
-import { useExcel } from '@/lib/ExcelContext'
+//import { useExcel } from '@/context/ExcelContext'
 
 type SubRow = Record<string, string | number>;
 
@@ -83,14 +85,14 @@ export const columnsConfig = (): ColumnDef<Booking>[] => [
               Book Now
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Book Now</DialogTitle>
               <DialogDescription>
                 Complete your booking for {row.getValue("date")}.
               </DialogDescription>
             </DialogHeader>
-            <CreateBooking currentSelectedDate={row.getValue("date")} />
+            <CreateBooking currentSelectedDate={parse(row.getValue("date"), "dd/MM/yyyy", new Date(), { locale: enGB })} />
           </DialogContent>
         </Dialog>
       )

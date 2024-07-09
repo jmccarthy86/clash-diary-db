@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@azure/identity": "^4.2.0",
+    "@getbrevo/brevo": "^2.2.0",
     "@hookform/resolvers": "^3.6.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@radix-ui/react-alert-dialog": "^1.1.1",
@@ -46,6 +47,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
+    "prettier": "^3.0.0-alpha.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

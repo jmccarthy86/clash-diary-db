@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from 'react';
+import TableSkeleton from './Skeleton';
 import {
   useReactTable,
   getCoreRowModel,
@@ -28,14 +29,11 @@ interface ListViewProps {
 }
 
 const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => {
+
+    console.log('ListView rendered');
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-    /**
-     * This is the complete sheet for the currently selected year,
-     * transformed from the returned excel object, then we're transforming it one more
-     * time to work with our tables.
-     */
-    const transformedData = React.useMemo(() => yearData ? createYearCalendarWithData(currentYear,transformData(yearData.Dates)) : [], [yearData])
+    const transformedData = React.useMemo(() => yearData ? transformData(createYearCalendarWithData(currentYear, yearData.Dates)) : [], [yearData, currentYear])
 
     const [sorting, setSorting] = React.useState<SortingState>([{ id: 'date', desc: false }])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -46,6 +44,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     React.useEffect(() => {
         const fromYear = dateRange.from.getFullYear();
         if (fromYear !== currentYear) {
+            console.log('Changing year in ListView');
             changeYear(fromYear);
         }
     }, [dateRange, currentYear, changeYear]);
@@ -84,7 +83,12 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
         table.toggleAllRowsExpanded(false);
     };
 
-    if (loading) return <div>Loading...</div>;
+    //if (loading) return <div>Loading...</div>;
+	if ( loading ) { 
+		return <TableSkeleton />
+	}
+
+	//console.log(error);
     if (error) return <div>Error: {error.message}</div>;
 
     return (

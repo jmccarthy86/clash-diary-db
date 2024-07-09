@@ -3,12 +3,15 @@
 import React from 'react';
 import { startOfMonth, endOfMonth, startOfDay } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ListView from "@/components/table/table";
+import ListView from "@/components/table/ListView";
 import { CalendarView } from "@/components/calendar/calendar";
 import { ExcelProvider, useExcel } from '@/context/ExcelContext';
 
 function MainContent() {
-    const { loading, error } = useExcel();
+    
+    //console.log("MainContent rendered");
+    //const { loading, error } = useExcel();
+ 
     const [dateRange, setDateRange] = React.useState<{ from: Date, to: Date }>({
         from: startOfMonth(new Date()),
         to: endOfMonth(new Date()),
@@ -28,12 +31,9 @@ function MainContent() {
         });
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <Tabs defaultValue="calendar" className="w-[960px]">
+            <Tabs defaultValue="calendar" className="w-[960px] p-6 rounded-md border bg-background">
                 <TabsList>
                     <TabsTrigger value="calendar">Calendar</TabsTrigger>
                     <TabsTrigger value="table">Table</TabsTrigger>

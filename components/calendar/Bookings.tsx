@@ -1,12 +1,15 @@
 "use client"
 
 import * as React from "react";
+import { enGB } from "date-fns/locale"
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import BookingDetail from "@/components/bookings/BookingDetail";
 import { useExcel } from '@/context/ExcelContext';
+import { Dialog, DialogDescription, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import CreateBooking from "@/components/bookings/CreateBooking"
 
 interface DetailCardProps {
-  sheetData: any; 
   currentSelectedDate: Date | undefined;
   allowEdit: boolean;
 }
@@ -18,11 +21,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
     return null;
   }
 
-  const selectedDate = currentSelectedDate.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric'
-  });
+  const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
 
   const rows = yearData.Dates[selectedDate] || {};
 
@@ -35,16 +34,33 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
   }
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">
-        {currentSelectedDate.toLocaleDateString('en-US', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        })}
-      </h2>
-
-      <p className="mb-4">See existing bookings below.</p>
+    <div className="flex flex-col gap-2">
+		<div className="rounded-md border px-6 py-3 flex items-center justify-between">
+			<h2 className="text-xl font-bold">
+				{format(currentSelectedDate, "do MMMM yyyy")}
+			</h2>
+			<Dialog>
+				<DialogTrigger asChild>
+					<Button 
+					variant="outline"
+					onClick={(e) => {
+						e.stopPropagation();
+					}}
+					>
+					Book Now
+					</Button>
+				</DialogTrigger>
+				<DialogContent className="sm:max-w-[600px]">
+					<DialogHeader>
+					<DialogTitle>Book Now</DialogTitle>
+					<DialogDescription>
+						Complete your booking for {format(currentSelectedDate, "dd/MM/yyyy" )}
+					</DialogDescription>
+					</DialogHeader>
+					<CreateBooking currentSelectedDate={currentSelectedDate} />
+				</DialogContent>
+			</Dialog>
+	  	</div>
 
       {Object.keys(rows).length === 0 ? (
         <p>No bookings for this date.</p>
