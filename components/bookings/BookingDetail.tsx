@@ -124,7 +124,7 @@ export default function BookingDetail({
 			data-relation={UserId || undefined}
 		>
 			<CardContent className="grid gap-1">
-				{Object.entries(otherDetails).map( (key, value) =>
+				{Object.entries(otherDetails).map( ([key, value]) =>
 					value &&
 					!hiddenValues.includes(key) && (
 						<div key={key} className="flex-1 space-y-1">

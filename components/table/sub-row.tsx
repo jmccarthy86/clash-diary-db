@@ -14,7 +14,7 @@ import { SubRowData } from "@/lib/types"
 import { useExcel } from '@/context/ExcelContext'
 
 interface SubRowComponentProps {
-	subRows?: Record<string, any>[];
+    subRows?: SubRowData[];
 }
 
 export function SubRowComponent({ subRows }: SubRowComponentProps) {
@@ -22,7 +22,10 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
-  if (subRows?.length === 0 ) return <span>No Bookings have been made for this date.</span>;
+  if (subRows.length < 1 ) return <span>No Bookings have been made for this date.</span>;
+
+  console.log(subRows);
+  //return <></>;
 
   return (
     <Table>
@@ -35,7 +38,7 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
             </TableRow>
         </TableHeader>
         <TableBody>
-        {subRows?.map((subRow, index) => (
+        {subRows.map((subRow, index) => (
             subRow.TitleOfShow === '' && subRow.Venue === '' && subRow.PressContact === '' ? (
                 <TableRow key={index} className="bg-gray-200">
                     <TableCell colSpan={4} className="text-center">No data available</TableCell>

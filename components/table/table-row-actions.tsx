@@ -39,7 +39,7 @@ interface TableRowActionsProps {
     subRow: SubRowData;
 }
 
-export function TableRowActions(subRow: { subRow: any }) {
+export function TableRowActions({subRow}) {
 	console.log("subRow:", subRow);
     const { refreshData, yearData, callExcelMethod } = useExcel();
 

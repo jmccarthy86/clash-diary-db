@@ -30,7 +30,7 @@ interface ListViewProps {
 
 const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => {
 
-    console.log('ListView rendered');
+    //console.log('ListView rendered');
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
     const transformedData = React.useMemo(() => yearData ? transformData(createYearCalendarWithData(currentYear, yearData.Dates)) : [], [yearData, currentYear])
@@ -145,7 +145,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                             {row.getIsExpanded() && (
                             <TableRow className="bg-muted/40 hover:bg-muted/50">
                                 <TableCell colSpan={row.getVisibleCells().length}>
-                                <SubRowComponent subRows={row.original.subRows} />
+                                	<SubRowComponent subRows={row.original.subRows} />
                                 </TableCell>
                             </TableRow>
                             )}

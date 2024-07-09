@@ -10,6 +10,7 @@ import { Dialog, DialogDescription, DialogContent, DialogHeader, DialogTitle, Di
 import CreateBooking from "@/components/bookings/CreateBooking"
 
 interface DetailCardProps {
+  sheetData: any; 
   currentSelectedDate: Date | undefined;
   allowEdit: boolean;
 }
@@ -24,7 +25,6 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
   const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
 
   const rows = yearData.Dates[selectedDate] || {};
-  console.log("Rows:", rows);
 
   if (loading) {
     return <p>Loading bookings...</p>;
@@ -66,11 +66,11 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
       {Object.keys(rows).length === 0 ? (
         <p>No bookings for this date.</p>
       ) : (
-        Object.entries(rows.bookings).map((rowRange, rowData) => {
+        Object.entries(rows).map(([rowRange, rowData]) => {
           return (
             <BookingDetail
               key={rowRange}
-              rowRange={rows.booking}
+              rowRange={rowRange}
               rowData={rowData}
               currentSelectedDate={currentSelectedDate}
               allowEdit={allowEdit}
