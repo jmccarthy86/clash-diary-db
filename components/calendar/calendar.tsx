@@ -19,7 +19,7 @@ export function CalendarView({
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
     //console.log("yearData : " + JSON.stringify(yearData));
-    console.log("rendering calendar");
+    //console.log("rendering calendar");
 
     React.useEffect(() => {
       setCurrentMonth(selectedDate);
@@ -67,7 +67,7 @@ export function CalendarView({
     if (error) return <p>Error: {error.message}</p>;
 
     return (
-        <div className="flex items-start space-x-2">
+        <div className="flex flex-col lg:flex-row items-center lg:items-start space-x-2 gap-4">
             <Calendar
                 mode="single"
                 fromYear={2024}
@@ -76,7 +76,7 @@ export function CalendarView({
                 onMonthChange={handleMonthChange}
                 month={currentMonth}
                 showOutsideDays={false}
-                className="rounded-md border flex-none"
+                className="rounded-md border flex-none mb-2 lg:mb-0"
                 modifiers={{ booked: bookedDates }}
                 modifiersClassNames={{
                     booked: "calendar-triangle",

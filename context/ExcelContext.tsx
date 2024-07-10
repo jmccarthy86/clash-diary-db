@@ -34,7 +34,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const callExcelMethod = useCallback(
         async (method: string, ...args: any[]) => {
-            console.log("Calling Excel method:", method, "with args:", args);
+            //console.log("Calling Excel method:", method, "with args:", args);
             try {
                 const response = await fetch("/api/manager", {
                     method: "POST",

@@ -13,14 +13,14 @@ import {
   ColumnFiltersState,
   getPaginationRowModel
 } from '@tanstack/react-table';
-import SubRowComponent from './sub-row';
-import DatePickerWithRange from "./filter-date-range";
-import { DataTablePagination } from './table-pagination';
+import SubRowComponent from './SubRow';
+import DatePickerWithRange from "./FilterDateRange";
+import { DataTablePagination } from './Pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from "../ui/button";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { transformData, createYearCalendarWithData } from '@/lib/utils'
-import { columnsConfig } from '@/components/table/columns'
+import { columnsConfig } from '@/components/table/ColumnsConfig'
 import { useExcel } from '@/context/ExcelContext';
 
 interface ListViewProps {
@@ -93,16 +93,17 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
 
     return (
         <div className="w-full">
-            <div className="flex items-center justify-between py-4">
+            <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-2">
                 <DatePickerWithRange 
                     date={dateRange} 
-                    setDate={onDateRangeChange} 
+                    setDate={onDateRangeChange}
+					className="w-full lg:w-auto"
                 />
-                <div className="flex space-x-2">
+                <div className="flex space-x-2 w-full lg:w-auto">
                     <Button
                         onClick={handleExpandAll}
                         variant="outline"
-                        className="flex items-center"
+                        className="flex flex-1 items-center"
                     >
                         <ChevronDownIcon className="mr-2 h-4 w-4" />
                         Expand All
@@ -110,7 +111,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                     <Button
                         onClick={handleCollapseAll}
                         variant="outline"
-                        className="flex items-center"
+                        className="flex flex-1 items-center"
                     >
                         <ChevronUpIcon className="mr-2 h-4 w-4" />
                         Collapse All

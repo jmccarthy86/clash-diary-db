@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { parse } from "date-fns"
+import { parse, format, parseISO, compareAsc } from "date-fns"
 import { enGB } from "date-fns/locale";
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown, ChevronDown, ChevronUp, CalendarCheck } from "lucide-react"
@@ -39,20 +39,30 @@ export const columnsConfig = (): ColumnDef<Booking>[] => [
           </Button>
         )
     },
-    cell: ({ row }) => (
-      <div className="flex items-center">
-      {row.original.subRows.length > 0 && (
-        <CalendarCheck className="mr-2 h-4 w-4" />
-      )}
-      <div className="lowercase">{row.getValue("date")}</div>
-    </div>
-    ),
+    cell: ({ row }) => {
+
+		const formattedDate = format( parse( row.getValue("date"), 'dd/MM/yyyy', new Date() ), 'do MMMM yyyy' );
+		return (
+
+      		<div className="flex items-center gap-1">
+				<div className="leading-4">{formattedDate}</div>
+				{row.original.subRows.length > 0 && (
+					<CalendarCheck className="text-slate-500 h-3 w-3 align-top" />
+				)}
+			</div>
+		)
+  	},
     filterFn: (row, id, value: { from: Date, to: Date } | undefined) => {
       if (!value?.from || !value?.to) return true;
       const dateStr = row.getValue(id) as string;
       const date = parseDate(dateStr);
       return date >= value.from && date <= value.to;
     },
+    sortingFn: (rowA, rowB, columnId) => {
+		const dateA = parse(rowA.getValue(columnId), 'dd/MM/yyyy', new Date());
+		const dateB = parse(rowB.getValue(columnId), 'dd/MM/yyyy', new Date());
+		return compareAsc(dateA, dateB);
+	},
   },
   {
     id: 'expand',

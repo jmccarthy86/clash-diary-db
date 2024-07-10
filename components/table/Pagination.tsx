@@ -23,8 +23,8 @@ import {
     table,
   }: DataTablePaginationProps<TData>) {
     return (
-      <div className="w-full flex items-center justify-between py-4 px-2">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="w-full flex flex-col lg:flex-row items-center justify-between py-4 px-2">
+        <div className="flex-1 text-sm text-muted-foreground  mb-2 lg:mb-0">
           {/* {table.getFilteredSelectedRowModel().rows.length} of{" "} */}
           {table.getFilteredRowModel().rows.length} Dates in Range
         </div>

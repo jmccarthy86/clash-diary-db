@@ -18,6 +18,10 @@ export type SubRowData = {
 	TitleOfShow: string;
 	Venue: string;
 	PressContact: string;
+	IsOperaDance: boolean;
+	IsSeasonGala: boolean;
+	OtherVenue: string;
+	P: boolean;
 };
 
 export interface EmailRecipient {

@@ -6,14 +6,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useExcel } from "@/context/ExcelContext";
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Check, ChevronsUpDown  } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover"
+import { SelectVenue } from "@/components/bookings/SelectVenue"
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -34,6 +30,18 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import venues from "@/lib/venues";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+  } from "@/components/ui/command"
+  import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+  } from "@/components/ui/popover"
 //import { toast } from "@/components/ui/use-toast";
 
 export default function BookingForm({
@@ -68,7 +76,8 @@ export default function BookingForm({
 		DateBkd: "",
 		IsSeasonGala: false,
 		IsOperaDance: false,
-		UserId: ""
+		UserId: "",
+		TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00')
 	}
 
 	const FormSchema = z.object({
@@ -135,276 +144,304 @@ export default function BookingForm({
                     className="space-y-6"
                 >
                     <div className="grid w-full items-center gap-4">
-					<FormField
-						control={form.control}
-						name="Date"
-						render={({ field }) => (
-							<FormItem className="flex flex-col">
-							<FormLabel>Date</FormLabel>
-							<Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-								<PopoverTrigger asChild>
-								<FormControl>
-									<Button
-									variant={"outline"}
-									className={cn(
-										"w-full pl-3 text-left font-normal",
-										!field.value && "text-muted-foreground"
-									)}
-									disabled={submitting}
-									onClick={() => setIsCalendarOpen(true)}
-									>
-									{field.value ? (
-										format(field.value, "do MMMM yyyy")
-									) : (
-										<span>Pick a date</span>
-									)}
-									<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-									</Button>
-								</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-auto p-0" align="start" style={{ pointerEvents: 'auto' }}>
-								<Calendar
-									mode="single"
-									selected={field.value}
-									onSelect={(date) => {
-									field.onChange(date);
-										setTimeout(() => setIsCalendarOpen(false), 175);
-									}}
-									initialFocus
-								/>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-							</FormItem>
-						)}
-					/>
+						<FormField
+							control={form.control}
+							name="Date"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+								<FormLabel>Date</FormLabel>
+								<Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+									<PopoverTrigger asChild>
+									<FormControl>
+										<Button
+										variant={"outline"}
+										className={cn(
+											"w-full pl-3 text-left font-normal",
+											!field.value && "text-muted-foreground"
+										)}
+										disabled={submitting}
+										onClick={() => setIsCalendarOpen(true)}
+										>
+										{field.value ? (
+											format(field.value, "do MMMM yyyy")
+										) : (
+											<span>Pick a date</span>
+										)}
+										<CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+										</Button>
+									</FormControl>
+									</PopoverTrigger>
+									<PopoverContent className="w-auto p-0" align="start" style={{ pointerEvents: 'auto' }}>
+									<Calendar
+										mode="single"
+										selected={field.value}
+										onSelect={(date) => {
+										field.onChange(date);
+											setTimeout(() => setIsCalendarOpen(false), 175);
+										}}
+										initialFocus
+									/>
+									</PopoverContent>
+								</Popover>
+								<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 
-                        <div>
+					<div className="flex flex-col lg:flex-row gap-2">
+                        <div className="w-full lg:w-1/2">
                             <FormLabel>SOLT Member Venue</FormLabel>
-                            <div className="flex space-x-1.5 w-full">
-                                <div className="w-1/2">
-                                    <FormField
-                                        control={form.control}
-                                        name="Venue"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-														disabled={submitting}
-                                                    >
-                                                        <SelectTrigger
-                                                            id="solt-venue"
-                                                            className="w-full"
-                                                        >
-                                                            <SelectValue placeholder="Select a Venue..." />
-                                                        </SelectTrigger>
-                                                        <SelectContent position="popper">
-															<>
-															{venues && venues.map( (venue, index) => (
-																<SelectItem key={index} value={venue}>
-																	{venue}
-																</SelectItem>
-															))}
-															</>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
+							<FormField
+								control={form.control}
+								name="Venue"
+								render={({ field }) => (
+									<FormItem>
+<Popover>
+	<PopoverTrigger asChild>
+		<FormControl>
+		<Button
+			variant="outline"
+			role="combobox"
+			className={cn(
+			"w-[200px] justify-between",
+			!field.value && "text-muted-foreground"
+			)}
+		>
+			{field.value
+			? venues.find(
+				(venue) => venue.value === field.value
+				)?.label
+			: "Selct Your Venue"}
+			<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+		</Button>
+		</FormControl>
+	</PopoverTrigger>
+	<PopoverContent className="w-[200px] p-0">
+		<Command>
+		<CommandInput placeholder="Search language..." />
+		<CommandEmpty>No language found.</CommandEmpty>
+		<CommandGroup>
+			{venues.map((venue) => (
+			<CommandItem
+				value={venue.label}
+				key={venue.value}
+				onSelect={() => {
+				form.setValue("Venue", venue.value)
+				}}
+			>
+				<Check
+				className={cn(
+					"mr-2 h-4 w-4",
+					venue.value === field.value
+					? "opacity-100"
+					: "opacity-0"
+				)}
+				/>
+				{venue.label}
+			</CommandItem>
+			))}
+		</CommandGroup>
+		</Command>
+	</PopoverContent>
+</Popover>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div className="w-full lg:w-1/2">
+							<FormLabel>Other Venue</FormLabel>
+							<FormField
+								control={form.control}
+								name="OtherVenue"
+								render={({ field }) => (
+									<FormItem className="mb-2 lg:mb-0">
+										<FormControl>
+											<Input
+												id="OtherVenue"
+												{...field}
+												placeholder="Venue Name"
+												disabled={submitting}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="VenueIsTba"
+								render={({ field }) => (
+									<FormItem className="flex items-center">
+										<FormControl>
+											<Checkbox
+												checked={field.value}
+												onCheckedChange={
+													field.onChange
+												}
+												disabled={submitting} 
+												className="mt-2 mr-1"
+											/>
+										</FormControl>
+										<FormLabel>
+											Tick box if a TBA
+										</FormLabel>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					</div>
 
-                                <div className="flex flex-col space-y-1.5 w-1/2">
-                                    <FormField
-                                        control={form.control}
-                                        name="OtherVenue"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Input
-                                                        id="OtherVenue"
-                                                        {...field}
-                                                        placeholder="Venue Name"
-														disabled={submitting}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="VenueIsTba"
-                                        render={({ field }) => (
-                                            <FormItem className="flex items-center space-x-2">
-                                                <FormControl>
-                                                    <Checkbox
-                                                        checked={field.value}
-                                                        onCheckedChange={
-                                                            field.onChange
-                                                        }
-														disabled={submitting} 
-                                                    />
-                                                </FormControl>
-                                                <FormLabel>
-                                                    Tick box if a TBA
-                                                </FormLabel>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+					<div className="flex flex-col space-y-1.5">
+						<FormField
+							control={form.control}
+							name="TitleOfShow"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Show Title</FormLabel>
+									<FormControl>
+										<Input
+											id="show-title"
+											{...field}
+											disabled={isFieldDisabled("TitleOfShow")} 
+											placeholder="Name of your project"
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="ShowTitleIsTba"
+							render={({ field }) => (
+								<FormItem className="flex items-center">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+											disabled={submitting}
+											className="mt-2 mr-1"
+										/>
+									</FormControl>
+									<FormLabel>Tick box if a TBA</FormLabel>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 
-                        <div className="flex flex-col space-y-1.5">
-                            <FormField
-                                control={form.control}
-                                name="TitleOfShow"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Show Title</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                id="show-title"
-                                                {...field}
-												disabled={isFieldDisabled("TitleOfShow")} 
-                                                placeholder="Name of your project"
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="ShowTitleIsTba"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
+					<div className="flex flex-col lg:flex-row gap-2">
+                        <div className="w-full lg:w-1/2">
+							<FormField
+								control={form.control}
+								name="Producer"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Producer</FormLabel>
+										<FormControl>
+											<Input
+												id="Producer"
+												{...field}
+												placeholder="Producer(s) Name(s)"
 												disabled={submitting}
-                                            />
-                                        </FormControl>
-                                        <FormLabel>Tick box if a TBA</FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+						<div className="w-full lg:w-1/2">
+							<FormField
+								control={form.control}
+								name="PressContact"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>
+											Press Contact (tel/email)
+										</FormLabel>
+										<FormControl>
+											<Input
+												id="PressContact"
+												{...field}
+												placeholder="press@soltukt.co.uk"
+												disabled={submitting}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+						</div>
+					</div>
 
-                        <div className="flex space-x-1.5">
-                            <div className="flex flex-col space-y-1.5 w-1/2">
-                                <FormField
-                                    control={form.control}
-                                    name="Producer"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Producer</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    id="Producer"
-                                                    {...field}
-                                                    placeholder="Producer(s) Name(s)"
-													disabled={submitting}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-1.5 w-1/2">
-                                <FormField
-                                    control={form.control}
-                                    name="PressContact"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Press Contact (tel/email)
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    id="PressContact"
-                                                    {...field}
-                                                    placeholder="press@soltukt.co.uk"
-													disabled={submitting}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex flex-col space-y-1.5">
-                            <FormField
-                                control={form.control}
-                                name="P"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-												disabled={submitting}
-                                            />
-                                        </FormControl>
-                                        <FormLabel>
-                                            Make this a penciled (P) booking
-                                        </FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="IsSeasonGala"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-												disabled={submitting}
-                                            />
-                                        </FormControl>
-                                        <FormLabel>
-                                            Mark this as a Season Announcement
-                                            or Gala Night
-                                        </FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="IsOperaDance"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center space-x-2">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-												disabled={submitting}
-                                            />
-                                        </FormControl>
-                                        <FormLabel>
-                                            Mark as Opera/Dance
-                                        </FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div>
+					<div className="flex flex-col space-y-1.5">
+						<FormField
+							control={form.control}
+							name="P"
+							render={({ field }) => (
+								<FormItem className="flex items-center">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+											disabled={submitting}
+											className="mt-2 mr-1"
+										/>
+									</FormControl>
+									<FormLabel>
+										Make this a penciled (P) booking
+									</FormLabel>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="IsSeasonGala"
+							render={({ field }) => (
+								<FormItem className="flex items-center">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+											disabled={submitting}
+											className="mt-2 mr-1"
+										/>
+									</FormControl>
+									<FormLabel>
+										Mark this as a Season Announcement
+										or Gala Night
+									</FormLabel>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="IsOperaDance"
+							render={({ field }) => (
+								<FormItem className="flex items-center">
+									<FormControl>
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+											disabled={submitting}
+											className="mt-2 mr-1"
+										/>
+									</FormControl>
+									<FormLabel>
+										Mark as Opera/Dance
+									</FormLabel>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
+
 					<div className="flex items-center gap-2">
 						<Button type="submit">
 							{submitting ? (

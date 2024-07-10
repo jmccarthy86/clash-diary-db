@@ -4,8 +4,9 @@ import React from 'react';
 import { startOfMonth, endOfMonth, startOfDay } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListView from "@/components/table/ListView";
-import { CalendarView } from "@/components/calendar/calendar";
+import { CalendarView } from "@/components/calendar/Calendar";
 import { ExcelProvider, useExcel } from '@/context/ExcelContext';
+import { CalendarIcon, TableIcon } from '@radix-ui/react-icons'
 
 function MainContent() {
     
@@ -32,11 +33,11 @@ function MainContent() {
     };
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-            <Tabs defaultValue="calendar" className="w-[960px] p-6 rounded-md border bg-background">
-                <TabsList>
-                    <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                    <TabsTrigger value="table">Table</TabsTrigger>
+        <main className="flex min-h-screen flex-col items-center justify-between p-4 sm:p-6 md:p-8 lg:p-12 xl:p-24">
+            <Tabs defaultValue="calendar" className="w-[960px] max-w-full p-6 rounded-md border bg-background">
+                <TabsList className="w-full lg:w-auto">
+                    <TabsTrigger value="calendar"><div className="flex items-center gap-1"><CalendarIcon /><span>Calendar</span></div></TabsTrigger>
+					<TabsTrigger value="table"><div className="flex items-center gap-1"><TableIcon /><span>List View</span></div></TabsTrigger>
                 </TabsList>
                 <TabsContent value="calendar">
                     <CalendarView 

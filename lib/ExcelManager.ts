@@ -91,9 +91,6 @@ export class ExcelManager {
 
 			this.worksheetId = response.id;  // Set the new worksheet as the current one
 
-			// // Define the default headers
-			// const headers = ["Day", "Date", "P", "Venue", "OtherVenue", "VenueIsTba", "TitleOfShow", "ShowTitleIsTba", "Producer", "PressContact", "DateBkd", "IsSeasonGala", "IsOperaDance", "UserId"];
-
 			// Calculate the range for the headers
 			const endColumn = String.fromCharCode('A'.charCodeAt(0) + headers.length - 1);
 			const headerRange = `A1:${endColumn}1`;

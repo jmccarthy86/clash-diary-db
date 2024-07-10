@@ -3,13 +3,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 const TableSkeleton = () => {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between py-4">
-        <div className="grid gap-2">
-          <Skeleton className="h-10 w-[300px]" />
+      <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-2">
+        <div className="grid gap-2 w-full lg:w-auto">
+          <Skeleton className="h-10 w-full lg:w-[300px]" />
         </div>
         <div className="flex space-x-2">
-          <Skeleton className="h-10 w-[120px]" />
-          <Skeleton className="h-10 w-[120px]" />
+          <Skeleton className="h-10 flex-1 lg:w-[120px]" />
+          <Skeleton className="h-10 flex-1 lg:w-[120px]" />
         </div>
       </div>
       <div className="rounded-md border">

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { enGB } from "date-fns/locale"
-import { format } from "date-fns";
+import { format, isAfter, isBefore, isEqual, isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import BookingDetail from "@/components/bookings/BookingDetail";
 import { useExcel } from '@/context/ExcelContext';
@@ -36,20 +36,21 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
 
   return (
     <div className="flex flex-col gap-2">
-		<div className="rounded-md border px-6 py-3 flex items-center justify-between">
+		<div className="rounded-md border pl-6 pr-3 py-3 flex items-center justify-between">
 			<h2 className="text-xl font-bold">
 				{format(currentSelectedDate, "do MMMM yyyy")}
 			</h2>
 			<Dialog>
 				<DialogTrigger asChild>
-					<Button 
-					variant="outline"
-					onClick={(e) => {
-						e.stopPropagation();
-					}}
+				{(isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date())) && (
+					<Button
+						onClick={(e) => {
+							e.stopPropagation();
+						}}
 					>
-					Book Now
+						Book Now
 					</Button>
+				)}
 				</DialogTrigger>
 				<DialogContent className="sm:max-w-[600px]">
 					<DialogHeader>
@@ -64,8 +65,10 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
 	  	</div>
 
       {Object.keys(rows).length === 0 ? (
-        <p>No bookings for this date.</p>
-      ) : (
+		<div className="p-6 border rounded-md">
+        	<p>No bookings for this date.</p>
+		</div>
+	  ) : (
         Object.entries(rows).map(([rowRange, rowData]) => {
           return (
             <BookingDetail

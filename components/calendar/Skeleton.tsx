@@ -2,9 +2,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const CalendarSkeleton = () => {
   return (
-	<div className="flex items-start space-x-2">
+	<div className="flex flex-col lg:flex-row items-center lg:items-start space-x-2">
 		{/* Calendar Skeleton */}
-		<div className="rdp p-3 rounded-md border flex-none">
+		<div className="rdp p-3 rounded-md border flex-none mb-2">
 		<Skeleton className="h-6 w-32 mb-4" /> {/* Month and year */}
 		<div className="grid grid-cols-7 gap-1">
 			{[...Array(7)].map((_, i) => (

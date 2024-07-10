@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Booking, RequestData, SubRow } from "@/lib/types"
 import { format } from 'date-fns'
+import { headers } from '@/lib/config'
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs))
@@ -125,23 +126,6 @@ function formatDate(date: Date): string {
 }
 
 export function prepareBookingFormData(data: any) {
-	const headers = [
-		"Day",
-		"Date",
-		"P",
-		"Venue",
-		"OtherVenue",
-		"VenueIsTba",
-		"TitleOfShow",
-		"ShowTitleIsTba",
-		"Producer",
-		"PressContact",
-		"DateBkd",
-		"IsSeasonGala",
-		"IsOperaDance",
-		"UserId"
-	];
-
 	return Object.values(Object.fromEntries(
 		headers.map((key) => {
 			if (key === "Date" && data[key] instanceof Date) {

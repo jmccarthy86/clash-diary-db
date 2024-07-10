@@ -50,7 +50,7 @@ export const saveExcelData = async (userId: string, documentId: string, sheetNam
 
 export const convertExcelDataToObject = (data, year) => {
 
-	console.log('convertExcelDataToObject data: ', data)
+	//console.log('convertExcelDataToObject data: ', data)
 	// Organise provided data
 	const { address, values } = data;
 	const headers = values[0];
@@ -151,35 +151,6 @@ export const convertFormDataToExcelObject = (data) => {
 	return rows;
 
 };
-
-// export const convertFormDataToExcelObject = (data) => {
-
-//   const headers = ["Day", "Date", "P", "Venue", "OtherVenue", "VenueIsTba", "TitleOfShow", "ShowTitleIsTba", "Producer", "PressContact", "DateBkd", "UserId", "IsSeasonGala", "isOperaDance"];
-
-//   const date = new Date(data.DATE);
-//   const formattedDate = date.toISOString().split('T')[0];
-//   const rowRange = `A${date.getDate() + 1}:H${date.getDate() + 1}`;
-//   const rowObject = {};
-
-//   rowObject[`A${date.getDate() + 1}`] = { "DAY": data.DAY };
-//   rowObject[`B${date.getDate() + 1}`] = { "DATE": date.getDate() };
-//   rowObject[`C${date.getDate() + 1}`] = { "P": data.P ? "P" : "" };
-//   rowObject[`D${date.getDate() + 1}`] = { "VENUE": data.VENUE };
-//   rowObject[`E${date.getDate() + 1}`] = { "TITLE OF SHOW": data["TITLE OF SHOW"] };
-//   rowObject[`F${date.getDate() + 1}`] = { "PRODUCER": data.PRODUCER };
-//   rowObject[`G${date.getDate() + 1}`] = { "PRESS CONTACT": data["PRESS CONTACT"] };
-//   rowObject[`H${date.getDate() + 1}`] = { "DATE BKD": "" }; // Add this field if required
-
-//   return {
-//     MonthYear: `${date.getMonth() + 1}:${date.getFullYear()}`,
-//     Range: `'${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear().toString().slice(-2)}'!A1:H100`,
-//     Dates: {
-//       [formattedDate]: {
-//         [rowRange]: rowObject
-//       }
-//     }
-//   };
-// };
 
 export const addNewRow = (dataObject, date, newRowData) => {
 	// Check if the date exists in the dataObject

@@ -97,7 +97,8 @@ export function TableRowActions({subRow}) {
     };
 
     return (
-        <>
+		<>
+        <div className="hidden lg:block">
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -120,71 +121,79 @@ export function TableRowActions({subRow}) {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <Dialog open={openView} onOpenChange={setOpenView}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Booking Details</DialogTitle>
-                        <DialogDescription>
-                            {/* Some Description */}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <BookingDetail
-                        key={subRow.Range}
-                        rowRange={subRow.Range}
-                        rowData={subRow}
-                        currentSelectedDate={subRow.Date}
-                        allowEdit={false}
-                    />
-                </DialogContent>
-            </Dialog>
-            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Edit Booking</DialogTitle>
-                        <DialogDescription>
-                            {/* Something here */}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <EditBooking
-                        rowRange={subRow.range}
-                        currentDetail={subRow}
-                        currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB })}
-                    />
-                </DialogContent>
-            </Dialog>
-            <AlertDialog
-                open={showDeleteDialog}
-                onOpenChange={setShowDeleteDialog}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Are you sure you want to delete this booking?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-							This action cannot be undone. This
-							will permanently delete the booking
-							from our records.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-						<Button
-								onClick={handleDelete}
-								disabled={isDeleting}
-							>
-								{isDeleting ? (
-									<div className="flex items-center gap-2">
-										<LoadingSpinner />
-										<span>Deleting</span>
-									</div>
-								) : (
-									<span>Delete</span>
-								)}
-							</Button>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
+		</div>
+
+		<Dialog open={openView} onOpenChange={setOpenView}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Booking Details</DialogTitle>
+					<DialogDescription>
+						{/* Some Description */}
+					</DialogDescription>
+				</DialogHeader>
+				<BookingDetail
+					key={subRow.Range}
+					rowRange={subRow.Range}
+					rowData={subRow}
+					currentSelectedDate={subRow.Date}
+					allowEdit={false}
+				/>
+			</DialogContent>
+		</Dialog>
+		<Dialog open={openEdit} onOpenChange={setOpenEdit}>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Edit Booking</DialogTitle>
+					<DialogDescription>
+						{/* Something here */}
+					</DialogDescription>
+				</DialogHeader>
+				<EditBooking
+					rowRange={subRow.range}
+					currentDetail={subRow}
+					currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB })}
+				/>
+			</DialogContent>
+		</Dialog>
+		<AlertDialog
+			open={showDeleteDialog}
+			onOpenChange={setShowDeleteDialog}
+		>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>
+						Are you sure you want to delete this booking?
+					</AlertDialogTitle>
+					<AlertDialogDescription>
+						This action cannot be undone. This
+						will permanently delete the booking
+						from our records.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<Button
+							onClick={handleDelete}
+							disabled={isDeleting}
+						>
+							{isDeleting ? (
+								<div className="flex items-center gap-2">
+									<LoadingSpinner />
+									<span>Deleting</span>
+								</div>
+							) : (
+								<span>Delete</span>
+							)}
+						</Button>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
+
+		<div className="flex lg:hidden gap-2">
+			<Button onClick={handleViewClick} variant="outline" size="sm">View</Button>
+			<Button onClick={handleEditClick} variant="outline" size="sm">Edit</Button>
+			<Button onClick={handleDeleteClick} variant="outline" size="sm">Delete</Button>
+		</div>
+		</>
     );
 }

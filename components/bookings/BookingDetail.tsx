@@ -1,4 +1,5 @@
 import React from "react";
+import { isAfter, isSameDay } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import {
     Card,
@@ -32,30 +33,7 @@ import { unCamelCase } from "@/lib/utils";
 import { useExcel } from "@/context/ExcelContext";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
-import { set } from "date-fns";
-
-const BadgeVariants = {
-    P: { bg: "bg-red-500", text: "text-white" },
-    OPERA_DANCE: { bg: "bg-blue-500", text: "text-white" },
-    GALA_NIGHT: { bg: "bg-green-500", text: "text-white" },
-};
-
-function CustomBadge({
-    type,
-    children,
-}: {
-    type: keyof typeof BadgeVariants;
-    children: React.ReactNode;
-}) {
-    return (
-        <Badge
-            variant="outline"
-            className={`mr-2 ${BadgeVariants[type].bg} ${BadgeVariants[type].text} px-3 py-2 rounded-md`}
-        >
-            {children}
-        </Badge>
-    );
-}
+import BookingBadge, { BadgeVariants } from "./BookingBadge";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -71,8 +49,6 @@ export default function BookingDetail({
     allowEdit,
 }: BookingDetailProps) {
 
-	console.log( rowData )
-
     const { refreshData, callExcelMethod, yearData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
@@ -87,6 +63,7 @@ export default function BookingDetail({
         "range",
         "Venue",
         "OtherVenue",
+		"TimeStamp"
     ];
 
     const handleDelete = async () => {
@@ -138,48 +115,52 @@ export default function BookingDetail({
 					)
 				)}
 
-				{otherDetails.Venue === "N/A" ||
-				otherDetails.Venue === "" ? (
+				{otherDetails.Venue === "" ? (
 					otherDetails.OtherVenue &&
 					otherDetails.OtherVenue !== "N/A" && (
 						<div key="OtherVenue" className="flex-1 space-y-1">
-							<p className="text-sm font-medium leading-none">
+							<p className="font-medium leading-none">
 								Other Venue
 							</p>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-muted-foreground">
 								{otherDetails.OtherVenue}
 							</p>
 						</div>
 					)
 				) : (
 					<div key="Venue" className="flex-1 space-y-1">
-						<p className="text-sm font-medium leading-none">
+						<p className="font-medium leading-none">
 							Venue
 						</p>
-						<p className="text-sm text-muted-foreground">
+						<p className="text-muted-foreground">
 							{otherDetails.Venue}
 						</p>
 					</div>
 				)}
-
-				<div className="flex">
-					{P &&  (
-						<CustomBadge type="P">P</CustomBadge>
+				{(!!otherDetails.IsSeasonGala || !!otherDetails.IsOperaDance || !!P || !!otherDetails.Venue) && (
+				<div className="flex mt-3">
+					{otherDetails.Venue && (
+						<BookingBadge type="SOLT_MEMBER">Member</BookingBadge>
+					)}
+					{P && (
+						<BookingBadge type="P">P</BookingBadge>
 					)}
 					{otherDetails.IsOperaDance && (
-						<CustomBadge type="OPERA_DANCE">
+						<BookingBadge type="OPERA_DANCE">
 							Opera/Dance
-						</CustomBadge>
+						</BookingBadge>
 					)}
 					{otherDetails.IsSeasonGala  && (
-						<CustomBadge type="GALA_NIGHT">
+						<BookingBadge type="GALA_NIGHT">
 							Season Announcement/Gala Night
-						</CustomBadge>
+						</BookingBadge>
 					)}
 				</div>
+				)}
 			</CardContent>
 			<CardFooter className="flex gap-2">
-			{allowEdit && (
+			{/* @todo we'll need to write a userId check method, check if data is there from auth and sheet*/}
+			{allowEdit && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date())) && (
 				<>
 				<Dialog>
 					<DialogTrigger asChild>

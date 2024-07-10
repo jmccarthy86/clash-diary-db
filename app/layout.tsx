@@ -12,13 +12,15 @@ interface RootLayoutProps {
   children: React.ReactNode;
 }
 
+// <script src="http://localhost:8097"></script>
+
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
         className={cn(
-          "min-h-screen bg-muted/30 font-sans antialiased",
+          "min-h-screen bg-muted/70 font-sans antialiased",
           fontSans.variable
         )}
       >

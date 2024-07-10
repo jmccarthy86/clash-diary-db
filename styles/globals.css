@@ -67,6 +67,18 @@
 	}
 }
 
+@media (max-width: 768px) {
+	:root {
+		font-size: 16px; /* Adjust to your desired smaller size */
+	}
+}
+
+@media (max-width: 640px) {
+	:root {
+		font-size: 14px; /* Adjust to your desired smaller size */
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border;
