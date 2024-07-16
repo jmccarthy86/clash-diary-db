@@ -52,6 +52,7 @@ export default function BookingDetail({
     const { refreshData, callExcelMethod, yearData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
+	const [hasAuthCookie, setHasAuthCookie] = React.useState(false);
 
     const { UserId, P, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
     const hiddenValues = [
@@ -65,6 +66,21 @@ export default function BookingDetail({
         "OtherVenue",
 		"TimeStamp"
     ];
+
+	React.useEffect(() => {
+		const checkAuthCookie = () => {
+		  const cookies = document.cookie.split(';');
+		  const clashSyncCookie = cookies.find(cookie => cookie.trim().startsWith('clash_sync='));
+		  setHasAuthCookie(!!clashSyncCookie);
+		};
+	  
+		checkAuthCookie();
+		// Set up an interval to check the cookie every 60 seconds
+		const intervalId = setInterval(checkAuthCookie, 60000);
+	  
+		// Clean up the interval on component unmount
+		return () => clearInterval(intervalId);
+	}, []);
 
     const handleDelete = async () => {
 
@@ -94,6 +110,8 @@ export default function BookingDetail({
 
         setIsDeleting(false);
     };
+
+	const showEditOptions = allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
     return (
 		<Card
@@ -160,7 +178,7 @@ export default function BookingDetail({
 			</CardContent>
 			<CardFooter className="flex gap-2">
 			{/* @todo we'll need to write a userId check method, check if data is there from auth and sheet*/}
-			{allowEdit && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date())) && (
+			{showEditOptions && (
 				<>
 				<Dialog>
 					<DialogTrigger asChild>

@@ -17,6 +17,8 @@ import SubRowComponent from './SubRow';
 import DatePickerWithRange from "./FilterDateRange";
 import { DataTablePagination } from './Pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { ColumnDef } from "@tanstack/react-table"
+import { Booking, RequestData } from '@/lib/types'
 import { Button } from "../ui/button";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { transformData, createYearCalendarWithData } from '@/lib/utils'
@@ -33,13 +35,25 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     //console.log('ListView rendered');
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-    const transformedData = React.useMemo(() => yearData ? transformData(createYearCalendarWithData(currentYear, yearData.Dates)) : [], [yearData, currentYear])
-
+	console.log('yearData:', yearData);
+	const transformedData = React.useMemo(() => {
+		if (yearData) {
+			const calendarData = createYearCalendarWithData(currentYear, yearData.Dates);
+			const requestData: RequestData = {
+				Year: currentYear.toString(),
+				Range: `1/1/${currentYear}-31/12/${currentYear}`,
+				Dates: calendarData
+			};
+			return transformData(requestData);
+		}
+		return [];
+	}, [yearData, currentYear]);
+	console.log('transformedData:', transformedData);
     const [sorting, setSorting] = React.useState<SortingState>([{ id: 'date', desc: false }])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [expanded, setExpanded] = React.useState({})
 
-    const columns = React.useMemo(() => columnsConfig(), [])
+    const columns = React.useMemo(() => columnsConfig(), []) as ColumnDef<Booking, any>[];
     
     React.useEffect(() => {
         const fromYear = dateRange.from.getFullYear();

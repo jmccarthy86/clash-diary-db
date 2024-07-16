@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Booking, RequestData, SubRow } from "@/lib/types"
+import { Booking, RequestData, SubRowData } from "@/lib/types"
 import { format } from 'date-fns'
 import { headers } from '@/lib/config'
 
@@ -45,34 +45,21 @@ export function getGMTDateFormattedDayOfTheMonth(date: Date | undefined): string
 	return formatter.format(date);
 }
 
-// export function transformBookingData(data: Record<string, any>): Booking[] {
-// 	return Object.entries(data).map(([date, bookings]) => ({
-// 		date,
-// 		bookings: Object.values(bookings).map((booking: any) => ({
-// 			showTitle: booking.TitleOfShow,
-// 			venue: booking.Venue,
-// 			pressContact: booking.PressContact,
-// 		})),
-// 	}));
-// }
-
-export function transformData(inputData: Record<string, Record<string, Record<string, any>>>): Booking[] {
+export function transformData(inputData: RequestData): Booking[] {
 	const result: Booking[] = [];
 
-	for (const [date, entries] of Object.entries(inputData)) {
+	for (const [date, entries] of Object.entries(inputData.Dates)) {
 		const booking: Booking = {
 			date,
 			subRows: []
 		};
 
-		if (Object.keys(entries).length > 0) {
-			for (const [range, data] of Object.entries(entries)) {
-				const subRow: SubRow = {
-					range,
-					...data
-				};
-				booking.subRows.push(subRow);
-			}
+		for (const [range, data] of Object.entries(entries)) {
+			const subRow: SubRowData = {
+				range,
+				...data
+			};
+			booking.subRows.push(subRow);
 		}
 
 		result.push(booking);
@@ -105,8 +92,17 @@ export function convertToDate(dateString: string): Date | null {
 	return isNaN(date.getTime()) ? null : date;
 }
 
-export function createYearCalendarWithData(year: number, existingData: Record<string, any>) {
-	const yearCalendar: Record<string, any> = {};
+// // This type should match RequestData
+// export type YearCalendarData = RequestData;
+
+type DateEntry = {
+	[range: string]: {
+		[key: string]: string | number | boolean | null;
+	};
+};
+
+export function createYearCalendarWithData(year: number, existingData: RequestData['Dates']): RequestData['Dates'] {
+	const yearCalendar: RequestData['Dates'] = {};
 	const startDate = new Date(year, 0, 1);  // January 1st of the given year
 	const endDate = new Date(year, 11, 31);  // December 31st of the given year
 

@@ -19,8 +19,20 @@ import {
 } from "@/components/ui/popover"
 import venues from "@/lib/venues"
 import { FormControl } from "@/components/ui/form"
+import { UseFormReturn } from "react-hook-form"
+import { z } from "zod"
+import { FormSchema } from "@/components/bookings/BookingForm"
 
-export function SelectVenue( { form, field }) {
+
+type SelectVenueProps = {
+	form: UseFormReturn<z.infer<typeof FormSchema>>;
+	field: {
+	  value: string;
+	  onChange: (value: string) => void;
+	};
+  }
+
+export function SelectVenue({ form, field }: SelectVenueProps) {
 //   const [open, setOpen] = React.useState(false)
 //   const [value, setValue] = React.useState("")
 
@@ -47,15 +59,15 @@ export function SelectVenue( { form, field }) {
 	</PopoverTrigger>
 	<PopoverContent className="w-[200px] p-0">
 		<Command>
-		<CommandInput placeholder="Search language..." />
-		<CommandEmpty>No language found.</CommandEmpty>
+		<CommandInput placeholder="Search Venue..." />
+		<CommandEmpty>No Venue found.</CommandEmpty>
 		<CommandGroup>
 			{venues.map((venue) => (
 			<CommandItem
 				value={venue.label}
 				key={venue.value}
 				onSelect={() => {
-				form.setValue("language", venue.value)
+				form.setValue("Venue", venue.value)
 				}}
 			>
 				<Check

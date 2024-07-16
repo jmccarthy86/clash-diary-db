@@ -1,15 +1,27 @@
-export type RequestData = {
-	Year: string,
-	Range: string,
-	//Dates: Record<string, Record<string, Record<string, any>>>
-	Dates: Record<string, { range: string, bookings: Record<string, string>[] }>
-}
+// export type RequestData = {
+// 	Year: string,
+// 	Range: string,
+// 	Dates: Record<string, { range: string, bookings: Record<string, string>[] }>
+// }
 
-export type SubRow = Record<string, string | number>;
+// Updated RequestData type
+export type RequestData = {
+	Year: string;
+	Range: string;
+	Dates: {
+		[date: string]: {
+			[range: string]: {
+				[key: string]: string | number | boolean | null;
+			};
+		};
+	};
+};
+
+//export type SubRow = Record<string, string | number>;
 
 export type Booking = {
 	date: string;
-	subRows: SubRow[];
+	subRows: SubRowData[]
 };
 
 export type SubRowData = {
@@ -22,6 +34,7 @@ export type SubRowData = {
 	IsSeasonGala: boolean;
 	OtherVenue: string;
 	P: boolean;
+	[key: string]: string | number | boolean | null;  // Allow for additional properties
 };
 
 export interface EmailRecipient {

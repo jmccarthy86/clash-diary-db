@@ -39,7 +39,7 @@ interface TableRowActionsProps {
     subRow: SubRowData;
 }
 
-export function TableRowActions({subRow}) {
+export function TableRowActions({ subRow }: TableRowActionsProps) {
 	console.log("subRow:", subRow);
     const { refreshData, yearData, callExcelMethod } = useExcel();
 
@@ -132,10 +132,10 @@ export function TableRowActions({subRow}) {
 					</DialogDescription>
 				</DialogHeader>
 				<BookingDetail
-					key={subRow.Range}
-					rowRange={subRow.Range}
+					key={subRow.range}
+					rowRange={subRow.range}
 					rowData={subRow}
-					currentSelectedDate={subRow.Date}
+					currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB })}
 					allowEdit={false}
 				/>
 			</DialogContent>

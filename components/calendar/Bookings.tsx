@@ -10,7 +10,6 @@ import { Dialog, DialogDescription, DialogContent, DialogHeader, DialogTitle, Di
 import CreateBooking from "@/components/bookings/CreateBooking"
 
 interface DetailCardProps {
-  sheetData: any; 
   currentSelectedDate: Date | undefined;
   allowEdit: boolean;
 }

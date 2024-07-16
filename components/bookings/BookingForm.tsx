@@ -35,6 +35,7 @@ import {
 	CommandEmpty,
 	CommandGroup,
 	CommandInput,
+	CommandList,
 	CommandItem,
   } from "@/components/ui/command"
   import {
@@ -43,6 +44,25 @@ import {
 	PopoverTrigger,
   } from "@/components/ui/popover"
 //import { toast } from "@/components/ui/use-toast";
+
+export const FormSchema = z.object({
+	Day: z.string().optional(),
+	Date: z.date({
+		required_error: "A date is required.",
+	}),
+	P: z.boolean().optional(),
+	Venue: z.string().optional(),
+	OtherVenue: z.string().optional(),
+	VenueIsTba: z.boolean().optional(),
+	TitleOfShow: z.string().optional(),
+	ShowTitleIsTba: z.boolean().optional(),
+	Producer: z.string().min(1, "Producer is required"),
+	PressContact: z.string().min(1, "Press Contact is required"),
+	IsSeasonGala: z.boolean().optional(),
+	IsOperaDance: z.boolean().optional(),
+	UserId: z.string().optional(),
+	DateBkd: z.string().optional(),
+});
 
 export default function BookingForm({
 	initialData,
@@ -61,48 +81,83 @@ export default function BookingForm({
 	const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
 	const [submitting, setSubmitting] = React.useState(false);
 	const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
+	const [cookieUserId, setCookieUserId] = React.useState<string>("");
+	const [open, setOpen] = React.useState(false);
 
-	const defaultValues = initialData || {
-		Day: "",
-		Date: new Date(),
-		P: false,
-		Venue: "",
-		OtherVenue: "",
-		VenueIsTba: false,
-		TitleOfShow: "",
-		ShowTitleIsTba: false,
-		Producer: "",
-		PressContact: "",
-		DateBkd: "",
-		IsSeasonGala: false,
-		IsOperaDance: false,
-		UserId: "",
-		TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00')
-	}
+	React.useEffect(() => {
+		// Function to get cookie value by name
+		const getCookie = (name: string): string | undefined => {
+		  const value = `; ${document.cookie}`;
+		  const parts = value.split(`; ${name}=`);
+		  if (parts.length === 2) return parts.pop()?.split(';').shift();
+		};
+	
+		// Get the clash_sync cookie value
+		const clashSyncCookie = getCookie('clash_sync');
+		if (clashSyncCookie) {
+			setCookieUserId(clashSyncCookie);
+		}
+	}, []);
 
-	const FormSchema = z.object({
-		Day: z.string().optional(),
-		Date: z.date({
-			required_error: "A date is required.",
-		}),
-		P: z.boolean().optional(),
-		Venue: z.string().optional(),
-		OtherVenue: z.string().optional(),
-		VenueIsTba: z.boolean().optional(),
-		TitleOfShow: z.string().optional(),
-		ShowTitleIsTba: z.boolean().optional(),
-		Producer: z.string().min(1, "Producer is required"),
-		PressContact: z.string().min(1, "Press Contact is required"),
-		IsSeasonGala: z.boolean().optional(),
-		IsOperaDance: z.boolean().optional(),
-		UserId: z.string().optional(),
-		DateBkd: z.string().optional(),
-	});
+	// const defaultValues = initialData || {
+	// 	Day: "",
+	// 	Date: new Date(),
+	// 	P: false,
+	// 	Venue: "",
+	// 	OtherVenue: "",
+	// 	VenueIsTba: false,
+	// 	TitleOfShow: "",
+	// 	ShowTitleIsTba: false,
+	// 	Producer: "",
+	// 	PressContact: "",
+	// 	DateBkd: "",
+	// 	IsSeasonGala: false,
+	// 	IsOperaDance: false,
+	// 	UserId: userId || initialData?.UserId || "",
+	// 	TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00'),
+	// 	MemberLevel: ""
+	// }
+
+	const defaultValues = React.useMemo(() => {
+		if (initialData) {
+		  // We're editing, use initialData but override UserId if cookie exists
+		  return {
+			...initialData,
+			UserId: cookieUserId || initialData.UserId || "",
+		  };
+		} else {
+		  // We're creating new, use empty fields except for UserId and other specified fields
+		  return {
+			Day: "",
+			Date: new Date(),
+			P: false,
+			Venue: "",
+			OtherVenue: "",
+			VenueIsTba: false,
+			TitleOfShow: "",
+			ShowTitleIsTba: false,
+			Producer: "",
+			PressContact: "",
+			DateBkd: "",
+			IsSeasonGala: false,
+			IsOperaDance: false,
+			UserId: cookieUserId || "",
+			TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00'),
+			MemberLevel: ""
+		  };
+		}
+	  }, [initialData, cookieUserId, currentSelectedDate]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: defaultValues
     });
+
+	React.useEffect(() => {
+		if (cookieUserId) {
+		  form.setValue('UserId', cookieUserId);
+		}
+	  }, [cookieUserId, form]);
 
 	const { formState: { isDirty } } = form;
 
@@ -136,12 +191,17 @@ export default function BookingForm({
 		}
 	}, [currentSelectedDate, form]);
 
+	//console.log(venues);
+
+	const formRef = React.useRef<HTMLFormElement>(null);
+
     return (
         <div className="w-full" style={{ pointerEvents: isCalendarOpen ? 'none' : 'auto' }}>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(handleSubmit)}
                     className="space-y-6"
+					ref={formRef}
                 >
                     <div className="grid w-full items-center gap-4">
 						<FormField
@@ -197,54 +257,55 @@ export default function BookingForm({
 								name="Venue"
 								render={({ field }) => (
 									<FormItem>
-<Popover>
-	<PopoverTrigger asChild>
-		<FormControl>
-		<Button
-			variant="outline"
-			role="combobox"
-			className={cn(
-			"w-[200px] justify-between",
-			!field.value && "text-muted-foreground"
-			)}
-		>
-			{field.value
-			? venues.find(
-				(venue) => venue.value === field.value
-				)?.label
-			: "Selct Your Venue"}
-			<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-		</Button>
-		</FormControl>
-	</PopoverTrigger>
-	<PopoverContent className="w-[200px] p-0">
-		<Command>
-		<CommandInput placeholder="Search language..." />
-		<CommandEmpty>No language found.</CommandEmpty>
-		<CommandGroup>
-			{venues.map((venue) => (
-			<CommandItem
-				value={venue.label}
-				key={venue.value}
-				onSelect={() => {
-				form.setValue("Venue", venue.value)
-				}}
-			>
-				<Check
-				className={cn(
-					"mr-2 h-4 w-4",
-					venue.value === field.value
-					? "opacity-100"
-					: "opacity-0"
-				)}
-				/>
-				{venue.label}
-			</CommandItem>
-			))}
-		</CommandGroup>
-		</Command>
-	</PopoverContent>
-</Popover>
+										<Popover open={open} onOpenChange={setOpen}>
+											<PopoverTrigger asChild>
+												<FormControl>
+												<Button
+													variant="outline"
+													role="combobox"
+													className={cn(
+													"w-[200px] justify-between",
+													!field.value && "text-muted-foreground"
+													)}
+												>
+													{field.value
+													? venues.find((venue) => venue.value === field.value)?.label
+													: "Select venue"}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+												</FormControl>
+											</PopoverTrigger>
+											<PopoverContent className="w-[200px] p-0" asChild containerRef={formRef}>
+												<Command>
+												<CommandInput placeholder="Search language..." />
+												<CommandEmpty>No language found.</CommandEmpty>
+												<CommandGroup>
+													<CommandList>
+													{venues.map((venue) => (	
+														<CommandItem
+															value={venue.value}
+															key={venue.value}
+															onSelect={() => {
+															form.setValue("Venue", venue.value)
+															setOpen(false)
+															}}
+														>
+															<Check
+															className={cn(
+																"mr-2 h-4 w-4",
+																venue.value === field.value
+																? "opacity-100"
+																: "opacity-0"
+															)}
+															/>
+															{venue.label}
+														</CommandItem>
+													))}
+													</CommandList>
+												</CommandGroup>
+												</Command>
+											</PopoverContent>
+										</Popover>
 										<FormMessage />
 									</FormItem>
 								)}

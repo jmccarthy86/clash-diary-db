@@ -2,6 +2,8 @@ import "@/styles/globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster"
+import Script from 'next/script'
+import { Test } from '@/components/bookings/test' 
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,8 +26,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           fontSans.variable
         )}
       >
+		{/* <Test /> */}
         {children}
         <Toaster />
+		<Script
+          src="http://localhost:8097"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

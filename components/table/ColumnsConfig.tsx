@@ -17,15 +17,17 @@ import {
 } from "@/components/ui/dialog"
 import CreateBooking from "../bookings/CreateBooking"
 //import { useExcel } from '@/context/ExcelContext'
+import { Booking } from "@/lib/types"
 
-type SubRow = Record<string, string | number>;
+//type SubRow = Record<string, string | number>;
 
-export type Booking = {
-  date: string
-  subRows: SubRow[]
-}
+// export type Booking = {
+//   date: string
+//   //subRows: SubRow[]
+//   subRows: SubRowData[]
+// }
 
-export const columnsConfig = (): ColumnDef<Booking>[] => [
+export const columnsConfig = (): ColumnDef<Booking, any>[] => [
   {
     accessorKey: 'date',
     header: ({ column }) => {
@@ -40,8 +42,9 @@ export const columnsConfig = (): ColumnDef<Booking>[] => [
         )
     },
     cell: ({ row }) => {
+		console.log("Row:", row);
 
-		const formattedDate = format( parse( row.getValue("date"), 'dd/MM/yyyy', new Date() ), 'do MMMM yyyy' );
+		const formattedDate = format( parse( row.getValue("date"), 'dd/MM/yyyy', new Date() ), 'd MMMM yyyy' );
 		return (
 
       		<div className="flex items-center gap-1">

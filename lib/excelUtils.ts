@@ -1,74 +1,37 @@
 // /lib/excelUtils.ts
 import { headers } from '@/lib/config'
+import { RequestData } from '@/lib/types'
 
-// export async function fetchExcelData(userId: string, documentId: string, sheetName, range = null, useUsedRange = false) {
-// 	const params = new URLSearchParams({ userId, documentId, sheetName });
-// 	if (range) {
-// 		params.append('range', range);
-// 	}
-// 	if (useUsedRange) {
-// 		params.append('useUsedRange', 'true');
-// 	}
+// Define types for the input parameters
+interface ExcelData {
+	address: string;
+	values: any[][];  // 2D array to represent Excel data
+}
 
-// 	const response = await fetch(`/api/fetchExcelData?${params.toString()}`);
-// 	const data = await response.json();
+// Define a flexible type for row data
+interface RowData {
+	[key: string]: string | number | boolean | null;
+}
 
-// 	//console.log(data);
+// Define the structure of the result
+type Result = RequestData;
 
-// 	if (data.error) {
-// 		throw new Error(data.error);
-// 	}
-
-// 	return {
-// 		excelData: data.values,
-// 		usedRange: data.range,
-// 	};
-// }
-
-export const saveExcelData = async (userId: string, documentId: string, sheetName: string, data: any[], range: string, operation: 'update' | 'create' | 'delete') => {
-
-	const response = await fetch('/api/saveExcelData', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			userId,
-			documentId,
-			sheetName,
-			data,
-			range,
-			operation
-		})
-	});
-
-	if (!response.ok) {
-		throw new Error('Failed to save Excel data');
-	}
-	return response.json();
-};
-
-export const convertExcelDataToObject = (data, year) => {
-
-	//console.log('convertExcelDataToObject data: ', data)
+export const convertExcelDataToObject = (data: ExcelData, year: string): Result => {
 	// Organise provided data
 	const { address, values } = data;
-	const headers = values[0];
-	const rows = values.slice(1);
+	const colHeaders = headers; // headers imported in file
+	const rows = values.slice(1); // remove the first row as it holds headers
 	const endColumnLetter = address.split('!')[1].split(':')[1].replace(/[0-9]/g, '');
-	// console.log(range);
-	// console.log(endColumnLetter);
 
 	// Prepare and build our object for return
-	const result = {
-		//MonthYear: `${month}:${year}`, 
+	const result: Result = {
 		Year: year,
 		Range: address.split('!')[1].replace(/^'/, ''),
 		Dates: {}
 	};
 
 	// Check if the "Date" column exists in the headers, if not we can't continue.
-	const dateIndex = headers.indexOf('Date');
+	const dateIndex = colHeaders.indexOf('Date');
 	if (dateIndex === -1) {
 		console.error("Date column not found");
 		return result;
@@ -76,17 +39,14 @@ export const convertExcelDataToObject = (data, year) => {
 
 	// Build our {Dates} object
 	rows.forEach((row, rowIndex) => {
-
-		// skip the first 2 rows as they are headersSet and totals
-		const rowNumber = rowIndex + 2;
-
-		const date = row[1]; // Assuming "Date" is the second column (index 1)
+		const rowNumber = rowIndex + 1;
+		const date = row[dateIndex] as string; // Use dateIndex instead of hardcoding 1
 		const rowRange = `A${rowNumber}:${endColumnLetter}${rowNumber}`;
-		//console.log(rowRange);
-		const rowObject = {};
+
+		const rowObject: RowData = {};
 
 		row.forEach((cell, cellIndex) => {
-			rowObject[headers[cellIndex]] = cell;
+			rowObject[colHeaders[cellIndex]] = cell;
 		});
 
 		if (!result.Dates[date]) {
@@ -94,97 +54,99 @@ export const convertExcelDataToObject = (data, year) => {
 		}
 
 		result.Dates[date][rowRange] = rowObject;
-
 	});
+
+	//console.log(result);
 
 	return result;
 };
 
-export const convertObjectToExcelData = (dataObject) => {
-	const { Range, Dates } = dataObject;
-	const allRows = [];
-	const headersSet = new Set();
+// export const convertObjectToExcelData = (dataObject: RequestData) => {
+// 	console.log(dataObject)
+// 	const { Range, Dates } = dataObject;
+// 	const allRows = [];
+// 	const headersSet = new Set();
 
-	// Collect headers dynamically from the data
-	Object.keys(Dates).forEach(date => {
-		const rows = Dates[date];
-		Object.keys(rows).forEach(rowRange => {
-			const row = rows[rowRange];
-			Object.keys(row).forEach(cellKey => {
-				const cell = row[cellKey];
-				const header = Object.keys(cell)[0];
-				if (header && header.trim() !== '' && header !== null) {
-					headersSet.add(header);
-				}
-			});
-		});
-	});
+// 	// Collect headers dynamically from the data
+// 	Object.keys(Dates).forEach(date => {
+// 		const rows = Dates[date];
+// 		Object.keys(rows).forEach(rowRange => {
+// 			const row = rows[rowRange];
+// 			Object.keys(row).forEach(cellKey => {
+// 				const cell = row[cellKey];
+// 				const header = Object.keys(cell)[0];
+// 				if (header && header.trim() !== '' && header !== null) {
+// 					headersSet.add(header);
+// 				}
+// 			});
+// 		});
+// 	});
 
-	const headers = Array.from(headersSet);
+// 	const headers = Array.from(headersSet);
 
-	Object.keys(Dates).forEach(date => {
-		const rows = Dates[date];
-		Object.keys(rows).forEach(rowRange => {
-			const row = rows[rowRange];
-			const rowArray = headers.map(header => {
-				const cell = Object.values(row).find(cell => Object.keys(cell)[0] === header);
-				return cell ? cell[header] : '';
-			});
-			allRows.push(rowArray);
-		});
-	});
+// 	Object.keys(Dates).forEach(date => {
+// 		const rows = Dates[date];
+// 		Object.keys(rows).forEach(rowRange => {
+// 			const row = rows[rowRange];
+// 			const rowArray = headers.map(header => {
+// 				const cell = Object.values(row).find(cell => Object.keys(cell)[0] === header);
+// 				return cell ? cell[header] : '';
+// 			});
+// 			allRows.push(rowArray);
+// 		});
+// 	});
 
-	return { range: Range, values: [headers, ...allRows] };
+// 	return { range: Range, values: [headers, ...allRows] };
 
-};
+// };
 
-export const convertFormDataToExcelObject = (data) => {
+// export const convertFormDataToExcelObject = (data) => {
 
-	const headers = ["Day", "Date", "P", "Venue", "OtherVenue", "VenueIsTba", "TitleOfShow", "ShowTitleIsTba", "Producer", "PressContact", "DateBkd", "IsSeasonGala", "IsOperaDance", "UserId"];
+// 	const headers = ["Day", "Date", "P", "Venue", "OtherVenue", "VenueIsTba", "TitleOfShow", "ShowTitleIsTba", "Producer", "PressContact", "DateBkd", "IsSeasonGala", "IsOperaDance", "UserId"];
 
-	let rows: any[] = [];
+// 	let rows: any[] = [];
 
-	headers.forEach(header => {
-		rows.push((data[header] ? data[header] : 'N/A'));
-	});
+// 	headers.forEach(header => {
+// 		rows.push((data[header] ? data[header] : 'N/A'));
+// 	});
 
-	return rows;
+// 	return rows;
 
-};
+// };
 
-export const addNewRow = (dataObject, date, newRowData) => {
-	// Check if the date exists in the dataObject
-	if (!dataObject.Dates[date]) {
-		dataObject.Dates[date] = {};
-	}
+// export const addNewRow = (dataObject, date, newRowData) => {
+// 	// Check if the date exists in the dataObject
+// 	if (!dataObject.Dates[date]) {
+// 		dataObject.Dates[date] = {};
+// 	}
 
-	// Determine the next available row number
-	const dateRows = Object.keys(dataObject.Dates[date]);
-	const highestRowNumber = dateRows.length > 0
-		? Math.max(...dateRows.map(rowRange => parseInt(rowRange.match(/\d+/)[0])))
-		: 1; // Start from row 1 if no rows exist for the date
+// 	// Determine the next available row number
+// 	const dateRows = Object.keys(dataObject.Dates[date]);
+// 	const highestRowNumber = dateRows.length > 0
+// 		? Math.max(...dateRows.map(rowRange => parseInt(rowRange.match(/\d+/)[0])))
+// 		: 1; // Start from row 1 if no rows exist for the date
 
-	const newRowNumber = highestRowNumber + 1;
-	const newRowRange = `A${newRowNumber}:H${newRowNumber}`;
+// 	const newRowNumber = highestRowNumber + 1;
+// 	const newRowRange = `A${newRowNumber}:H${newRowNumber}`;
 
-	// Add the new row
-	dataObject.Dates[date][newRowRange] = {};
+// 	// Add the new row
+// 	dataObject.Dates[date][newRowRange] = {};
 
-	// Populate the new row with the provided data
-	Object.keys(newRowData).forEach((colLetter, index) => {
-		const cellAddress = `${colLetter}${newRowNumber}`;
-		dataObject.Dates[date][newRowRange][cellAddress] = newRowData[colLetter];
-	});
+// 	// Populate the new row with the provided data
+// 	Object.keys(newRowData).forEach((colLetter, index) => {
+// 		const cellAddress = `${colLetter}${newRowNumber}`;
+// 		dataObject.Dates[date][newRowRange][cellAddress] = newRowData[colLetter];
+// 	});
 
-	return dataObject;
-};
+// 	return dataObject;
+// };
 
-const convertDateFormat = (dateString) => {
-	const parts = dateString.split('/');
-	if (parts.length !== 3) {
-		console.warn(`Invalid date format: ${dateString}`); // Debugging
-		return null;
-	}
-	const [day, month, year] = parts;
-	return `${month}/${day}/${year}`;
-};
+// const convertDateFormat = (dateString) => {
+// 	const parts = dateString.split('/');
+// 	if (parts.length !== 3) {
+// 		console.warn(`Invalid date format: ${dateString}`); // Debugging
+// 		return null;
+// 	}
+// 	const [day, month, year] = parts;
+// 	return `${month}/${day}/${year}`;
+// };
