@@ -1,26 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+import { format, setMilliseconds, setMinutes, setSeconds, setHours } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useExcel } from "@/context/ExcelContext";
 import { CalendarIcon, Check, ChevronsUpDown  } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
-import { SelectVenue } from "@/components/bookings/SelectVenue"
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { LoadingSpinner } from "@/components/ui/loader";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import {
     Form,
     FormControl,
@@ -43,7 +34,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
   } from "@/components/ui/popover"
-//import { toast } from "@/components/ui/use-toast";
 
 export const FormSchema = z.object({
 	Day: z.string().optional(),
@@ -62,61 +52,21 @@ export const FormSchema = z.object({
 	IsOperaDance: z.boolean().optional(),
 	UserId: z.string().optional(),
 	DateBkd: z.string().optional(),
+	TimeStamp: z.string().optional()
 });
 
-export default function BookingForm({
-	initialData,
-	onSubmit,
-	isEdit,
-	currentSelectedDate
-  }: {
+export default function BookingForm( { initialData, onSubmit, isEdit, currentSelectedDate}: {
 	initialData?: Record<string, any>;
 	onSubmit: (data: Record<string, any>) => void;
 	isEdit: boolean;
 	currentSelectedDate: Date;
-  }) {
-	//console.log( "currently selected date form" + currentSelectedDate)
-	//console.log(isNaN(currentSelectedDate.getTime()))
+  } ) {
 	
 	const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
 	const [submitting, setSubmitting] = React.useState(false);
 	const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
 	const [cookieUserId, setCookieUserId] = React.useState<string>("");
 	const [open, setOpen] = React.useState(false);
-
-	React.useEffect(() => {
-		// Function to get cookie value by name
-		const getCookie = (name: string): string | undefined => {
-		  const value = `; ${document.cookie}`;
-		  const parts = value.split(`; ${name}=`);
-		  if (parts.length === 2) return parts.pop()?.split(';').shift();
-		};
-	
-		// Get the clash_sync cookie value
-		const clashSyncCookie = getCookie('clash_sync');
-		if (clashSyncCookie) {
-			setCookieUserId(clashSyncCookie);
-		}
-	}, []);
-
-	// const defaultValues = initialData || {
-	// 	Day: "",
-	// 	Date: new Date(),
-	// 	P: false,
-	// 	Venue: "",
-	// 	OtherVenue: "",
-	// 	VenueIsTba: false,
-	// 	TitleOfShow: "",
-	// 	ShowTitleIsTba: false,
-	// 	Producer: "",
-	// 	PressContact: "",
-	// 	DateBkd: "",
-	// 	IsSeasonGala: false,
-	// 	IsOperaDance: false,
-	// 	UserId: userId || initialData?.UserId || "",
-	// 	TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00'),
-	// 	MemberLevel: ""
-	// }
 
 	const defaultValues = React.useMemo(() => {
 		if (initialData) {
@@ -153,14 +103,6 @@ export default function BookingForm({
         defaultValues: defaultValues
     });
 
-	React.useEffect(() => {
-		if (cookieUserId) {
-		  form.setValue('UserId', cookieUserId);
-		}
-	  }, [cookieUserId, form]);
-
-	const { formState: { isDirty } } = form;
-
 	const handleSubmit = async (data: Record<string, any>) => {
 
         if (!isDirty) {
@@ -168,7 +110,6 @@ export default function BookingForm({
             return;
         }
 
-		//console.log(data)
 		setSubmitting(true);
 		try {
 		  await onSubmit(data);
@@ -185,13 +126,51 @@ export default function BookingForm({
 	};
 
 	React.useEffect(() => {
+		// Function to get cookie value by name
+		const getCookie = (name: string): string | undefined => {
+		  const value = `; ${document.cookie}`;
+		  const parts = value.split(`; ${name}=`);
+		  if (parts.length === 2) return parts.pop()?.split(';').shift();
+		};
+	
+		// Get the clash_sync cookie value
+		const clashSyncCookie = getCookie('clash_sync');
+		if (clashSyncCookie) {
+			setCookieUserId(clashSyncCookie);
+		}
+	}, []);
+
+	React.useEffect(() => {
 		if (currentSelectedDate) {
 			form.setValue('Date', currentSelectedDate);
 			form.setValue('Day', format(currentSelectedDate, "EEEE"));
 		}
 	}, [currentSelectedDate, form]);
 
-	//console.log(venues);
+	React.useEffect(() => {
+		if (currentSelectedDate) {
+			const now = new Date();
+			const combinedDate = setMilliseconds(
+			  setSeconds(
+				setMinutes(
+				  setHours(currentSelectedDate, now.getHours()),
+				  now.getMinutes()
+				),
+				now.getSeconds()
+			  ),
+			  now.getMilliseconds()
+			);
+			form.setValue('TimeStamp', format(combinedDate, 'dd/MM/yyyy HH:mm:ss'));
+		}
+	}, [currentSelectedDate, form]);
+
+	React.useEffect(() => {
+		if (cookieUserId) {
+		  form.setValue('UserId', cookieUserId);
+		}
+	  }, [cookieUserId, form]);
+
+	const { formState: { isDirty } } = form;
 
 	const formRef = React.useRef<HTMLFormElement>(null);
 
@@ -203,6 +182,9 @@ export default function BookingForm({
                     className="space-y-6"
 					ref={formRef}
                 >
+	          		<input type="hidden" {...form.register('TimeStamp')} />
+					<input type="hidden" {...form.register('UserId')} />
+
                     <div className="grid w-full items-center gap-4">
 						<FormField
 							control={form.control}
@@ -239,6 +221,7 @@ export default function BookingForm({
 										field.onChange(date);
 											setTimeout(() => setIsCalendarOpen(false), 175);
 										}}
+										fromDate={new Date()}
 										initialFocus
 									/>
 									</PopoverContent>
@@ -255,7 +238,12 @@ export default function BookingForm({
 							<FormField
 								control={form.control}
 								name="Venue"
-								render={({ field }) => (
+								render={ ( { field } ) => {
+
+									const displayLabel = field.value ? field.value : "Select venue";
+
+									return (
+										
 									<FormItem>
 										<Popover open={open} onOpenChange={setOpen}>
 											<PopoverTrigger asChild>
@@ -264,13 +252,11 @@ export default function BookingForm({
 													variant="outline"
 													role="combobox"
 													className={cn(
-													"w-[200px] justify-between",
+													"w-full justify-between",
 													!field.value && "text-muted-foreground"
 													)}
 												>
-													{field.value
-													? venues.find((venue) => venue.value === field.value)?.label
-													: "Select venue"}
+													{displayLabel ? displayLabel : "Select venue"}
 													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 												</Button>
 												</FormControl>
@@ -308,7 +294,9 @@ export default function BookingForm({
 										</Popover>
 										<FormMessage />
 									</FormItem>
-								)}
+									
+									)
+  								}}
 							/>
 						</div>
 						<div className="w-full lg:w-1/2">

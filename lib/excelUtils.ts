@@ -39,7 +39,7 @@ export const convertExcelDataToObject = (data: ExcelData, year: string): Result 
 
 	// Build our {Dates} object
 	rows.forEach((row, rowIndex) => {
-		const rowNumber = rowIndex + 1;
+		const rowNumber = rowIndex + 2;
 		const date = row[dateIndex] as string; // Use dateIndex instead of hardcoding 1
 		const rowRange = `A${rowNumber}:${endColumnLetter}${rowNumber}`;
 

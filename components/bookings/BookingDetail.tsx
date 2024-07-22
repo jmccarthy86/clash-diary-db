@@ -1,10 +1,7 @@
 import React from "react";
 import { isAfter, isSameDay } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import {
     Card,
-    CardHeader,
-    CardTitle,
     CardContent,
     CardFooter,
 } from "@/components/ui/card";
@@ -19,7 +16,6 @@ import {
 } from "@/components/ui/dialog";
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -33,7 +29,8 @@ import { unCamelCase } from "@/lib/utils";
 import { useExcel } from "@/context/ExcelContext";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
-import BookingBadge, { BadgeVariants } from "./BookingBadge";
+import BookingBadge from "./BookingBadge";
+import venues from "@/lib/venues";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -59,7 +56,7 @@ export default function BookingDetail({
         "IsSeasonGala",
         "IsOperaDance",
         "DateBkd",
-        "ShowIsTitleTba",
+        "ShowTitleIsTba",
         "VenueIsTba",
         "range",
         "Venue",
@@ -111,53 +108,61 @@ export default function BookingDetail({
         setIsDeleting(false);
     };
 
-	const showEditOptions = allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+	const showEditOptions = true; //allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
+	console.log(otherDetails.VenueIsTba);
     return (
 		<Card
 			className="w-full pt-6"
 			data-relation={UserId || undefined}
 		>
 			<CardContent className="grid gap-1">
-				{Object.entries(otherDetails).map( ([key, value]) =>
-					value &&
-					!hiddenValues.includes(key) && (
-						<div key={key} className="flex-1 space-y-1">
-							<p className="font-medium leading-none">
-							{unCamelCase(key)}
-							</p>
-							<p className="text-muted-foreground">
-								{String(value)}
-							</p>
-						</div>
-					)
-				)}
 
-				{otherDetails.Venue === "" ? (
-					otherDetails.OtherVenue &&
-					otherDetails.OtherVenue !== "N/A" && (
-						<div key="OtherVenue" className="flex-1 space-y-1">
-							<p className="font-medium leading-none">
-								Other Venue
-							</p>
-							<p className="text-muted-foreground">
-								{otherDetails.OtherVenue}
-							</p>
-						</div>
-					)
-				) : (
-					<div key="Venue" className="flex-1 space-y-1">
-						<p className="font-medium leading-none">
-							Venue
-						</p>
-						<p className="text-muted-foreground">
-							{otherDetails.Venue}
-						</p>
-					</div>
-				)}
+			<div key="Date" className="flex-1 space-y-1">
+    <p className="font-medium leading-none">Date</p>
+    <p className="text-muted-foreground">{otherDetails.Date}</p>
+</div>
+
+<div key="TitleOfShow" className="flex-1 space-y-1">
+    <p className="font-medium leading-none">Title Of Show</p>
+    <p className="text-muted-foreground">
+        {otherDetails.TitleOfShow ? (
+            otherDetails.TitleOfShow
+        ) : (
+            otherDetails.ShowTitleIsTba && "TBA"
+        )}
+    </p>
+</div>
+
+<div key="Producer" className="flex-1 space-y-1">
+    <p className="font-medium leading-none">Producer</p>
+    <p className="text-muted-foreground">{otherDetails.Producer}</p>
+</div>
+
+<div key="PressContact" className="flex-1 space-y-1">
+    <p className="font-medium leading-none">Press Contact</p>
+    <p className="text-muted-foreground">{otherDetails.PressContact}</p>
+</div>
+        
+<div key="OtherVenue" className="flex-1 space-y-1">
+    <p className="font-medium leading-none">Venue</p>
+    <p className="text-muted-foreground">
+        {otherDetails.Venue ? (
+            otherDetails.Venue
+        ) : otherDetails.OtherVenue ? (
+            otherDetails.OtherVenue
+        ) : otherDetails.VenueIsTba ? (
+            "TBA"
+        ) : (
+            ""
+        )}
+    </p>
+</div>
+
+
 				{(!!otherDetails.IsSeasonGala || !!otherDetails.IsOperaDance || !!P || !!otherDetails.Venue) && (
 				<div className="flex mt-3">
-					{otherDetails.Venue && (
+					{venues.some(venue => venue.value === otherDetails.Venue) && (
 						<BookingBadge type="SOLT_MEMBER">Member</BookingBadge>
 					)}
 					{P && (
