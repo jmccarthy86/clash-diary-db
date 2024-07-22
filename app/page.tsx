@@ -4,7 +4,7 @@ import React from 'react';
 import { startOfMonth, endOfMonth, startOfDay } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListView from "@/components/table/ListView";
-import { CalendarView } from "@/components/calendar/Calendar";
+import { CalendarView } from "@/components/calendar/calendar";
 import { ExcelProvider, useExcel } from '@/context/ExcelContext';
 import { CalendarIcon, TableIcon } from '@radix-ui/react-icons'
 

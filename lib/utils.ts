@@ -58,10 +58,24 @@ export function transformData(inputData: RequestData): Booking[] {
 		};
 
 		for (const [range, data] of Object.entries(entries)) {
+
+			console.log(data);
+			// Define the default values for missing fields
+
+			// Ensure data is cast to Partial<SubRowData> and provide defaults for missing fields
 			const subRow: SubRowData = {
+				Date: data.Date as string || "",
 				range,
+				TitleOfShow: data.TitleOfShow as string || "",
+				Venue: data.Venue as string || "",
+				PressContact: data.PressContact as string || "",
+				IsOperaDance: data.IsOperaDance !== undefined ? data.IsOperaDance as boolean : false,
+				IsSeasonGala: data.IsSeasonGala !== undefined ? data.IsSeasonGala as boolean : false,
+				OtherVenue: data.OtherVenue as string || "",
+				P: data.P !== undefined ? data.P as boolean : false,
 				...data
 			};
+
 			booking.subRows.push(subRow);
 		}
 
