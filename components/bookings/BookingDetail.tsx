@@ -108,7 +108,7 @@ export default function BookingDetail({
         setIsDeleting(false);
     };
 
-	const showEditOptions = true; //allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+	const showEditOptions = allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
 	console.log(otherDetails.VenueIsTba);
     return (
