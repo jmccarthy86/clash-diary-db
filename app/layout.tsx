@@ -30,7 +30,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         {children}
         <Toaster />
 		<Script
-			src="../lib/iframeMessage.js"
+			src="iframeMessage.js"
 			strategy="afterInteractive"
 		/>
       </body>
