@@ -24,7 +24,7 @@ export function getGMTDateFormatted(date: Date | undefined): string {
 		//timeZone: 'UTC'
 	};
 
-	//console.log('date: ' + date);
+	////console.log('date: ' + date);
 
 	// Format the date
 	const formatter = new Intl.DateTimeFormat('en-GB', options);
@@ -41,7 +41,7 @@ export function getGMTDateFormattedDayOfTheMonth(date: Date | undefined): string
 		day: 'numeric',
 	};
 
-	console.log('date: ' + date);
+	//console.log('date: ' + date);
 
 	// Format the date
 	const formatter = new Intl.DateTimeFormat('en-GB', options);
@@ -59,7 +59,7 @@ export function transformData(inputData: RequestData): Booking[] {
 
 		for (const [range, data] of Object.entries(entries)) {
 
-			console.log(data);
+			//console.log(data);
 			// Define the default values for missing fields
 
 			// Ensure data is cast to Partial<SubRowData> and provide defaults for missing fields
@@ -73,6 +73,7 @@ export function transformData(inputData: RequestData): Booking[] {
 				IsSeasonGala: data.IsSeasonGala !== undefined ? data.IsSeasonGala as boolean : false,
 				OtherVenue: data.OtherVenue as string || "",
 				P: data.P !== undefined ? data.P as boolean : false,
+				UserId: data.UserId as string || "",
 				...data
 			};
 
@@ -164,7 +165,7 @@ export async function handleClashEmails(yearData: RequestData, currentSelectedDa
 			self.indexOf(email) === index
 		);
 
-		console.log('Unique emails: ', uniqueEmails);
+		//console.log('Unique emails: ', uniqueEmails);
 
 		// Send emails to all unique contacts
 		for (const email of uniqueEmails) {
@@ -196,7 +197,7 @@ export async function handleClashEmail(user: EmailSender, data: FieldValues, cur
 	});
 
 	if (emailSent) {
-		console.log('Clash email sent successfully');
+		//console.log('Clash email sent successfully');
 	} else {
 		console.error('Failed to send clash email');
 	}

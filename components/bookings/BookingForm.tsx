@@ -50,7 +50,7 @@ export const FormSchema = z.object({
 	PressContact: z.string().min(1, "Press Contact is required"),
 	IsSeasonGala: z.boolean().optional(),
 	IsOperaDance: z.boolean().optional(),
-	UserId: z.string().optional(),
+	UserId: z.number().optional(),
 	DateBkd: z.string().optional(),
 	TimeStamp: z.string().optional()
 });
@@ -65,7 +65,7 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 	const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
 	const [submitting, setSubmitting] = React.useState(false);
 	const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
-	const [cookieUserId, setCookieUserId] = React.useState<string>("");
+	const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
 	const [open, setOpen] = React.useState(false);
 
 	const defaultValues = React.useMemo(() => {
@@ -73,7 +73,7 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 		  // We're editing, use initialData but override UserId if cookie exists
 		  return {
 			...initialData,
-			UserId: cookieUserId || initialData.UserId || "",
+			UserId: hasAuthCookie || initialData.UserId || "",
 		  };
 		} else {
 		  // We're creating new, use empty fields except for UserId and other specified fields
@@ -91,12 +91,12 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 			DateBkd: "",
 			IsSeasonGala: false,
 			IsOperaDance: false,
-			UserId: cookieUserId || "",
+			UserId: hasAuthCookie || 0,
 			TimeStamp: format(currentSelectedDate, 'dd/MM/yyyy 00:00:00'),
 			MemberLevel: ""
 		  };
 		}
-	  }, [initialData, cookieUserId, currentSelectedDate]);
+	  }, [initialData, hasAuthCookie, currentSelectedDate]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -125,19 +125,53 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 		return false;
 	};
 
+	// React.useEffect(() => {
+	// 	// Function to get cookie value by name
+	// 	const getCookie = (name: string): string | undefined => {
+	// 	  const value = `; ${document.cookie}`;
+	// 	  const parts = value.split(`; ${name}=`);
+	// 	  if (parts.length === 2) return parts.pop()?.split(';').shift();
+	// 	};
+	
+	// 	// Get the clash_sync cookie value
+	// 	const clashSyncCookie = getCookie('clash_sync');
+	// 	if (clashSyncCookie) {
+	// 		setHasAuthCookie(clashSyncCookie);
+	// 	}
+	// }, []);
+
 	React.useEffect(() => {
-		// Function to get cookie value by name
-		const getCookie = (name: string): string | undefined => {
-		  const value = `; ${document.cookie}`;
-		  const parts = value.split(`; ${name}=`);
-		  if (parts.length === 2) return parts.pop()?.split(';').shift();
+	
+		const checkAuthCookie = (cookies: string) => {
+
+			const cookieArray = cookies.split(';');
+			const clashSyncCookie = cookieArray.find(cookie => cookie.trim().startsWith('clash_sync='));
+			console.log('Clash Sync Cookie:', clashSyncCookie);
+			if (clashSyncCookie && Number(clashSyncCookie.split('=')[1]) !== 0 ) {
+				setHasAuthCookie(Number(clashSyncCookie.split('=')[1]));
+			}
 		};
 	
-		// Get the clash_sync cookie value
-		const clashSyncCookie = getCookie('clash_sync');
-		if (clashSyncCookie) {
-			setCookieUserId(clashSyncCookie);
-		}
+		const handleMessage = (event: MessageEvent) => {			
+			if (event.origin !== 'https://soltukt.test') {
+				console.warn('Invalid origin:', event.origin);
+				return;
+			}
+			
+			if (event.data && event.data.cookies) {
+				checkAuthCookie(event.data.cookies);
+			} else {
+				console.warn('No cookies in message data:', event.data);
+			}
+		};
+	
+		window.addEventListener('message', handleMessage);
+	
+		// Clean up the event listener on component unmount
+		return () => {
+			//console.log('Cleaning up message event listener in iframe');
+			window.removeEventListener('message', handleMessage);
+		};
 	}, []);
 
 	React.useEffect(() => {
@@ -165,14 +199,16 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 	}, [currentSelectedDate, form]);
 
 	React.useEffect(() => {
-		if (cookieUserId) {
-		  form.setValue('UserId', cookieUserId);
+		if (hasAuthCookie) {
+		  form.setValue('UserId', hasAuthCookie);
 		}
-	  }, [cookieUserId, form]);
+	  }, [hasAuthCookie, form]);
 
 	const { formState: { isDirty } } = form;
 
 	const formRef = React.useRef<HTMLFormElement>(null);
+
+	console.log(hasAuthCookie);
 
     return (
         <div className="w-full" style={{ pointerEvents: isCalendarOpen ? 'none' : 'auto' }}>

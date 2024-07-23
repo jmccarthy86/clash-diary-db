@@ -19,13 +19,13 @@ interface SubRowComponentProps {
 }
 
 export function SubRowComponent({ subRows }: SubRowComponentProps) {
-  const { loading, error } = useExcel();
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  	const { loading, error } = useExcel();
+//   if (loading) return <p>Loading...</p>;
+//   if (error) return <p>Error: {error.message}</p>;
   if (subRows.length < 1 ) return <span>No Bookings have been made for this date.</span>;
 
-  console.log(subRows);
+  //console.log(subRows);
   //return <></>;
 
   return (
@@ -42,14 +42,14 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
         {subRows.map((subRow, index) => (
             subRow.TitleOfShow === '' && subRow.Venue === '' && subRow.PressContact === '' ? (
                 <TableRow key={index} className="bg-gray-200">
-                    <TableCell colSpan={4} className="text-center">No data available</TableCell>
+                    <TableCell key="subrow-no-data" colSpan={4} className="text-center">No data available</TableCell>
                 </TableRow>
             ) : (
 				<>
                 <TableRow key={index} className="hidden lg:table-row">
-                    <TableCell>{subRow.TitleOfShow}</TableCell>
-                    <TableCell>{subRow.Venue}</TableCell>
-                    <TableCell>{subRow.PressContact}</TableCell>
+                    <TableCell key={`${index}-${subRow.TitleOfShow}`}>{subRow.TitleOfShow}</TableCell>
+                    <TableCell key={`${index}-${subRow.Venue}`}>{subRow.Venue}</TableCell>
+                    <TableCell key={`${index}-${subRow.PressContact}`}>{subRow.PressContact}</TableCell>
 
 					{/*Due to our data coming from a time prior to the tool, 
 					we may recieve a string, therefore we convert first with !! */}

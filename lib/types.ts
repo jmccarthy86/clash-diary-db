@@ -34,6 +34,7 @@ export type SubRowData = {
 	IsSeasonGala: boolean;
 	OtherVenue: string;
 	P: boolean;
+	UserId: string;
 	[key: string]: string | number | boolean | null;  // Allow for additional properties
 };
 

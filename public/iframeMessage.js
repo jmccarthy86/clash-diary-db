@@ -1,26 +1,35 @@
-// // Function to send the iframe height to parent
-// function sendHeight() {
-// 	var height = document.body.scrollHeight;
-// 	window.parent.postMessage({ height: height }, 'https://soltukt.test');
-// }
-
-// // Adjust height on load
-// window.onload = sendHeight;
-
-// // Adjust height on content changes
-// var observer = new MutationObserver(sendHeight);
-// observer.observe(document.body, {
-// 	attributes: true,
-// 	childList: true,
-// 	subtree: true
-// });
-
 function sendHeight() {
-    var height = document.body.scrollHeight;
-    window.parent.postMessage({ height: height }, '*');
+    if (!document.body.hasAttribute('data-scroll-locked')) {
+        var height = document.body.scrollHeight;
+        window.parent.postMessage({ height: height }, 'https://solt.co.uk');
+    }
+}
+
+function sendLockedHeight() {
+    window.parent.postMessage({ height: 750 }, 'https://solt.co.uk');
 }
 
 window.onload = sendHeight;
 
-var observer = new ResizeObserver(sendHeight);
-observer.observe(document.body);
+var resizeObserver = new ResizeObserver(sendHeight);
+resizeObserver.observe(document.body);
+
+var mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-scroll-locked') {
+            const isScrollLocked = document.body.hasAttribute('data-scroll-locked');
+            if (isScrollLocked) {
+                console.log('Scroll locked: true');
+                sendLockedHeight();
+            } else {
+                console.log('Scroll locked: false');
+                sendHeight(); // Send actual height if scroll is unlocked
+            }
+        }
+    });
+});
+
+mutationObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ['data-scroll-locked'],
+});

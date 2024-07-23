@@ -42,7 +42,7 @@ export const columnsConfig = (): ColumnDef<Booking, any>[] => [
         )
     },
     cell: ({ row }) => {
-		console.log("Row:", row);
+		//console.log("Row:", row);
 
 		const formattedDate = format( parse( row.getValue("date"), 'dd/MM/yyyy', new Date() ), 'd MMMM yyyy' );
 		return (

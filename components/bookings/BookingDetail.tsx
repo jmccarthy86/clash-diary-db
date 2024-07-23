@@ -49,34 +49,60 @@ export default function BookingDetail({
     const { refreshData, callExcelMethod, yearData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
-	const [hasAuthCookie, setHasAuthCookie] = React.useState(false);
+	const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
 
     const { UserId, P, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
-    const hiddenValues = [
-        "IsSeasonGala",
-        "IsOperaDance",
-        "DateBkd",
-        "ShowTitleIsTba",
-        "VenueIsTba",
-        "range",
-        "Venue",
-        "OtherVenue",
-		"TimeStamp"
-    ];
+    // const hiddenValues = [
+    //     "IsSeasonGala",
+    //     "IsOperaDance",
+    //     "DateBkd",
+    //     "ShowTitleIsTba",
+    //     "VenueIsTba",
+    //     "range",
+    //     "Venue",
+    //     "OtherVenue",
+	// 	"TimeStamp"
+    // ];
 
 	React.useEffect(() => {
-		const checkAuthCookie = () => {
-		  const cookies = document.cookie.split(';');
-		  const clashSyncCookie = cookies.find(cookie => cookie.trim().startsWith('clash_sync='));
-		  setHasAuthCookie(!!clashSyncCookie);
+		//console.log('Setting up message event listener in iframe');
+	
+		const checkAuthCookie = (cookies: string) => {
+			const cookieArray = cookies.split(';');
+			const clashSyncCookie = cookieArray.find(cookie => cookie.trim().startsWith('clash_sync='));
+			//console.log('Clash Sync Cookie:', clashSyncCookie);
+			if (clashSyncCookie && Number(clashSyncCookie.split('=')[1]) !== 0 ) {
+				setHasAuthCookie(Number(clashSyncCookie.split('=')[1]));
+			}
 		};
-	  
-		checkAuthCookie();
-		// Set up an interval to check the cookie every 60 seconds
-		const intervalId = setInterval(checkAuthCookie, 60000);
-	  
-		// Clean up the interval on component unmount
-		return () => clearInterval(intervalId);
+	
+		const handleMessage = (event: MessageEvent) => {
+			//console.log('Message event received in iframe:', event);
+			
+			if (event.origin !== 'https://soltukt.test') {
+				console.warn('Invalid origin:', event.origin);
+				return;
+			}
+			
+			if (event.data && event.data.cookies) {
+				//console.log('Cookies received in iframe:', event.data.cookies);
+				checkAuthCookie(event.data.cookies);
+			} else {
+				console.warn('No cookies in message data:', event.data);
+			}
+		};
+	
+		window.addEventListener('message', handleMessage);
+	
+		// Notify parent that iframe is ready
+		//console.log('Iframe is ready, notifying parent');
+		window.parent.postMessage('iframeReady', 'https://soltukt.test');
+	
+		// Clean up the event listener on component unmount
+		return () => {
+			//console.log('Cleaning up message event listener in iframe');
+			window.removeEventListener('message', handleMessage);
+		};
 	}, []);
 
     const handleDelete = async () => {
@@ -108,9 +134,8 @@ export default function BookingDetail({
         setIsDeleting(false);
     };
 
-	const showEditOptions = allowEdit && hasAuthCookie && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
-
-	console.log(otherDetails.VenueIsTba);
+	const showEditOptions = hasAuthCookie !== 0 && hasAuthCookie === Number(UserId) && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+	
     return (
 		<Card
 			className="w-full pt-6"

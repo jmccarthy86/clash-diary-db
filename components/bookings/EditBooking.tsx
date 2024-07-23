@@ -47,7 +47,7 @@ console.log(currentDetail)
 		DateBkd: currentDetail.DateBkd || "",
 		IsSeasonGala: currentDetail.IsSeasonGala || false,
 		IsOperaDance: currentDetail.IsOperaDance || false,
-		UserId: "" // @todo This will check for the user id when it's available. Currently, it's hardcoded as an empty string.
+		UserId: currentDetail.UserId || 0,
 	}
 
 	

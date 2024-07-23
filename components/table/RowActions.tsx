@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { parse } from "date-fns"
+import { parse, isAfter, isSameDay } from "date-fns";
 import { enGB } from "date-fns/locale";
 import { LoadingSpinner } from "@/components/ui/loader"
 import {
@@ -34,13 +34,14 @@ import EditBooking from "@/components/bookings/EditBooking";
 import { SubRowData } from "@/lib/types";
 import { useExcel } from "@/context/ExcelContext";
 import { toast } from "@/components/ui/use-toast";
+import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
 
 interface TableRowActionsProps {
     subRow: SubRowData;
 }
 
 export function TableRowActions({ subRow }: TableRowActionsProps) {
-	console.log("subRow:", subRow);
+	//console.log("subRow:", subRow);
     const { refreshData, yearData, callExcelMethod } = useExcel();
 
     const [openView, setOpenView] = React.useState(false);
@@ -48,6 +49,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
+	const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
 
     const handleViewClick = () => {
         setIsOpen(false);
@@ -82,7 +84,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
         } catch (error) {
 
-            console.error("Error deleting booking:", error);
+            //console.error("Error deleting booking:", error);
             toast({
                 title: "Error",
                 description:
@@ -95,6 +97,53 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         setIsDeleting(false);
 
     };
+
+	React.useEffect(() => {
+		//console.log('Setting up message event listener in iframe');
+	
+		const checkAuthCookie = (cookies: string) => {
+			const cookieArray = cookies.split(';');
+			const clashSyncCookie = cookieArray.find(cookie => cookie.trim().startsWith('clash_sync='));
+			console.log('Clash Sync Cookie:', clashSyncCookie);
+			if (clashSyncCookie && Number(clashSyncCookie.split('=')[1]) !== 0 ) {
+				setHasAuthCookie(Number(clashSyncCookie.split('=')[1]));
+			}
+		};
+	
+		const handleMessage = (event: MessageEvent) => {
+			//console.log('Message event received in iframe:', event);
+			
+			if (event.origin !== 'https://soltukt.test') {
+				console.warn('Invalid origin:', event.origin);
+				return;
+			}
+			
+			if (event.data && event.data.cookies) {
+				//console.log('Cookies received in iframe:', event.data.cookies);
+				checkAuthCookie(event.data.cookies);
+			} else {
+				console.warn('No cookies in message data:', event.data);
+			}
+		};
+	
+		window.addEventListener('message', handleMessage);
+	
+		// Notify parent that iframe is ready
+		//console.log('Iframe is ready, notifying parent');
+		window.parent.postMessage('iframeReady', 'https://soltukt.test');
+	
+		// Clean up the event listener on component unmount
+		return () => {
+			//console.log('Cleaning up message event listener in iframe');
+			window.removeEventListener('message', handleMessage);
+		};
+	}, []);
+
+	const currentSelectedDate = parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB });
+	const showEditOptions = hasAuthCookie !== 0 && hasAuthCookie === Number(subRow.UserId) && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+	// console.log("showEditOptions:", showEditOptions)
+	// console.log(hasAuthCookie);
+	// console.log(subRow.UserId);
 
     return (
 		<>
@@ -110,15 +159,19 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                     <DropdownMenuItem onSelect={handleViewClick}>
                         View
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={handleEditClick}>
-                        Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onSelect={handleDeleteClick}
-                        className="text-red-600"
-                    >
-                        Delete
-                    </DropdownMenuItem>
+					{showEditOptions && 
+						<>
+							<DropdownMenuItem onSelect={handleEditClick}>
+								Edit
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onSelect={handleDeleteClick}
+								className="text-red-600"
+							>
+								Delete
+							</DropdownMenuItem>
+						</>
+					}
                 </DropdownMenuContent>
             </DropdownMenu>
 		</div>
@@ -191,9 +244,13 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
 		<div className="flex lg:hidden gap-2">
 			<Button onClick={handleViewClick} variant="outline" size="sm">View</Button>
-			<Button onClick={handleEditClick} variant="outline" size="sm">Edit</Button>
-			<Button onClick={handleDeleteClick} variant="outline" size="sm">Delete</Button>
-		</div>
+			{showEditOptions && (
+				<>
+					<Button onClick={handleEditClick} variant="outline" size="sm">Edit</Button>
+					<Button onClick={handleDeleteClick} variant="outline" size="sm">Delete</Button>
+				</>
+			)}
+			</div>
 		</>
     );
 }

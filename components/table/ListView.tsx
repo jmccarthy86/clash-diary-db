@@ -32,10 +32,10 @@ interface ListViewProps {
 
 const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => {
 
-    //console.log('ListView rendered');
+    ////console.log('ListView rendered');
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-	console.log('yearData:', yearData);
+	//console.log('yearData:', yearData);
 	const transformedData = React.useMemo(() => {
 		if (yearData) {
 			const calendarData = createYearCalendarWithData(currentYear, yearData.Dates);
@@ -48,7 +48,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
 		}
 		return [];
 	}, [yearData, currentYear]);
-	console.log('transformedData:', transformedData);
+	//console.log('transformedData:', transformedData);
     const [sorting, setSorting] = React.useState<SortingState>([{ id: 'date', desc: false }])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [expanded, setExpanded] = React.useState({})
@@ -58,7 +58,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     React.useEffect(() => {
         const fromYear = dateRange.from.getFullYear();
         if (fromYear !== currentYear) {
-            console.log('Changing year in ListView');
+            //console.log('Changing year in ListView');
             changeYear(fromYear);
         }
     }, [dateRange, currentYear, changeYear]);
@@ -102,7 +102,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
 		return <TableSkeleton />
 	}
 
-	//console.log(error);
+	////console.log(error);
     if (error) return <div>Error: {error.message}</div>;
 
     return (
