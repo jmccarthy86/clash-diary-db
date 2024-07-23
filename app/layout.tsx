@@ -33,6 +33,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
           src="http://localhost:8097"
           strategy="beforeInteractive"
         />
+		<Script
+			src="../lib/iframeMessagee.js"
+			strategy="afterInteractive"
+		/>
       </body>
     </html>
   );
