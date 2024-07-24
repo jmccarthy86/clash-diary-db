@@ -113,7 +113,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 		const handleMessage = (event: MessageEvent) => {
 			//console.log('Message event received in iframe:', event);
 			
-			if (event.origin !== 'https://soltukt.test') {
+			if (event.origin !== 'https://solt.co.uk') {
 				console.warn('Invalid origin:', event.origin);
 				return;
 			}
@@ -130,7 +130,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 	
 		// Notify parent that iframe is ready
 		//console.log('Iframe is ready, notifying parent');
-		window.parent.postMessage('iframeReady', 'https://soltukt.test');
+		window.parent.postMessage('iframeReady', 'https://solt.co.uk');
 	
 		// Clean up the event listener on component unmount
 		return () => {

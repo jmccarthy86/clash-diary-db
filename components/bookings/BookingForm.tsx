@@ -153,7 +153,7 @@ export default function BookingForm( { initialData, onSubmit, isEdit, currentSel
 		};
 	
 		const handleMessage = (event: MessageEvent) => {			
-			if (event.origin !== 'https://soltukt.test') {
+			if (event.origin !== 'https://solt.co.uk') {
 				console.warn('Invalid origin:', event.origin);
 				return;
 			}
