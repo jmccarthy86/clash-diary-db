@@ -26,19 +26,25 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     fontSans.variable
                 )}
             >
-                <header>
+                <header className="flex items-center justify-center py-4 flex-col">
                     <Image
                         src="/solt-clash-diary.png"
                         alt="Solt Logo"
                         width={100}
                         height={100}
                     />
+                    <h1 className="text-lg text-center font-bold pt-1">
+                        Clash Diary
+                    </h1>
                 </header>
                 {/* <Test /> */}
                 {children}
-                <footer>
-                    Copyright 2024 | Back to main{" "}
-                    <a href="https://solt.co.uk">solt.co.uk</a> website
+                <footer className="flex items-center justify-center p-4 text-center gap-1">
+                    <span>Copyright 2024 | Back to the main</span>
+                    <a className="font-medium" href="https://solt.co.uk">
+                        solt.co.uk
+                    </a>
+                    <span>website</span>
                 </footer>
                 <Toaster />
                 <Script src="iframeMessage.js" strategy="afterInteractive" />
