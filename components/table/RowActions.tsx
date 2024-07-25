@@ -2,7 +2,7 @@
 import * as React from "react";
 import { parse, isAfter, isSameDay } from "date-fns";
 import { enGB } from "date-fns/locale";
-import { LoadingSpinner } from "@/components/ui/loader"
+import { LoadingSpinner } from "@/components/ui/loader";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,7 +41,7 @@ interface TableRowActionsProps {
 }
 
 export function TableRowActions({ subRow }: TableRowActionsProps) {
-	//console.log("subRow:", subRow);
+    //console.log("subRow:", subRow);
     const { refreshData, yearData, callExcelMethod } = useExcel();
 
     const [openView, setOpenView] = React.useState(false);
@@ -49,7 +49,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
-	const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
+    const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
 
     const handleViewClick = () => {
         setIsOpen(false);
@@ -67,11 +67,9 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     };
 
     const handleDelete = async () => {
-
-		setIsDeleting(true);
+        setIsDeleting(true);
 
         try {
-
             await callExcelMethod("deleteRow", subRow.range, yearData?.Range);
             await refreshData();
 
@@ -81,9 +79,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
             });
 
             setShowDeleteDialog(false);
-
         } catch (error) {
-
             //console.error("Error deleting booking:", error);
             toast({
                 title: "Error",
@@ -91,166 +87,195 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                     "There was an error deleting the booking. Please try again.",
                 variant: "destructive",
             });
-
         }
 
         setIsDeleting(false);
-
     };
 
-	React.useEffect(() => {
-		//console.log('Setting up message event listener in iframe');
-	
-		const checkAuthCookie = (cookies: string) => {
-			const cookieArray = cookies.split(';');
-			const clashSyncCookie = cookieArray.find(cookie => cookie.trim().startsWith('clash_sync='));
-			console.log('Clash Sync Cookie:', clashSyncCookie);
-			if (clashSyncCookie && Number(clashSyncCookie.split('=')[1]) !== 0 ) {
-				setHasAuthCookie(Number(clashSyncCookie.split('=')[1]));
-			}
-		};
-	
-		const handleMessage = (event: MessageEvent) => {
-			//console.log('Message event received in iframe:', event);
-			
-			if (event.origin !== 'https://solt.co.uk') {
-				console.warn('Invalid origin:', event.origin);
-				return;
-			}
-			
-			if (event.data && event.data.cookies) {
-				//console.log('Cookies received in iframe:', event.data.cookies);
-				checkAuthCookie(event.data.cookies);
-			} else {
-				console.warn('No cookies in message data:', event.data);
-			}
-		};
-	
-		window.addEventListener('message', handleMessage);
-	
-		// Notify parent that iframe is ready
-		//console.log('Iframe is ready, notifying parent');
-		window.parent.postMessage('iframeReady', 'https://solt.co.uk');
-	
-		// Clean up the event listener on component unmount
-		return () => {
-			//console.log('Cleaning up message event listener in iframe');
-			window.removeEventListener('message', handleMessage);
-		};
-	}, []);
+    React.useEffect(() => {
+        //console.log('Setting up message event listener in iframe');
 
-	const currentSelectedDate = parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB });
-	const showEditOptions = hasAuthCookie !== 0 && hasAuthCookie === Number(subRow.UserId) && (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
-	// console.log("showEditOptions:", showEditOptions)
-	// console.log(hasAuthCookie);
-	// console.log(subRow.UserId);
+        const checkAuthCookie = (cookies: string) => {
+            const cookieArray = cookies.split(";");
+            const clashSyncCookie = cookieArray.find((cookie) =>
+                cookie.trim().startsWith("clash_sync=")
+            );
+            console.log("Clash Sync Cookie:", clashSyncCookie);
+            if (
+                clashSyncCookie &&
+                Number(clashSyncCookie.split("=")[1]) !== 0
+            ) {
+                setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
+            }
+        };
+
+        const handleMessage = (event: MessageEvent) => {
+            //console.log('Message event received in iframe:', event);
+
+            if (event.origin !== "https://soltdigital.co.uk") {
+                console.warn("Invalid origin:", event.origin);
+                return;
+            }
+
+            if (event.data && event.data.cookies) {
+                //console.log('Cookies received in iframe:', event.data.cookies);
+                checkAuthCookie(event.data.cookies);
+            } else {
+                console.warn("No cookies in message data:", event.data);
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        // Notify parent that iframe is ready
+        //console.log('Iframe is ready, notifying parent');
+        window.parent.postMessage("iframeReady", "https://soltdigital.co.uk");
+
+        // Clean up the event listener on component unmount
+        return () => {
+            //console.log('Cleaning up message event listener in iframe');
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []);
+
+    const currentSelectedDate = parse(subRow.Date, "dd/MM/yyyy", new Date(), {
+        locale: enGB,
+    });
+    const showEditOptions =
+        hasAuthCookie !== 0 &&
+        hasAuthCookie === Number(subRow.UserId) &&
+        (isAfter(currentSelectedDate, new Date()) ||
+            isSameDay(currentSelectedDate, new Date()));
+    // console.log("showEditOptions:", showEditOptions)
+    // console.log(hasAuthCookie);
+    // console.log(subRow.UserId);
 
     return (
-		<>
-        <div className="hidden lg:block">
-            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <DotsHorizontalIcon className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={handleViewClick}>
-                        View
-                    </DropdownMenuItem>
-					{showEditOptions && 
-						<>
-							<DropdownMenuItem onSelect={handleEditClick}>
-								Edit
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onSelect={handleDeleteClick}
-								className="text-red-600"
-							>
-								Delete
-							</DropdownMenuItem>
-						</>
-					}
-                </DropdownMenuContent>
-            </DropdownMenu>
-		</div>
+        <>
+            <div className="hidden lg:block">
+                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <DotsHorizontalIcon className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onSelect={handleViewClick}>
+                            View
+                        </DropdownMenuItem>
+                        {showEditOptions && (
+                            <>
+                                <DropdownMenuItem onSelect={handleEditClick}>
+                                    Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onSelect={handleDeleteClick}
+                                    className="text-red-600"
+                                >
+                                    Delete
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
 
-		<Dialog open={openView} onOpenChange={setOpenView}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Booking Details</DialogTitle>
-					<DialogDescription>
-						{/* Some Description */}
-					</DialogDescription>
-				</DialogHeader>
-				<BookingDetail
-					key={subRow.range}
-					rowRange={subRow.range}
-					rowData={subRow}
-					currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB })}
-					allowEdit={false}
-				/>
-			</DialogContent>
-		</Dialog>
-		<Dialog open={openEdit} onOpenChange={setOpenEdit}>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Edit Booking</DialogTitle>
-					<DialogDescription>
-						{/* Something here */}
-					</DialogDescription>
-				</DialogHeader>
-				<EditBooking
-					rowRange={subRow.range}
-					currentDetail={subRow}
-					currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), { locale: enGB })}
-				/>
-			</DialogContent>
-		</Dialog>
-		<AlertDialog
-			open={showDeleteDialog}
-			onOpenChange={setShowDeleteDialog}
-		>
-			<AlertDialogContent>
-				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Are you sure you want to delete this booking?
-					</AlertDialogTitle>
-					<AlertDialogDescription>
-						This action cannot be undone. This
-						will permanently delete the booking
-						from our records.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<Button
-							onClick={handleDelete}
-							disabled={isDeleting}
-						>
-							{isDeleting ? (
-								<div className="flex items-center gap-2">
-									<LoadingSpinner />
-									<span>Deleting</span>
-								</div>
-							) : (
-								<span>Delete</span>
-							)}
-						</Button>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
+            <Dialog open={openView} onOpenChange={setOpenView}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Booking Details</DialogTitle>
+                        <DialogDescription>
+                            {/* Some Description */}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <BookingDetail
+                        key={subRow.range}
+                        rowRange={subRow.range}
+                        rowData={subRow}
+                        currentSelectedDate={parse(
+                            subRow.Date,
+                            "dd/MM/yyyy",
+                            new Date(),
+                            { locale: enGB }
+                        )}
+                        allowEdit={false}
+                    />
+                </DialogContent>
+            </Dialog>
+            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Booking</DialogTitle>
+                        <DialogDescription>
+                            {/* Something here */}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <EditBooking
+                        rowRange={subRow.range}
+                        currentDetail={subRow}
+                        currentSelectedDate={parse(
+                            subRow.Date,
+                            "dd/MM/yyyy",
+                            new Date(),
+                            { locale: enGB }
+                        )}
+                    />
+                </DialogContent>
+            </Dialog>
+            <AlertDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            Are you sure you want to delete this booking?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the booking from our records.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <Button onClick={handleDelete} disabled={isDeleting}>
+                            {isDeleting ? (
+                                <div className="flex items-center gap-2">
+                                    <LoadingSpinner />
+                                    <span>Deleting</span>
+                                </div>
+                            ) : (
+                                <span>Delete</span>
+                            )}
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
 
-		<div className="flex lg:hidden gap-2">
-			<Button onClick={handleViewClick} variant="outline" size="sm">View</Button>
-			{showEditOptions && (
-				<>
-					<Button onClick={handleEditClick} variant="outline" size="sm">Edit</Button>
-					<Button onClick={handleDeleteClick} variant="outline" size="sm">Delete</Button>
-				</>
-			)}
-			</div>
-		</>
+            <div className="flex lg:hidden gap-2">
+                <Button onClick={handleViewClick} variant="outline" size="sm">
+                    View
+                </Button>
+                {showEditOptions && (
+                    <>
+                        <Button
+                            onClick={handleEditClick}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            onClick={handleDeleteClick}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Delete
+                        </Button>
+                    </>
+                )}
+            </div>
+        </>
     );
 }
