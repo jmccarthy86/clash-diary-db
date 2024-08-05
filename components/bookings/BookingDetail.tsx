@@ -27,6 +27,7 @@ import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
 import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
+import affiliates from "@/lib/affiliates";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -184,7 +185,15 @@ export default function BookingDetail({
                     !!otherDetails.IsOperaDance ||
                     !!P ||
                     !!otherDetails.Venue) && (
-                    <div className="flex mt-3">
+                    <div className="flex flex-wrapmt-3">
+                        {affiliates.some(
+                            (affiliate) =>
+                                affiliate.value === otherDetails.AffiliateVenue
+                        ) && (
+                            <BookingBadge type="AFFILATE_VENUE">
+                                Affilate
+                            </BookingBadge>
+                        )}
                         {venues.some(
                             (venue) => venue.value === otherDetails.Venue
                         ) && (
@@ -207,7 +216,6 @@ export default function BookingDetail({
                 )}
             </CardContent>
             <CardFooter className="flex gap-2">
-                {/* @todo we'll need to write a userId check method, check if data is there from auth and sheet*/}
                 {showEditOptions && (
                     <>
                         <Dialog>

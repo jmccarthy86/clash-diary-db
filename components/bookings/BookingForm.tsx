@@ -27,6 +27,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import venues from "@/lib/venues";
+import affiliates from "@/lib/affiliates";
 import {
     Command,
     CommandEmpty,
@@ -48,6 +49,7 @@ export const FormSchema = z.object({
     }),
     P: z.boolean().optional(),
     Venue: z.string().optional(),
+    AffiliateVenue: z.string().optional(),
     OtherVenue: z.string().optional(),
     VenueIsTba: z.boolean().optional(),
     TitleOfShow: z.string().optional(),
@@ -77,6 +79,7 @@ export default function BookingForm({
     const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
     const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
     const [open, setOpen] = React.useState(false);
+    const [openAffiliate, setOpenAffiliate] = React.useState(false);
 
     const defaultValues = React.useMemo(() => {
         if (initialData) {
@@ -92,6 +95,7 @@ export default function BookingForm({
                 Date: new Date(),
                 P: false,
                 Venue: "",
+                AffiliateVenue: "",
                 OtherVenue: "",
                 VenueIsTba: false,
                 TitleOfShow: "",
@@ -133,21 +137,6 @@ export default function BookingForm({
         if (fieldName === "TitleOfShow") return form.watch("ShowTitleIsTba");
         return false;
     };
-
-    // React.useEffect(() => {
-    // 	// Function to get cookie value by name
-    // 	const getCookie = (name: string): string | undefined => {
-    // 	  const value = `; ${document.cookie}`;
-    // 	  const parts = value.split(`; ${name}=`);
-    // 	  if (parts.length === 2) return parts.pop()?.split(';').shift();
-    // 	};
-
-    // 	// Get the clash_sync cookie value
-    // 	const clashSyncCookie = getCookie('clash_sync');
-    // 	if (clashSyncCookie) {
-    // 		setHasAuthCookie(clashSyncCookie);
-    // 	}
-    // }, []);
 
     React.useEffect(() => {
         const checkAuthCookie = (cookies: string) => {
@@ -308,6 +297,7 @@ export default function BookingForm({
                     </div>
 
                     <div className="flex flex-col lg:flex-row gap-2">
+                        {/* SOLT Member Venue */}
                         <div className="w-full lg:w-1/2">
                             <FormLabel>SOLT Member Venue</FormLabel>
                             <FormField
@@ -348,9 +338,9 @@ export default function BookingForm({
                                                     containerRef={formRef}
                                                 >
                                                     <Command>
-                                                        <CommandInput placeholder="Search language..." />
+                                                        <CommandInput placeholder="Search Venues..." />
                                                         <CommandEmpty>
-                                                            No language found.
+                                                            No Venue found.
                                                         </CommandEmpty>
                                                         <CommandGroup>
                                                             <CommandList>
@@ -399,44 +389,139 @@ export default function BookingForm({
                                 }}
                             />
                         </div>
+
+                        {/* Affiliate */}
                         <div className="w-full lg:w-1/2">
-                            <FormLabel>Other Venue</FormLabel>
+                            <FormLabel>Affilate Venues</FormLabel>
                             <FormField
                                 control={form.control}
-                                name="OtherVenue"
-                                render={({ field }) => (
-                                    <FormItem className="mb-2 lg:mb-0">
-                                        <FormControl>
-                                            <Input
-                                                id="OtherVenue"
-                                                {...field}
-                                                placeholder="Venue Name"
-                                                disabled={submitting}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="VenueIsTba"
-                                render={({ field }) => (
-                                    <FormItem className="flex items-center">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                                disabled={submitting}
-                                                className="mt-2 mr-1"
-                                            />
-                                        </FormControl>
-                                        <FormLabel>Tick box if a TBA</FormLabel>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                                name="AffiliateVenue"
+                                render={({ field }) => {
+                                    const displayLabel = field.value
+                                        ? field.value
+                                        : "Select venue";
+
+                                    return (
+                                        <FormItem>
+                                            <Popover
+                                                open={openAffiliate}
+                                                onOpenChange={setOpenAffiliate}
+                                            >
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between",
+                                                                !field.value &&
+                                                                    "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {displayLabel
+                                                                ? displayLabel
+                                                                : "Select venue"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    className="w-[200px] p-0"
+                                                    asChild
+                                                    containerRef={formRef}
+                                                >
+                                                    <Command>
+                                                        <CommandInput placeholder="Search Venues..." />
+                                                        <CommandEmpty>
+                                                            No Venue found.
+                                                        </CommandEmpty>
+                                                        <CommandGroup>
+                                                            <CommandList>
+                                                                {affiliates.map(
+                                                                    (venue) => (
+                                                                        <CommandItem
+                                                                            value={
+                                                                                venue.value
+                                                                            }
+                                                                            key={
+                                                                                venue.value
+                                                                            }
+                                                                            onSelect={() => {
+                                                                                form.setValue(
+                                                                                    "AffiliateVenue",
+                                                                                    venue.value
+                                                                                );
+                                                                                setOpen(
+                                                                                    false
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "mr-2 h-4 w-4",
+                                                                                    venue.value ===
+                                                                                        field.value
+                                                                                        ? "opacity-100"
+                                                                                        : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                            {
+                                                                                venue.label
+                                                                            }
+                                                                        </CommandItem>
+                                                                    )
+                                                                )}
+                                                            </CommandList>
+                                                        </CommandGroup>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
                             />
                         </div>
+                    </div>
+
+                    {/* Other Venue */}
+                    <div className="w-full lg:w-1/2">
+                        <FormLabel>Other Venue</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="OtherVenue"
+                            render={({ field }) => (
+                                <FormItem className="mb-2 lg:mb-0">
+                                    <FormControl>
+                                        <Input
+                                            id="OtherVenue"
+                                            {...field}
+                                            placeholder="Venue Name"
+                                            disabled={submitting}
+                                        />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="VenueIsTba"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                            disabled={submitting}
+                                            className="mt-2 mr-1"
+                                        />
+                                    </FormControl>
+                                    <FormLabel>Tick box if a TBA</FormLabel>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                     </div>
 
                     <div className="flex flex-col space-y-1.5">
