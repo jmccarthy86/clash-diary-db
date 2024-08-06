@@ -1,13 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-    format,
-    setMilliseconds,
-    setMinutes,
-    setSeconds,
-    setHours,
-} from "date-fns";
+import { format, setMilliseconds, setMinutes, setSeconds, setHours } from "date-fns";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,11 +30,7 @@ import {
     CommandList,
     CommandItem,
 } from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const FormSchema = z.object({
     Day: z.string().optional(),
@@ -145,10 +135,7 @@ export default function BookingForm({
                 cookie.trim().startsWith("clash_sync=")
             );
             console.log("Clash Sync Cookie:", clashSyncCookie);
-            if (
-                clashSyncCookie &&
-                Number(clashSyncCookie.split("=")[1]) !== 0
-            ) {
+            if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             }
         };
@@ -187,18 +174,12 @@ export default function BookingForm({
             const now = new Date();
             const combinedDate = setMilliseconds(
                 setSeconds(
-                    setMinutes(
-                        setHours(currentSelectedDate, now.getHours()),
-                        now.getMinutes()
-                    ),
+                    setMinutes(setHours(currentSelectedDate, now.getHours()), now.getMinutes()),
                     now.getSeconds()
                 ),
                 now.getMilliseconds()
             );
-            form.setValue(
-                "TimeStamp",
-                format(combinedDate, "dd/MM/yyyy HH:mm:ss")
-            );
+            form.setValue("TimeStamp", format(combinedDate, "dd/MM/yyyy HH:mm:ss"));
         }
     }, [currentSelectedDate, form]);
 
@@ -217,10 +198,7 @@ export default function BookingForm({
     console.log(hasAuthCookie);
 
     return (
-        <div
-            className="w-full"
-            style={{ pointerEvents: isCalendarOpen ? "none" : "auto" }}
-        >
+        <div className="w-full" style={{ pointerEvents: isCalendarOpen ? "none" : "auto" }}>
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(handleSubmit)}
@@ -237,29 +215,20 @@ export default function BookingForm({
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
                                     <FormLabel>Date</FormLabel>
-                                    <Popover
-                                        open={isCalendarOpen}
-                                        onOpenChange={setIsCalendarOpen}
-                                    >
+                                    <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
                                         <PopoverTrigger asChild>
                                             <FormControl>
                                                 <Button
                                                     variant={"outline"}
                                                     className={cn(
                                                         "w-full pl-3 text-left font-normal",
-                                                        !field.value &&
-                                                            "text-muted-foreground"
+                                                        !field.value && "text-muted-foreground"
                                                     )}
                                                     disabled={submitting}
-                                                    onClick={() =>
-                                                        setIsCalendarOpen(true)
-                                                    }
+                                                    onClick={() => setIsCalendarOpen(true)}
                                                 >
                                                     {field.value ? (
-                                                        format(
-                                                            field.value,
-                                                            "do MMMM yyyy"
-                                                        )
+                                                        format(field.value, "do MMMM yyyy")
                                                     ) : (
                                                         <span>Pick a date</span>
                                                     )}
@@ -277,13 +246,7 @@ export default function BookingForm({
                                                 selected={field.value}
                                                 onSelect={(date) => {
                                                     field.onChange(date);
-                                                    setTimeout(
-                                                        () =>
-                                                            setIsCalendarOpen(
-                                                                false
-                                                            ),
-                                                        175
-                                                    );
+                                                    setTimeout(() => setIsCalendarOpen(false), 175);
                                                 }}
                                                 fromDate={new Date()}
                                                 initialFocus
@@ -304,16 +267,11 @@ export default function BookingForm({
                                 control={form.control}
                                 name="Venue"
                                 render={({ field }) => {
-                                    const displayLabel = field.value
-                                        ? field.value
-                                        : "Select venue";
+                                    const displayLabel = field.value ? field.value : "Select venue";
 
                                     return (
                                         <FormItem>
-                                            <Popover
-                                                open={open}
-                                                onOpenChange={setOpen}
-                                            >
+                                            <Popover open={open} onOpenChange={setOpen}>
                                                 <PopoverTrigger asChild>
                                                     <FormControl>
                                                         <Button
@@ -339,45 +297,33 @@ export default function BookingForm({
                                                 >
                                                     <Command>
                                                         <CommandInput placeholder="Search Venues..." />
-                                                        <CommandEmpty>
-                                                            No Venue found.
-                                                        </CommandEmpty>
+                                                        <CommandEmpty>No Venue found.</CommandEmpty>
                                                         <CommandGroup>
                                                             <CommandList>
-                                                                {venues.map(
-                                                                    (venue) => (
-                                                                        <CommandItem
-                                                                            value={
+                                                                {venues.map((venue) => (
+                                                                    <CommandItem
+                                                                        value={venue.value}
+                                                                        key={venue.value}
+                                                                        onSelect={() => {
+                                                                            form.setValue(
+                                                                                "Venue",
                                                                                 venue.value
-                                                                            }
-                                                                            key={
-                                                                                venue.value
-                                                                            }
-                                                                            onSelect={() => {
-                                                                                form.setValue(
-                                                                                    "Venue",
-                                                                                    venue.value
-                                                                                );
-                                                                                setOpen(
-                                                                                    false
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <Check
-                                                                                className={cn(
-                                                                                    "mr-2 h-4 w-4",
-                                                                                    venue.value ===
-                                                                                        field.value
-                                                                                        ? "opacity-100"
-                                                                                        : "opacity-0"
-                                                                                )}
-                                                                            />
-                                                                            {
-                                                                                venue.label
-                                                                            }
-                                                                        </CommandItem>
-                                                                    )
-                                                                )}
+                                                                            );
+                                                                            setOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                venue.value ===
+                                                                                    field.value
+                                                                                    ? "opacity-100"
+                                                                                    : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        {venue.label}
+                                                                    </CommandItem>
+                                                                ))}
                                                             </CommandList>
                                                         </CommandGroup>
                                                     </Command>
@@ -392,14 +338,12 @@ export default function BookingForm({
 
                         {/* Affiliate */}
                         <div className="w-full lg:w-1/2">
-                            <FormLabel>Affilate Venues</FormLabel>
+                            <FormLabel>Affiliate Venues</FormLabel>
                             <FormField
                                 control={form.control}
                                 name="AffiliateVenue"
                                 render={({ field }) => {
-                                    const displayLabel = field.value
-                                        ? field.value
-                                        : "Select venue";
+                                    const displayLabel = field.value ? field.value : "Select venue";
 
                                     return (
                                         <FormItem>
@@ -432,45 +376,33 @@ export default function BookingForm({
                                                 >
                                                     <Command>
                                                         <CommandInput placeholder="Search Venues..." />
-                                                        <CommandEmpty>
-                                                            No Venue found.
-                                                        </CommandEmpty>
+                                                        <CommandEmpty>No Venue found.</CommandEmpty>
                                                         <CommandGroup>
                                                             <CommandList>
-                                                                {affiliates.map(
-                                                                    (venue) => (
-                                                                        <CommandItem
-                                                                            value={
+                                                                {affiliates.map((venue) => (
+                                                                    <CommandItem
+                                                                        value={venue.value}
+                                                                        key={venue.value}
+                                                                        onSelect={() => {
+                                                                            form.setValue(
+                                                                                "AffiliateVenue",
                                                                                 venue.value
-                                                                            }
-                                                                            key={
-                                                                                venue.value
-                                                                            }
-                                                                            onSelect={() => {
-                                                                                form.setValue(
-                                                                                    "AffiliateVenue",
-                                                                                    venue.value
-                                                                                );
-                                                                                setOpen(
-                                                                                    false
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <Check
-                                                                                className={cn(
-                                                                                    "mr-2 h-4 w-4",
-                                                                                    venue.value ===
-                                                                                        field.value
-                                                                                        ? "opacity-100"
-                                                                                        : "opacity-0"
-                                                                                )}
-                                                                            />
-                                                                            {
-                                                                                venue.label
-                                                                            }
-                                                                        </CommandItem>
-                                                                    )
-                                                                )}
+                                                                            );
+                                                                            setOpen(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                venue.value ===
+                                                                                    field.value
+                                                                                    ? "opacity-100"
+                                                                                    : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        {venue.label}
+                                                                    </CommandItem>
+                                                                ))}
                                                             </CommandList>
                                                         </CommandGroup>
                                                     </Command>
@@ -535,9 +467,7 @@ export default function BookingForm({
                                         <Input
                                             id="show-title"
                                             {...field}
-                                            disabled={isFieldDisabled(
-                                                "TitleOfShow"
-                                            )}
+                                            disabled={isFieldDisabled("TitleOfShow")}
                                             placeholder="Name of your project"
                                         />
                                     </FormControl>
@@ -592,9 +522,7 @@ export default function BookingForm({
                                 name="PressContact"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Press Contact (tel/email)
-                                        </FormLabel>
+                                        <FormLabel>Press Contact (tel/email)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 id="PressContact"
@@ -624,9 +552,7 @@ export default function BookingForm({
                                             className="mt-2 mr-1"
                                         />
                                     </FormControl>
-                                    <FormLabel>
-                                        Make this a penciled (P) booking
-                                    </FormLabel>
+                                    <FormLabel>Make this a penciled (P) booking</FormLabel>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -645,8 +571,7 @@ export default function BookingForm({
                                         />
                                     </FormControl>
                                     <FormLabel>
-                                        Mark this as a Season Announcement or
-                                        Gala Night
+                                        Mark this as a Season Announcement or Gala Night
                                     </FormLabel>
                                     <FormMessage />
                                 </FormItem>
@@ -680,15 +605,11 @@ export default function BookingForm({
                                     <span>Saving</span>
                                 </div>
                             ) : (
-                                <span>
-                                    {isEdit ? "Save Changes" : "Create Booking"}
-                                </span>
+                                <span>{isEdit ? "Save Changes" : "Create Booking"}</span>
                             )}
                         </Button>
                         {isEdit && !submitting && showNoChangesAlert && (
-                            <span className="text-red-600">
-                                No changes to save.
-                            </span>
+                            <span className="text-red-600">No changes to save.</span>
                         )}
                     </div>
                 </form>

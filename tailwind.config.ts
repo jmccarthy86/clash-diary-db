@@ -20,13 +20,16 @@ const config = {
         },
         extend: {
             fontFamily: {
-                sans: ["var(--font-sans)", ...fontFamily.sans],
+                sans: "var(--font-open-sans)",
             },
             backgroundImage: {
                 "solt-bg": "linear-gradient(90deg, #6f064f 0%, #de3414 100%)",
             },
             backgroundColor: {
                 "solt-gold": "#F5B330",
+                "solt-red": "#de3414",
+                "solt-purple": "#6f064f",
+                "solt-purple-50": "rgb(111 6 79 / 50%)",
             },
             colors: {
                 border: "hsl(var(--border))",

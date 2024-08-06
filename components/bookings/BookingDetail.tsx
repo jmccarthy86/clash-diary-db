@@ -69,10 +69,7 @@ export default function BookingDetail({
                 cookie.trim().startsWith("clash_sync=")
             );
             //console.log('Clash Sync Cookie:', clashSyncCookie);
-            if (
-                clashSyncCookie &&
-                Number(clashSyncCookie.split("=")[1]) !== 0
-            ) {
+            if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             }
         };
@@ -122,8 +119,7 @@ export default function BookingDetail({
 
             toast({
                 title: "Error deleting booking",
-                description:
-                    "There was an error deleting the booking. Please try again.",
+                description: "There was an error deleting the booking. Please try again.",
                 variant: "destructive",
             });
         }
@@ -134,8 +130,7 @@ export default function BookingDetail({
     const showEditOptions =
         hasAuthCookie !== 0 &&
         hasAuthCookie === Number(UserId) &&
-        (isAfter(currentSelectedDate, new Date()) ||
-            isSameDay(currentSelectedDate, new Date()));
+        (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
     return (
         <Card className="w-full pt-6" data-relation={UserId || undefined}>
@@ -156,16 +151,12 @@ export default function BookingDetail({
 
                 <div key="Producer" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Producer</p>
-                    <p className="text-muted-foreground">
-                        {otherDetails.Producer}
-                    </p>
+                    <p className="text-muted-foreground">{otherDetails.Producer}</p>
                 </div>
 
                 <div key="PressContact" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Press Contact</p>
-                    <p className="text-muted-foreground">
-                        {otherDetails.PressContact}
-                    </p>
+                    <p className="text-muted-foreground">{otherDetails.PressContact}</p>
                 </div>
 
                 <div key="OtherVenue" className="flex-1 space-y-1">
@@ -187,25 +178,14 @@ export default function BookingDetail({
                     !!otherDetails.Venue) && (
                     <div className="flex flex-wrapmt-3">
                         {affiliates.some(
-                            (affiliate) =>
-                                affiliate.value === otherDetails.AffiliateVenue
-                        ) && (
-                            <BookingBadge type="AFFILATE_VENUE">
-                                Affilate
-                            </BookingBadge>
-                        )}
-                        {venues.some(
-                            (venue) => venue.value === otherDetails.Venue
-                        ) && (
-                            <BookingBadge type="SOLT_MEMBER">
-                                Member
-                            </BookingBadge>
+                            (affiliate) => affiliate.value === otherDetails.AffiliateVenue
+                        ) && <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>}
+                        {venues.some((venue) => venue.value === otherDetails.Venue) && (
+                            <BookingBadge type="SOLT_MEMBER">Member</BookingBadge>
                         )}
                         {P && <BookingBadge type="P">P</BookingBadge>}
                         {otherDetails.IsOperaDance && (
-                            <BookingBadge type="OPERA_DANCE">
-                                Opera/Dance
-                            </BookingBadge>
+                            <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
                         )}
                         {otherDetails.IsSeasonGala && (
                             <BookingBadge type="GALA_NIGHT">
@@ -228,8 +208,8 @@ export default function BookingDetail({
                                 <DialogHeader>
                                     <DialogTitle>Edit Booking</DialogTitle>
                                     <DialogDescription>
-                                        Make changes to your booking here. Click
-                                        save when you&apos;re done.
+                                        Make changes to your booking here. Click save when
+                                        you&apos;re done.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <EditBooking
@@ -239,10 +219,7 @@ export default function BookingDetail({
                                 />
                             </DialogContent>
                         </Dialog>
-                        <AlertDialog
-                            open={isAlertDialogOpen}
-                            onOpenChange={setIsAlertDialogOpen}
-                        >
+                        <AlertDialog open={isAlertDialogOpen} onOpenChange={setIsAlertDialogOpen}>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" size="sm">
                                     Delete
@@ -251,23 +228,16 @@ export default function BookingDetail({
                             <AlertDialogContent>
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>
-                                        Are you sure you want to delete this
-                                        booking?
+                                        Are you sure you want to delete this booking?
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        This action cannot be undone. This will
-                                        permanently delete the booking from our
-                                        records.
+                                        This action cannot be undone. This will permanently delete
+                                        the booking from our records.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                    <AlertDialogCancel>
-                                        Cancel
-                                    </AlertDialogCancel>
-                                    <Button
-                                        onClick={handleDelete}
-                                        disabled={isDeleting}
-                                    >
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <Button onClick={handleDelete} disabled={isDeleting}>
                                         {isDeleting ? (
                                             <div className="flex items-center gap-2">
                                                 <LoadingSpinner />
