@@ -86,8 +86,10 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
 
     React.useEffect(() => {
         table.getColumn("date")?.setFilterValue(dateRange);
-        setCsvData(processRangeForCSV(dateRange, yearData.Dates));
-    }, [dateRange, table]);
+        if (yearData) {
+            setCsvData(processRangeForCSV(dateRange, yearData.Dates));
+        }
+    }, [yearData, dateRange, table]);
 
     const handleRowClick = (row: any) => {
         row.toggleExpanded();

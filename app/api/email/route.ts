@@ -31,6 +31,10 @@ export async function POST(request: Request) {
             throw new Error(`Email template '${templateName}' not found`);
         }
 
+        if (typeof params === "undefined") {
+            throw new Error("No params provided");
+        }
+
         const csvData = JSON.parse(params.dateEntries);
 
         // Generate the CSV content

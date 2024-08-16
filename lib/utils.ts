@@ -223,9 +223,12 @@ export async function handleClashEmail(
     } else {
         console.error("Failed to send clash email");
     }
-}   
+}
 
-export function processRangeForCSV(dateRange, Dates) {
+export function processRangeForCSV(
+    dateRange: { from: Date; to: Date },
+    Dates: RequestData["Dates"]
+) {
     console.log("dateRange", dateRange);
 
     // Since dateRange.from and dateRange.to are Date objects, we can use them directly
@@ -241,8 +244,8 @@ export function processRangeForCSV(dateRange, Dates) {
             const keyDate = parse(dateKey, "dd/MM/yyyy", new Date());
             return isWithinInterval(keyDate, { start: fromDate, end: toDate });
         })
-        .reduce((acc, dateKey) => {
-            Object.keys(Dates[dateKey]).forEach((rangeKey) => {
+        .reduce((acc: { [key: string]: any }, dateKey: string) => {
+            Object.keys(Dates[dateKey]).forEach((rangeKey: string) => {
                 acc[rangeKey] = Dates[dateKey][rangeKey];
             });
             return acc;
