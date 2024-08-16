@@ -1,60 +1,61 @@
-"use client"
+"use client";
 
-import * as React from 'react';
-import TableSkeleton from './Skeleton';
+import * as React from "react";
+import TableSkeleton from "./Skeleton";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getExpandedRowModel,
-  flexRender,
-  SortingState,
-  getFilteredRowModel,
-  ColumnFiltersState,
-  getPaginationRowModel
-} from '@tanstack/react-table';
-import SubRowComponent from './SubRow';
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    getExpandedRowModel,
+    flexRender,
+    SortingState,
+    getFilteredRowModel,
+    ColumnFiltersState,
+    getPaginationRowModel,
+} from "@tanstack/react-table";
+import SubRowComponent from "./SubRow";
 import DatePickerWithRange from "./FilterDateRange";
-import { DataTablePagination } from './Pagination';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { ColumnDef } from "@tanstack/react-table"
-import { Booking, RequestData } from '@/lib/types'
+import { DataTablePagination } from "./Pagination";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { ColumnDef } from "@tanstack/react-table";
+import { Booking, RequestData } from "@/lib/types";
 import { Button } from "../ui/button";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { transformData, createYearCalendarWithData } from '@/lib/utils'
-import { columnsConfig } from '@/components/table/ColumnsConfig'
-import { useExcel } from '@/context/ExcelContext';
+import { transformData, createYearCalendarWithData, processRangeForCSV } from "@/lib/utils";
+import { columnsConfig } from "@/components/table/ColumnsConfig";
+import { useExcel } from "@/context/ExcelContext";
+import DownloadButton from "../ui/download-button";
 
 interface ListViewProps {
-  dateRange: { from: Date, to: Date };
-  onDateRangeChange: (newRange: { from: Date, to: Date }) => void;
+    dateRange: { from: Date; to: Date };
+    onDateRangeChange: (newRange: { from: Date; to: Date }) => void;
 }
 
 const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => {
-
     ////console.log('ListView rendered');
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-	//console.log('yearData:', yearData);
-	const transformedData = React.useMemo(() => {
-		if (yearData) {
-			const calendarData = createYearCalendarWithData(currentYear, yearData.Dates);
-			const requestData: RequestData = {
-				Year: currentYear.toString(),
-				Range: `1/1/${currentYear}-31/12/${currentYear}`,
-				Dates: calendarData
-			};
-			return transformData(requestData);
-		}
-		return [];
-	}, [yearData, currentYear]);
-	//console.log('transformedData:', transformedData);
-    const [sorting, setSorting] = React.useState<SortingState>([{ id: 'date', desc: false }])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [expanded, setExpanded] = React.useState({})
+    //console.log('yearData:', yearData);
+    const transformedData = React.useMemo(() => {
+        if (yearData) {
+            const calendarData = createYearCalendarWithData(currentYear, yearData.Dates);
+            const requestData: RequestData = {
+                Year: currentYear.toString(),
+                Range: `1/1/${currentYear}-31/12/${currentYear}`,
+                Dates: calendarData,
+            };
+            return transformData(requestData);
+        }
+        return [];
+    }, [yearData, currentYear]);
+    //console.log('transformedData:', transformedData);
+    const [sorting, setSorting] = React.useState<SortingState>([{ id: "date", desc: false }]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [expanded, setExpanded] = React.useState({});
+    const [csvData, setCsvData] = React.useState({});
 
     const columns = React.useMemo(() => columnsConfig(), []) as ColumnDef<Booking, any>[];
-    
+
     React.useEffect(() => {
         const fromYear = dateRange.from.getFullYear();
         if (fromYear !== currentYear) {
@@ -62,6 +63,8 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
             changeYear(fromYear);
         }
     }, [dateRange, currentYear, changeYear]);
+
+    console.log("dateRange: ", dateRange);
 
     const table = useReactTable({
         data: transformedData,
@@ -83,6 +86,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
 
     React.useEffect(() => {
         table.getColumn("date")?.setFilterValue(dateRange);
+        setCsvData(processRangeForCSV(dateRange, yearData.Dates));
     }, [dateRange, table]);
 
     const handleRowClick = (row: any) => {
@@ -98,22 +102,28 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     };
 
     //if (loading) return <div>Loading...</div>;
-	if ( loading ) { 
-		return <TableSkeleton />
-	}
+    if (loading) {
+        return <TableSkeleton />;
+    }
 
-	////console.log(error);
-    if (error) return <div>Error: {error.message}</div>;
+    ////console.log(error);
+    if (error)
+        return (
+            <div>
+                There was an interuption loading the data. Please refresh the page and try again.
+            </div>
+        );
 
     return (
         <div className="w-full">
             <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-2">
-                <DatePickerWithRange 
-                    date={dateRange} 
+                <DatePickerWithRange
+                    date={dateRange}
                     setDate={onDateRangeChange}
-					className="w-full lg:w-auto"
+                    className="w-full lg:w-auto"
                 />
                 <div className="flex space-x-2 w-full lg:w-auto">
+                    <DownloadButton bookingData={csvData} />
                     <Button
                         onClick={handleExpandAll}
                         variant="outline"
@@ -135,36 +145,50 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
-                        {table.getHeaderGroups().map(headerGroup => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                            <TableHead key={header.id}>
-                                {header.isPlaceholder
-                                ? null
-                                : flexRender(header.column.columnDef.header, header.getContext())}
-                            </TableHead>
-                            ))}
-                        </TableRow>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead key={header.id}>
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext()
+                                              )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {table.getRowModel().rows.map(row => (
-                        <React.Fragment key={row.id}>
-                            <TableRow onClick={() => handleRowClick(row)} className="cursor-pointer">
-                            {row.getVisibleCells().map(cell => (
-                                <TableCell key={cell.id} {...(cell.column.id === 'bookNow' && { className: 'text-right' })}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
-                            ))}
-                            </TableRow>
-                            {row.getIsExpanded() && (
-                            <TableRow className="bg-muted/40 hover:bg-muted/50">
-                                <TableCell colSpan={row.getVisibleCells().length}>
-                                	<SubRowComponent subRows={row.original.subRows} />
-                                </TableCell>
-                            </TableRow>
-                            )}
-                        </React.Fragment>
+                        {table.getRowModel().rows.map((row) => (
+                            <React.Fragment key={row.id}>
+                                <TableRow
+                                    onClick={() => handleRowClick(row)}
+                                    className="cursor-pointer"
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell
+                                            key={cell.id}
+                                            {...(cell.column.id === "bookNow" && {
+                                                className: "text-right",
+                                            })}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                                {row.getIsExpanded() && (
+                                    <TableRow className="bg-muted/40 hover:bg-muted/50">
+                                        <TableCell colSpan={row.getVisibleCells().length}>
+                                            <SubRowComponent subRows={row.original.subRows} />
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </React.Fragment>
                         ))}
                     </TableBody>
                 </Table>
@@ -172,6 +196,6 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
             <DataTablePagination table={table} />
         </div>
     );
-}
+};
 
 export default ListView;

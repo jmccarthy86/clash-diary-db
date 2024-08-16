@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Bookings } from "./Bookings";
-import CalendarSkeleton from "@/components/calendar/Skeleton"
+import CalendarSkeleton from "@/components/calendar/Skeleton";
 import { useExcel } from "@/context/ExcelContext";
 
 interface CalendarViewProps {
@@ -11,18 +11,15 @@ interface CalendarViewProps {
     onDateChange: (date: Date) => void;
 }
 
-export function CalendarView({
-    selectedDate,
-    onDateChange,
-}: CalendarViewProps) {
+export function CalendarView({ selectedDate, onDateChange }: CalendarViewProps) {
     const [currentMonth, setCurrentMonth] = React.useState<Date>(selectedDate);
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-    //console.log("yearData : " + JSON.stringify(yearData));
-    //console.log("rendering calendar");
+    console.log("yearData : ", yearData);
+    console.log("rendering calendar");
 
     React.useEffect(() => {
-      setCurrentMonth(selectedDate);
+        setCurrentMonth(selectedDate);
     }, [selectedDate]);
 
     const handleDateSelect = (date: Date | undefined) => {
@@ -59,11 +56,11 @@ export function CalendarView({
             });
     }, [yearData]);
 
-	if (loading) {
-		return <CalendarSkeleton />
-	};
-	
-	// console.log(error);
+    if (loading) {
+        return <CalendarSkeleton />;
+    }
+
+    // console.log(error);
     if (error) return <p>Error: {error.message}</p>;
 
     return (
@@ -82,12 +79,9 @@ export function CalendarView({
                     booked: "calendar-triangle",
                 }}
             />
-			<div className="flex-grow">
-				<Bookings
-					currentSelectedDate={selectedDate}
-					allowEdit={true}
-				/>
-			</div>
+            <div className="flex-grow">
+                <Bookings currentSelectedDate={selectedDate} allowEdit={true} />
+            </div>
             {/* <Tabs defaultValue="detail" className="flex-grow">
                 <TabsList>
                     <TabsTrigger value="detail">Detail</TabsTrigger>

@@ -15,6 +15,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import CreateBooking from "@/components/bookings/CreateBooking";
+import DownloadButton from "../ui/download-button";
 
 interface DetailCardProps {
     currentSelectedDate: Date | undefined;
@@ -31,7 +32,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
     const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
 
     const rows = yearData.Dates[selectedDate] || {};
-    //console.log("Rows:", rows);
+    console.log("Rows:", rows);
 
     if (loading) {
         return <p>Loading bookings...</p>;
@@ -45,6 +46,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
         <div className="flex flex-col gap-2">
             <div className="rounded-md border pl-6 pr-3 py-3 flex items-center justify-between">
                 <h2 className="text-xl font-bold">{format(currentSelectedDate, "d MMMM yyyy")}</h2>
+                <DownloadButton bookingData={rows} />
                 <Dialog>
                     <DialogTrigger asChild>
                         {(isAfter(currentSelectedDate, new Date()) ||
