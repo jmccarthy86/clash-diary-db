@@ -46,31 +46,34 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
         <div className="flex flex-col gap-2">
             <div className="rounded-md border pl-6 pr-3 py-3 flex items-center justify-between">
                 <h2 className="text-xl font-bold">{format(currentSelectedDate, "d MMMM yyyy")}</h2>
-                <DownloadButton bookingData={rows} />
-                <Dialog>
-                    <DialogTrigger asChild>
-                        {(isAfter(currentSelectedDate, new Date()) ||
-                            isSameDay(currentSelectedDate, new Date())) && (
-                            <Button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                }}
-                            >
-                                Book Now
-                            </Button>
-                        )}
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                            <DialogTitle>Book Now</DialogTitle>
-                            <DialogDescription>
-                                Complete your booking for{" "}
-                                {format(currentSelectedDate, "dd/MM/yyyy")}
-                            </DialogDescription>
-                        </DialogHeader>
-                        <CreateBooking currentSelectedDate={currentSelectedDate} />
-                    </DialogContent>
-                </Dialog>
+                <div className="flex gap-2">
+                    <DownloadButton bookingData={rows} />
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            {(isAfter(currentSelectedDate, new Date()) ||
+                                isSameDay(currentSelectedDate, new Date())) && (
+                                <Button
+                                    className="font-bold"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                    }}
+                                >
+                                    Book Now
+                                </Button>
+                            )}
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[600px]">
+                            <DialogHeader>
+                                <DialogTitle>Book Now</DialogTitle>
+                                <DialogDescription>
+                                    Complete your booking for{" "}
+                                    {format(currentSelectedDate, "dd/MM/yyyy")}
+                                </DialogDescription>
+                            </DialogHeader>
+                            <CreateBooking currentSelectedDate={currentSelectedDate} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             {Object.keys(rows).length === 0 ? (

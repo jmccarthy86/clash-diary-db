@@ -1,5 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover";
+import { InfoCircledIcon } from "@radix-ui/react-icons";
 
 interface DownloadButtonProps {
     bookingData: { [key: string]: any };
@@ -44,9 +46,23 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ bookingData }) => {
     };
 
     return (
-        <Button variant="outline" onClick={handleCSVDownload}>
-            Download as CSV
-        </Button>
+        <div className="flex gap-4 bg-gray-100 hover:bg-gray-200 pl-4 pe-2 py-2 rounded-md">
+            <button className="underline" onClick={handleCSVDownload}>
+                Download as CSV
+            </button>
+            <Popover>
+                <PopoverTrigger className="border border-gray-300 px-1 rounded-sm">
+                    <InfoCircledIcon />
+                </PopoverTrigger>
+                <PopoverContent
+                    align="center"
+                    sideOffset={16}
+                    className="width-[200px] p-4 bg-white rounded-md shadow-lg"
+                >
+                    This will download the selected date bookings in full.
+                </PopoverContent>
+            </Popover>
+        </div>
     );
 };
 
