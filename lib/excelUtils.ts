@@ -1,64 +1,64 @@
 // /lib/excelUtils.ts
-import { headers } from '@/lib/config'
-import { RequestData } from '@/lib/types'
+import { headers } from "@/lib/config";
+import { RequestData } from "@/lib/types";
 
 // Define types for the input parameters
 interface ExcelData {
-	address: string;
-	values: any[][];  // 2D array to represent Excel data
+    address: string;
+    values: any[][]; // 2D array to represent Excel data
 }
 
 // Define a flexible type for row data
 interface RowData {
-	[key: string]: string | number | boolean | null;
+    [key: string]: string | number | boolean | null;
 }
 
 // Define the structure of the result
 type Result = RequestData;
 
 export const convertExcelDataToObject = (data: ExcelData, year: string): Result => {
-	// Organise provided data
-	const { address, values } = data;
-	const colHeaders = headers; // headers imported in file
-	const rows = values.slice(1); // remove the first row as it holds headers
-	const endColumnLetter = address.split('!')[1].split(':')[1].replace(/[0-9]/g, '');
+    // Organise provided data
+    const { address, values } = data;
+    const colHeaders = headers; // headers imported in file
+    const rows = values.slice(1); // remove the first row as it holds headers
+    const endColumnLetter = address.split("!")[1].split(":")[1].replace(/[0-9]/g, "");
 
-	// Prepare and build our object for return
-	const result: Result = {
-		Year: year,
-		Range: address.split('!')[1].replace(/^'/, ''),
-		Dates: {}
-	};
+    // Prepare and build our object for return
+    const result: Result = {
+        Year: year,
+        Range: address.split("!")[1].replace(/^'/, ""),
+        Dates: {},
+    };
 
-	// Check if the "Date" column exists in the headers, if not we can't continue.
-	const dateIndex = colHeaders.indexOf('Date');
-	if (dateIndex === -1) {
-		console.error("Date column not found");
-		return result;
-	}
+    // Check if the "Date" column exists in the headers, if not we can't continue.
+    const dateIndex = colHeaders.indexOf("Date");
+    if (dateIndex === -1) {
+        console.error("Date column not found");
+        return result;
+    }
 
-	// Build our {Dates} object
-	rows.forEach((row, rowIndex) => {
-		const rowNumber = rowIndex + 2;
-		const date = row[dateIndex] as string; // Use dateIndex instead of hardcoding 1
-		const rowRange = `A${rowNumber}:${endColumnLetter}${rowNumber}`;
+    // Build our {Dates} object
+    rows.forEach((row, rowIndex) => {
+        const rowNumber = rowIndex + 2;
+        const date = row[dateIndex] as string; // Use dateIndex instead of hardcoding 1
+        const rowRange = `A${rowNumber}:${endColumnLetter}${rowNumber}`;
 
-		const rowObject: RowData = {};
+        const rowObject: RowData = {};
 
-		row.forEach((cell, cellIndex) => {
-			rowObject[colHeaders[cellIndex]] = cell;
-		});
+        row.forEach((cell, cellIndex) => {
+            rowObject[colHeaders[cellIndex]] = cell;
+        });
 
-		if (!result.Dates[date]) {
-			result.Dates[date] = {};
-		}
+        if (!result.Dates[date]) {
+            result.Dates[date] = {};
+        }
 
-		result.Dates[date][rowRange] = rowObject;
-	});
+        result.Dates[date][rowRange] = rowObject;
+    });
 
-	//console.log(result);
+    //console.log(result);
 
-	return result;
+    return result;
 };
 
 // export const convertObjectToExcelData = (dataObject: RequestData) => {
