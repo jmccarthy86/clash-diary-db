@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useExcel } from "@/context/ExcelContext";
 import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -14,21 +14,34 @@ interface CreateBookingProps {
 
 export default function CreateBooking({ currentSelectedDate }: CreateBookingProps) {
     const { callExcelMethod, refreshData, yearData } = useExcel();
+    const latestYearDataRef = useRef(yearData); // Ref to store latest yearData
+
+    // Always keep the ref updated with the latest yearData
+    useEffect(() => {
+        latestYearDataRef.current = yearData;
+    }, [yearData]);
 
     const handleSubmit = async (data: FieldValues) => {
         try {
-            await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
-
-            // if (yearData) {
-            //     handleClashEmails(yearData, currentSelectedDate, data);
-            // }
+            // Call Excel method to create a new row
+            await callExcelMethod(
+                "createNewRow",
+                prepareBookingFormData(data),
+                latestYearDataRef.current?.Range
+            );
 
             toast({
                 title: "Booking created successfully",
                 description: "Your new booking has been added to the calendar.",
             });
 
+            // Refresh the data to ensure we get the latest yearData
             await refreshData();
+
+            // Use the latest yearData from the ref after refreshData
+            if (latestYearDataRef.current) {
+                handleClashEmails(latestYearDataRef.current, currentSelectedDate, data);
+            }
         } catch (error) {
             console.error("Error creating booking:", error);
             toast({
@@ -36,16 +49,8 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
                 description: "There was an error creating your booking. Please try again.",
                 variant: "destructive",
             });
-        } finally {
-            setTimeout(() => {
-                if (yearData) {
-                    handleClashEmails(yearData, currentSelectedDate, data);
-                }
-            }, 2000);
         }
     };
-
-    //console.log( "Current Selected Date:", currentSelectedDate);
 
     return (
         <Card>
