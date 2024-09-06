@@ -20,12 +20,9 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
         try {
             await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
 
-            // if (yearData) {
-            //     handleClashEmails(yearData, currentSelectedDate, data);
-            // }
-
-            // Save the form data for later use
-            bookingDataRef.current = data;
+            if (yearData) {
+                handleClashEmails(yearData, currentSelectedDate, data);
+            }
 
             toast({
                 title: "Booking created successfully",
@@ -42,15 +39,6 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
             });
         }
     };
-
-    // Watch for changes in yearData, then handle the email
-    React.useEffect(() => {
-        if (yearData && bookingDataRef.current) {
-            handleClashEmails(yearData, currentSelectedDate, bookingDataRef.current);
-        }
-    }, [yearData, currentSelectedDate]);
-
-    //console.log( "Current Selected Date:", currentSelectedDate);
 
     return (
         <Card>
