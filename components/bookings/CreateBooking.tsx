@@ -29,12 +29,6 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
             });
 
             await refreshData();
-
-            setTimeout(() => {
-                if (yearData) {
-                    handleClashEmails(yearData, currentSelectedDate, data);
-                }
-            }, 500);
         } catch (error) {
             console.error("Error creating booking:", error);
             toast({
@@ -42,6 +36,12 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
                 description: "There was an error creating your booking. Please try again.",
                 variant: "destructive",
             });
+        } finally {
+            setTimeout(() => {
+                if (yearData) {
+                    handleClashEmails(yearData, currentSelectedDate, data);
+                }
+            }, 2000);
         }
     };
 
