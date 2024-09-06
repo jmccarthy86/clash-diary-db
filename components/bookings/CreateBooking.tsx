@@ -1,62 +1,64 @@
 "use client";
 
-import React from 'react';
-import { useExcel } from '@/context/ExcelContext';
-import { prepareBookingFormData, handleClashEmails } from '@/lib/utils';
+import React from "react";
+import { useExcel } from "@/context/ExcelContext";
+import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import BookingForm from './BookingForm';
-import { FieldValues } from 'react-hook-form';
+import BookingForm from "./BookingForm";
+import { FieldValues } from "react-hook-form";
 
 interface CreateBookingProps {
-  	currentSelectedDate: Date;
+    currentSelectedDate: Date;
 }
 
 export default function CreateBooking({ currentSelectedDate }: CreateBookingProps) {
+    const { callExcelMethod, refreshData, yearData } = useExcel();
 
-  	const { callExcelMethod, refreshData, yearData } = useExcel();
+    const handleSubmit = async (data: FieldValues) => {
+        try {
+            await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
 
-  	const handleSubmit = async (data: FieldValues) => {
-    try {
+            // if (yearData) {
+            //     handleClashEmails(yearData, currentSelectedDate, data);
+            // }
 
-      	await callExcelMethod('createNewRow', prepareBookingFormData(data), yearData?.Range);
+            toast({
+                title: "Booking created successfully",
+                description: "Your new booking has been added to the calendar.",
+            });
 
-		if ( yearData ) {
-			handleClashEmails(yearData, currentSelectedDate, data);
-	  	}
-	  
-		toast({
-			title: "Booking created successfully",
-			description: "Your new booking has been added to the calendar.",
-		});
+            await refreshData();
 
-		await refreshData();
+            setTimeout(() => {
+                if (yearData) {
+                    handleClashEmails(yearData, currentSelectedDate, data);
+                }
+            }, 500);
+        } catch (error) {
+            console.error("Error creating booking:", error);
+            toast({
+                title: "Error creating booking",
+                description: "There was an error creating your booking. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
 
-	} catch (error) {
+    //console.log( "Current Selected Date:", currentSelectedDate);
 
-			console.error('Error creating booking:', error);
-			toast({
-				title: "Error creating booking",
-				description: "There was an error creating your booking. Please try again.",
-				variant: "destructive",
-			});
-		}
-	};
-
-  	//console.log( "Current Selected Date:", currentSelectedDate);
-
-  return (
-	<Card>
-		<CardHeader>
-    		<CardTitle>Create Booking</CardTitle>
-    	</CardHeader>
-		<CardContent>
-			<BookingForm
-				currentSelectedDate={currentSelectedDate}
-				onSubmit={handleSubmit}
-				isEdit={false}
-			/>
-		</CardContent>
-	</Card>
-  );
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Create Booking</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <BookingForm
+                    currentSelectedDate={currentSelectedDate}
+                    onSubmit={handleSubmit}
+                    isEdit={false}
+                />
+            </CardContent>
+        </Card>
+    );
 }
