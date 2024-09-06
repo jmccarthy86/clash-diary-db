@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import { useExcel } from "@/context/ExcelContext";
+import React, { useState, useEffect, useCallback } from "react";
 import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
+import { convertExcelDataToObject } from "@/lib/excelUtils";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import BookingForm from "./BookingForm";
@@ -13,34 +13,60 @@ interface CreateBookingProps {
 }
 
 export default function CreateBooking({ currentSelectedDate }: CreateBookingProps) {
-    const { callExcelMethod, refreshData, yearData } = useExcel();
-    const latestYearDataRef = useRef(yearData); // Ref to store latest yearData
+    const [yearData, setYearData] = useState<any>(null); // Local state for yearData
+    const [currentYear] = useState<number>(new Date().getFullYear());
 
-    // Always keep the ref updated with the latest yearData
-    useEffect(() => {
-        latestYearDataRef.current = yearData;
-    }, [yearData]);
+    // Separate function to call the Excel method
+    const callExcelMethod = useCallback(
+        async (method: string, ...args: any[]) => {
+            try {
+                const response = await fetch("/api/manager", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        method,
+                        year: currentYear.toString(),
+                        args,
+                    }),
+                });
+                if (!response.ok) throw new Error("Failed to call Excel method");
+                const { result } = await response.json();
+                return result;
+            } catch (err) {
+                throw err;
+            }
+        },
+        [currentYear]
+    );
+
+    // Separate function to fetch the latest data (not relying on the context)
+    const fetchData = useCallback(async () => {
+        try {
+            const sheetData = await callExcelMethod("getUsedRangeValues");
+            const transformedData = convertExcelDataToObject(sheetData, currentYear.toString());
+            setYearData(transformedData); // Update local yearData
+            return transformedData;
+        } catch (err) {
+            throw err;
+        }
+    }, [callExcelMethod, currentYear]);
 
     const handleSubmit = async (data: FieldValues) => {
         try {
             // Call Excel method to create a new row
-            await callExcelMethod(
-                "createNewRow",
-                prepareBookingFormData(data),
-                latestYearDataRef.current?.Range
-            );
+            await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
 
             toast({
                 title: "Booking created successfully",
                 description: "Your new booking has been added to the calendar.",
             });
 
-            // Refresh the data to ensure we get the latest yearData
-            await refreshData();
+            // Fetch the latest year data after creating the booking
+            const latestData = await fetchData(); // Fetch latest data separately
 
-            // Use the latest yearData from the ref after refreshData
-            if (latestYearDataRef.current) {
-                handleClashEmails(latestYearDataRef.current, currentSelectedDate, data);
+            // Use the latest data for handling clash emails
+            if (latestData) {
+                handleClashEmails(latestData, currentSelectedDate, data);
             }
         } catch (error) {
             console.error("Error creating booking:", error);
