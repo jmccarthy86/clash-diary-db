@@ -46,7 +46,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ bookingData }) => {
     };
 
     return (
-        <div className="flex gap-4 bg-gray-100 hover:bg-gray-200 pl-4 pe-2 py-2 rounded-md">
+        <div className="flex gap-4 bg-gray-100 hover:bg-gray-200 pl-2 pe-2 py-2 rounded-md">
             <button className="underline" onClick={handleCSVDownload}>
                 Download as CSV
             </button>
