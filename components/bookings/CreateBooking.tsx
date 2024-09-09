@@ -20,10 +20,6 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
         try {
             await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
 
-            if (yearData) {
-                handleClashEmails(yearData, currentSelectedDate, data);
-            }
-
             toast({
                 title: "Booking created successfully",
                 description: "Your new booking has been added to the calendar.",
@@ -37,6 +33,8 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
                 description: "There was an error creating your booking. Please try again.",
                 variant: "destructive",
             });
+        } finally {
+            handleClashEmails(currentSelectedDate, data);
         }
     };
 

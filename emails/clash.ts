@@ -4,18 +4,22 @@ export function getClashEmailContent(params: EmailData["params"]): string {
     return `
 	  <html>
 		<body>
-		    ${params?.Date ? `<p><strong>Date: </strong>${params.Date}</p>` : ""}
-		    ${params?.Venue ? `<p><strong>Venue: </strong>${params.Venue}</p>` : ""}
-		    ${params?.TitleOfShow ? `<p><strong>Show Title: </strong>${params.TitleOfShow}</p>` : ""}
+		    ${params?.Date ? `<p style="margin: 0;"><strong>Date: </strong>${params.Date}</p>` : ""}
+		    ${params?.Venue ? `<p style="margin: 0;"><strong>Venue: </strong>${params.Venue}</p>` : ""}
+		    ${
+                params?.TitleOfShow
+                    ? `<p style="margin: 0;"><strong>Show Title: </strong>${params.TitleOfShow}</p>`
+                    : ""
+            }
             </br>
-		    <p>You are receiving this email because you also have a First Night Diary booking on that date.</p>
-		    <p>Full clash details are attached as a CSV file, with press contacts included.</p>
-            <p>You can see the full diary here <a href="https://solt.co.uk/clash-diary">SOLT First Night Diary</a> and you can edit or delete your entry on the diary itself.</p>
+		    <p style="margin: 0;">You are receiving this email because you also have a First Night Diary booking on that date.</p>
+		    <p style="margin: 0;">Full clash details are attached as a CSV file, with press contacts included.</p>
+            <p style="margin: 0;">You can see the full diary here <a href="https://solt.co.uk/clash-diary">SOLT First Night Diary</a> and you can edit or delete your entry on the diary itself.</p>
             </br>
-		    <p>If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
+		    <p style="margin: 0;">If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
 		    <br/>
-		    <p>Best wishes,</p>
-		    <p>SOLT & UK Theatre</p>
+		    <p style="margin: 0;">Best wishes,</p>
+		    <p style="margin: 0;">SOLT & UK Theatre</p>
 		</body>
 	  </html>
 	`;

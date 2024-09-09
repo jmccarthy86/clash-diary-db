@@ -6,6 +6,7 @@ import { headers } from "@/lib/config";
 import { sendEmail } from "./emailService";
 import { EmailSender } from "@/lib/types";
 import { FieldValues } from "react-hook-form";
+import { fetchData } from "./fetchingExcel";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -149,11 +150,10 @@ export function prepareBookingFormData(data: any) {
     );
 }
 
-export async function handleClashEmails(
-    yearData: RequestData,
-    currentSelectedDate: Date,
-    newData: FieldValues
-) {
+export async function handleClashEmails(currentSelectedDate: Date, newData: FieldValues) {
+    const currentYear = currentSelectedDate.getFullYear();
+    const yearData = await fetchData(currentYear); // Fetch yearData using fetchData method
+
     const dateString = format(currentSelectedDate, "dd/MM/yyyy");
     const dateEntries = yearData.Dates[dateString];
 
