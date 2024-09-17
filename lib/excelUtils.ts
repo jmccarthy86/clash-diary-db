@@ -60,8 +60,6 @@ export const convertExcelDataToObject = (data: ExcelData, year: string): Result 
 
     return result;
 };
-
-// export const convertObjectToExcelData = (dataObject: RequestData) => {
 // 	console.log(dataObject)
 // 	const { Range, Dates } = dataObject;
 // 	const allRows = [];

@@ -77,7 +77,7 @@ export default function BookingDetail({
         const handleMessage = (event: MessageEvent) => {
             //console.log('Message event received in iframe:', event);
 
-            if (event.origin !== "https://soltdigital.co.uk") {
+            if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }
@@ -94,7 +94,7 @@ export default function BookingDetail({
 
         // Notify parent that iframe is ready
         //console.log('Iframe is ready, notifying parent');
-        window.parent.postMessage("iframeReady", "https://soltdigital.co.uk");
+        window.parent.postMessage("iframeReady", "https://solt.co.uk");
 
         // Clean up the event listener on component unmount
         return () => {
@@ -166,6 +166,8 @@ export default function BookingDetail({
                             ? otherDetails.Venue
                             : otherDetails.OtherVenue
                             ? otherDetails.OtherVenue
+                            : otherDetails.AffiliateVenue
+                            ? otherDetails.AffiliateVenue
                             : otherDetails.VenueIsTba
                             ? "TBA"
                             : ""}
