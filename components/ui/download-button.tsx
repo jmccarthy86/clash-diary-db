@@ -11,7 +11,7 @@ interface DownloadButtonProps {
 }
 
 const DownloadButton: React.FC<DownloadButtonProps> = ({ bookingData }, type) => {
-    console.log(bookingData);
+    //console.log(bookingData);
     const handleCSVDownload = () => {
         const csvData = generateCSV(bookingData);
         const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
@@ -72,7 +72,7 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ bookingData }, type) =>
                 <PopoverContent
                     align="center"
                     sideOffset={16}
-                    className="width-[200px] p-4 bg-white rounded-md shadow-lg"
+                    className="download-button width-[200px] p-4 bg-white rounded-md shadow-lg"
                 >
                     {type === "cal"
                         ? "This button will download a spreadsheet of the bookings on the single date shown below. To download a spreadsheet of bookings for more than one date, go to 'List View', select your required date range and click the download button. This way you can view a month, a year or more! Remember the download is a snapshot in time, the most up-to-date information will always be live on this webpage."

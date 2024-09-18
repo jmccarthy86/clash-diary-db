@@ -4,6 +4,7 @@
 
 @layer base {
     :root {
+        --radix-popover-content-available-width: 200px !important;
         font-size: 18px;
         --background: 0 0% 100%;
         --foreground: 240 10% 3.9%;
@@ -94,6 +95,10 @@
         border: 1px solid #6f064f;
     }
 
+    .download-button {
+        width: 300px !important;
+    }
+
     /* .calendar-triangle::after {
   content: '';
   @apply absolute bottom-0 left-[-12px]
@@ -102,4 +107,8 @@
          origin-bottom-left
          rotate-45;
 } */
+}
+
+:root {
+    --radix-popover-content-available-width: 200px !important;
 }
