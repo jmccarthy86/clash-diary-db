@@ -83,8 +83,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
             //console.error("Error deleting booking:", error);
             toast({
                 title: "Error",
-                description:
-                    "There was an error deleting the booking. Please try again.",
+                description: "There was an error deleting the booking. Please try again.",
                 variant: "destructive",
             });
         }
@@ -101,10 +100,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                 cookie.trim().startsWith("clash_sync=")
             );
             console.log("Clash Sync Cookie:", clashSyncCookie);
-            if (
-                clashSyncCookie &&
-                Number(clashSyncCookie.split("=")[1]) !== 0
-            ) {
+            if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             }
         };
@@ -112,7 +108,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         const handleMessage = (event: MessageEvent) => {
             //console.log('Message event received in iframe:', event);
 
-            if (event.origin !== "https://soltdigital.co.uk") {
+            if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }
@@ -129,7 +125,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
         // Notify parent that iframe is ready
         //console.log('Iframe is ready, notifying parent');
-        window.parent.postMessage("iframeReady", "https://soltdigital.co.uk");
+        window.parent.postMessage("iframeReady", "https://solt.co.uk");
 
         // Clean up the event listener on component unmount
         return () => {
@@ -144,8 +140,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const showEditOptions =
         hasAuthCookie !== 0 &&
         hasAuthCookie === Number(subRow.UserId) &&
-        (isAfter(currentSelectedDate, new Date()) ||
-            isSameDay(currentSelectedDate, new Date()));
+        (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
     // console.log("showEditOptions:", showEditOptions)
     // console.log(hasAuthCookie);
     // console.log(subRow.UserId);
@@ -161,14 +156,10 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={handleViewClick}>
-                            View
-                        </DropdownMenuItem>
+                        <DropdownMenuItem onSelect={handleViewClick}>View</DropdownMenuItem>
                         {showEditOptions && (
                             <>
-                                <DropdownMenuItem onSelect={handleEditClick}>
-                                    Edit
-                                </DropdownMenuItem>
+                                <DropdownMenuItem onSelect={handleEditClick}>Edit</DropdownMenuItem>
                                 <DropdownMenuItem
                                     onSelect={handleDeleteClick}
                                     className="text-red-600"
@@ -185,20 +176,15 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Booking Details</DialogTitle>
-                        <DialogDescription>
-                            {/* Some Description */}
-                        </DialogDescription>
+                        <DialogDescription>{/* Some Description */}</DialogDescription>
                     </DialogHeader>
                     <BookingDetail
                         key={subRow.range}
                         rowRange={subRow.range}
                         rowData={subRow}
-                        currentSelectedDate={parse(
-                            subRow.Date,
-                            "dd/MM/yyyy",
-                            new Date(),
-                            { locale: enGB }
-                        )}
+                        currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), {
+                            locale: enGB,
+                        })}
                         allowEdit={false}
                     />
                 </DialogContent>
@@ -207,34 +193,26 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Edit Booking</DialogTitle>
-                        <DialogDescription>
-                            {/* Something here */}
-                        </DialogDescription>
+                        <DialogDescription>{/* Something here */}</DialogDescription>
                     </DialogHeader>
                     <EditBooking
                         rowRange={subRow.range}
                         currentDetail={subRow}
-                        currentSelectedDate={parse(
-                            subRow.Date,
-                            "dd/MM/yyyy",
-                            new Date(),
-                            { locale: enGB }
-                        )}
+                        currentSelectedDate={parse(subRow.Date, "dd/MM/yyyy", new Date(), {
+                            locale: enGB,
+                        })}
                     />
                 </DialogContent>
             </Dialog>
-            <AlertDialog
-                open={showDeleteDialog}
-                onOpenChange={setShowDeleteDialog}
-            >
+            <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
                             Are you sure you want to delete this booking?
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete the booking from our records.
+                            This action cannot be undone. This will permanently delete the booking
+                            from our records.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -259,18 +237,10 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                 </Button>
                 {showEditOptions && (
                     <>
-                        <Button
-                            onClick={handleEditClick}
-                            variant="outline"
-                            size="sm"
-                        >
+                        <Button onClick={handleEditClick} variant="outline" size="sm">
                             Edit
                         </Button>
-                        <Button
-                            onClick={handleDeleteClick}
-                            variant="outline"
-                            size="sm"
-                        >
+                        <Button onClick={handleDeleteClick} variant="outline" size="sm">
                             Delete
                         </Button>
                     </>

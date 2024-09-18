@@ -1,6 +1,7 @@
 // /lib/excelUtils.ts
 import { headers } from "@/lib/config";
 import { RequestData } from "@/lib/types";
+import { processDate } from "@/lib/utils";
 
 // Define types for the input parameters
 interface ExcelData {
@@ -40,13 +41,17 @@ export const convertExcelDataToObject = (data: ExcelData, year: string): Result 
     // Build our {Dates} object
     rows.forEach((row, rowIndex) => {
         const rowNumber = rowIndex + 2;
-        const date = row[dateIndex] as string; // Use dateIndex instead of hardcoding 1
+        const date = processDate(row[dateIndex]) as string; // Use dateIndex instead of hardcoding 1
         const rowRange = `A${rowNumber}:${endColumnLetter}${rowNumber}`;
 
         const rowObject: RowData = {};
 
         row.forEach((cell, cellIndex) => {
-            rowObject[colHeaders[cellIndex]] = cell;
+            if (cellIndex === 1 || cellIndex === 11 || cellIndex === 15) {
+                rowObject[colHeaders[cellIndex]] = processDate(cell);
+            } else {
+                rowObject[colHeaders[cellIndex]] = cell;
+            }
         });
 
         if (!result.Dates[date]) {

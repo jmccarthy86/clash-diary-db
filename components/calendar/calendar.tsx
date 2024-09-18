@@ -68,7 +68,7 @@ export function CalendarView({ selectedDate, onDateChange }: CalendarViewProps) 
             <Calendar
                 mode="single"
                 fromYear={2024}
-                fromMonth={new Date("2024-08-01")}
+                fromMonth={new Date("2024-09-16")}
                 selected={selectedDate}
                 onSelect={handleDateSelect}
                 onMonthChange={handleMonthChange}

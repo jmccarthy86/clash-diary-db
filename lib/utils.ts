@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Booking, RequestData, SubRowData } from "@/lib/types";
-import { format, parseISO, isWithinInterval, parse } from "date-fns";
+import { format, isValid, parseISO, isWithinInterval, parse } from "date-fns";
 import { headers } from "@/lib/config";
 import { sendEmail } from "./emailService";
 import { EmailSender } from "@/lib/types";
@@ -253,3 +253,48 @@ export function processRangeForCSV(
 
     return result;
 }
+
+// Function to convert an Excel date serial number, accounting for both date and time
+const excelDateToJSDate = (serial: number): string => {
+    const excelEpoch = new Date(1900, 0, 1); // January 1, 1900
+    const days = Math.floor(serial); // Extract the date part (integer)
+    const time = serial - days; // Extract the time part (decimal)
+
+    // Convert the date part (days since epoch)
+    const date = new Date(excelEpoch.getTime() + (days - 1) * 24 * 60 * 60 * 1000);
+
+    // Check if there's a time component (decimal part)
+    if (time > 0) {
+        const millisecondsInDay = 24 * 60 * 60 * 1000;
+        const timeInMs = time * millisecondsInDay;
+        date.setTime(date.getTime() + timeInMs);
+
+        // Return date with time if there is a time component
+        return format(date, "dd/MM/yyyy HH:mm");
+    }
+
+    // Return only the date if there's no time component
+    return format(date, "dd/MM/yyyy");
+};
+
+// Function to check if the value is already in dd/MM/yyyy or needs to be converted
+export const processDate = (value: string | number): string => {
+    // Regular expression to check if the value is already in dd/MM/yyyy format
+    const dateFormatRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+
+    // If it's a string and matches the dd/MM/yyyy format, return it as is
+    if (typeof value === "string" && dateFormatRegex.test(value)) {
+        const parsedDate = parse(value, "dd/MM/yyyy", new Date());
+        if (isValid(parsedDate)) {
+            return value; // Already in correct format
+        }
+    }
+
+    // If it's a number (Excel date serial), convert it to a valid date format
+    if (typeof value === "number") {
+        return excelDateToJSDate(value);
+    }
+
+    // If the value is something else, return an empty string or handle error
+    return "";
+};

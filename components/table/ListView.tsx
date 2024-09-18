@@ -125,7 +125,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                     className="w-full lg:w-auto"
                 />
                 <div className="flex space-x-2 w-full lg:w-auto">
-                    <DownloadButton bookingData={csvData} />
+                    <DownloadButton bookingData={csvData} type="list" />
                     <Button
                         onClick={handleExpandAll}
                         variant="outline"

@@ -47,7 +47,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
             <div className="rounded-md border pl-6 pr-3 py-3 flex items-center justify-between">
                 <h2 className="text-xl font-bold">{format(currentSelectedDate, "d MMMM yyyy")}</h2>
                 <div className="flex gap-2">
-                    <DownloadButton bookingData={rows} />
+                    <DownloadButton bookingData={rows} type="cal" />
                     <Dialog>
                         <DialogTrigger asChild>
                             {(isAfter(currentSelectedDate, new Date()) ||

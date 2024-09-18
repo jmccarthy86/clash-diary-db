@@ -141,7 +141,7 @@ export default function BookingForm({
         };
 
         const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://soltdigital.co.uk") {
+            if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }
