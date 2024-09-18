@@ -268,7 +268,7 @@ const excelDateToJSDate = (serial: number): string => {
     console.log("Time part (decimal):", time); // Log the decimal part (time)
 
     // Convert the date part (days since epoch) in UTC
-    const dateInMs = excelEpoch + (days - 1) * 24 * 60 * 60 * 1000;
+    const dateInMs = excelEpoch + (days - 2) * 24 * 60 * 60 * 1000;
     console.log("Date in milliseconds (after adding days):", dateInMs); // Log the date in milliseconds
 
     // Create a new Date object with the calculated milliseconds in UTC
