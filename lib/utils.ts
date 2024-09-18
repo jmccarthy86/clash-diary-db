@@ -256,24 +256,43 @@ export function processRangeForCSV(
 
 // Function to convert an Excel date serial number, accounting for both date and time
 const excelDateToJSDate = (serial: number): string => {
-    const excelEpoch = new Date(1900, 0, 1); // January 1, 1900
+    console.log("Original Excel serial number:", serial); // Log the original serial
+
+    const excelEpoch = Date.UTC(1900, 0, 1); // January 1, 1900 in UTC
+    console.log("Excel epoch (milliseconds):", excelEpoch); // Log the Excel epoch time
+
     const days = Math.floor(serial); // Extract the date part (integer)
     const time = serial - days; // Extract the time part (decimal)
 
-    // Convert the date part (days since epoch)
-    const date = new Date(excelEpoch.getTime() + (days - 1) * 24 * 60 * 60 * 1000);
+    console.log("Days part (integer):", days); // Log the integer part (days)
+    console.log("Time part (decimal):", time); // Log the decimal part (time)
+
+    // Convert the date part (days since epoch) in UTC
+    const dateInMs = excelEpoch + (days - 1) * 24 * 60 * 60 * 1000;
+    console.log("Date in milliseconds (after adding days):", dateInMs); // Log the date in milliseconds
+
+    // Create a new Date object with the calculated milliseconds in UTC
+    const date = new Date(dateInMs);
+    console.log("Date object (before adding time):", date.toISOString()); // Log the date object before adding the time
 
     // Check if there's a time component (decimal part)
     if (time > 0) {
         const millisecondsInDay = 24 * 60 * 60 * 1000;
         const timeInMs = time * millisecondsInDay;
+        console.log("Milliseconds to add for time part:", timeInMs); // Log the milliseconds to add for the time part
+
+        date.setUTCHours(0, 0, 0, 0); // Reset time to 00:00 in UTC
         date.setTime(date.getTime() + timeInMs);
 
-        // Return date with time if there is a time component
+        console.log("Date object (after adding time):", date.toISOString()); // Log the date object after adding the time
+
+        // Return date with time in 'dd/MM/yyyy HH:mm' format
         return format(date, "dd/MM/yyyy HH:mm");
     }
 
-    // Return only the date if there's no time component
+    console.log("Final Date object (no time):", date.toISOString()); // Log the final date object if there's no time part
+
+    // Return only the date if there's no time component, in 'dd/MM/yyyy' format
     return format(date, "dd/MM/yyyy");
 };
 
