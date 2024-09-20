@@ -172,14 +172,14 @@ export default function BookingForm({
     React.useEffect(() => {
         if (currentSelectedDate) {
             const now = new Date();
-            const combinedDate = setMilliseconds(
-                setSeconds(
-                    setMinutes(setHours(currentSelectedDate, now.getHours()), now.getMinutes()),
-                    now.getSeconds()
-                ),
-                now.getMilliseconds()
-            );
-            form.setValue("TimeStamp", format(combinedDate, "dd/MM/yyyy HH:mm:ss"));
+            // const combinedDate = setMilliseconds(
+            //     setSeconds(
+            //         setMinutes(setHours(currentSelectedDate, now.getHours()), now.getMinutes()),
+            //         now.getSeconds()
+            //     ),
+            //     now.getMilliseconds()
+            // );
+            form.setValue("TimeStamp", format(now, "dd/MM/yyyy HH:mm:ss"));
         }
     }, [currentSelectedDate, form]);
 
