@@ -522,7 +522,7 @@ export default function BookingForm({
                                 name="PressContact"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Press Contact (tel/email)</FormLabel>
+                                        <FormLabel>Press Contact (email)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 id="PressContact"
