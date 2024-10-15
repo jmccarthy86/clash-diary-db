@@ -27,9 +27,10 @@ const OpenSans = localFont({
     variable: "--font-open-sans",
 });
 
-const fontSans = FontSans({
-    subsets: ["latin"],
-    variable: "--font-sans",
+// New Heading Font
+const HeadingFont = localFont({
+    src: [{ path: "../public/FuturaPTBold/font.woff2", weight: "700", style: "normal" }],
+    variable: "--font-heading", // Custom CSS variable for heading font
 });
 
 interface RootLayoutProps {
@@ -43,7 +44,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <html lang="en" suppressHydrationWarning>
             <head />
             <body
-                className={cn("min-h-screen bg-muted/70 font-sans antialiased", OpenSans.variable)}
+                className={cn(
+                    "min-h-screen bg-muted/70 font-sans antialiased",
+                    OpenSans.variable,
+                    HeadingFont.variable
+                )}
             >
                 <header className="flex items-center justify-center py-4 flex-col">
                     <Image src="/solt-clash-diary.png" alt="Solt Logo" width={100} height={100} />

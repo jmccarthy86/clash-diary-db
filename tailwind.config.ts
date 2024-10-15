@@ -21,6 +21,7 @@ const config = {
         extend: {
             fontFamily: {
                 sans: "var(--font-open-sans)",
+                heading: "var(--font-heading), sans-serif",
             },
             backgroundImage: {
                 "solt-bg": "linear-gradient(90deg, #6f064f 0%, #de3414 100%)",
