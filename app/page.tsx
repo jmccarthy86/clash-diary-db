@@ -25,20 +25,32 @@ function MainContent() {
     const [singleDate, setSingleDate] = React.useState<Date>(new Date());
 
     React.useEffect(() => {
-        const queryParams = new URLSearchParams(window.location.search);
-        const selectedDateParam = queryParams.get("selectedDate");
+        // Function to handle message from parent window
+        const handleMessage = (event: MessageEvent) => {
+            // Make sure the origin is the expected one
+            if (event.origin !== "https://solt.co.uk") return;
 
-        const isValidDate = (date: string) => !isNaN(Date.parse(date));
+            const { selectedDate } = event.data;
 
-        if (selectedDateParam && isValidDate(selectedDateParam)) {
-            const initialDate = new Date(selectedDateParam);
-            setSingleDate(initialDate);
-            setDateRange({
-                from: startOfMonth(initialDate),
-                to: endOfMonth(initialDate),
-            });
-        }
-    }, []); // Empty dependency array to run only once on mount
+            // Check if the message contains a valid date
+            if (selectedDate && !isNaN(Date.parse(selectedDate))) {
+                const newDate = new Date(selectedDate);
+                setSingleDate(newDate);
+                setDateRange({
+                    from: startOfMonth(newDate),
+                    to: endOfMonth(newDate),
+                });
+            }
+        };
+
+        // Add event listener for message
+        window.addEventListener("message", handleMessage);
+
+        // Cleanup event listener on component unmount
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
+    }, []); // Empty dependency array ensures this runs only on component mount
 
     const handleDateRangeChange = (newRange: { from: Date; to: Date }) => {
         setDateRange(newRange);
