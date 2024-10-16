@@ -212,13 +212,14 @@ export async function handleClashEmail(
 
     const emailSent = await sendEmail({
         to: [{ email: user.email, name: user.name }],
-        subject: "First Night Diary Notification",
+        subject: "SOLT & UK Theatre First Night Diary clash",
         templateName: "clash",
         sender: { name: "SOLT", email: "noreply@solt.co.uk" },
         params: {
             name: user.name,
             email: user.email,
             Date: format(currentSelectedDate, "dd/MM/yyyy"),
+            RawDate: format(currentSelectedDate, "yyyy-MM-dd"),
             Venue: data.Venue,
             TitleOfShow: data.TitleOfShow,
             MemberLevel: data.MemberLevel,

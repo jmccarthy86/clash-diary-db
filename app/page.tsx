@@ -12,11 +12,33 @@ function MainContent() {
     //console.log("MainContent rendered");
     //const { loading, error } = useExcel();
 
+    // const [dateRange, setDateRange] = React.useState<{ from: Date; to: Date }>({
+    //     from: startOfMonth(new Date()),
+    //     to: endOfMonth(new Date()),
+    // });
+    // const [singleDate, setSingleDate] = React.useState<Date>(new Date());
+
     const [dateRange, setDateRange] = React.useState<{ from: Date; to: Date }>({
         from: startOfMonth(new Date()),
         to: endOfMonth(new Date()),
     });
     const [singleDate, setSingleDate] = React.useState<Date>(new Date());
+
+    React.useEffect(() => {
+        const queryParams = new URLSearchParams(window.location.search);
+        const selectedDateParam = queryParams.get("selectedDate");
+
+        const isValidDate = (date: string) => !isNaN(Date.parse(date));
+
+        if (selectedDateParam && isValidDate(selectedDateParam)) {
+            const initialDate = new Date(selectedDateParam);
+            setSingleDate(initialDate);
+            setDateRange({
+                from: startOfMonth(initialDate),
+                to: endOfMonth(initialDate),
+            });
+        }
+    }, []); // Empty dependency array to run only once on mount
 
     const handleDateRangeChange = (newRange: { from: Date; to: Date }) => {
         setDateRange(newRange);
@@ -52,16 +74,10 @@ function MainContent() {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="calendar">
-                    <CalendarView
-                        selectedDate={singleDate}
-                        onDateChange={handleSingleDateChange}
-                    />
+                    <CalendarView selectedDate={singleDate} onDateChange={handleSingleDateChange} />
                 </TabsContent>
                 <TabsContent value="table">
-                    <ListView
-                        dateRange={dateRange}
-                        onDateRangeChange={handleDateRangeChange}
-                    />
+                    <ListView dateRange={dateRange} onDateRangeChange={handleDateRangeChange} />
                 </TabsContent>
             </Tabs>
         </main>

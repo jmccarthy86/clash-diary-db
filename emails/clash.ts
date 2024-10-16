@@ -15,16 +15,16 @@ export function getClashEmailContent(params: EmailData["params"]): string {
         </head>
         <body>
 		    ${params?.Date ? `<p style="margin: 0;"><strong>Date: </strong>${params.Date}</p>` : ""}
-		    ${params?.Venue ? `<p style="margin: 0;"><strong>Venue: </strong>${params.Venue}</p>` : ""}
 		    ${
                 params?.TitleOfShow
                     ? `<p style="margin: 0;"><strong>Show Title: </strong>${params.TitleOfShow}</p>`
                     : ""
             }
             </br>
-		    <p style="margin: 0;">You are receiving this email because you also have a First Night Diary booking on that date.</p>
-		    <p style="margin: 0;">Full clash details are attached as a CSV file, with press contacts included.</p>
-            <p style="margin: 0;">You can see the full diary here <a href="https://solt.co.uk/first-night-diary">SOLT First Night Diary</a> and you can edit or delete your entry on the diary itself.</p>
+		    <p style="margin: 0;">You are receiving this email because you have a booking in the SOLT & UK Theatre First Night Diary on the above date.</p>
+		    <p style="margin: 0;">Full clash details are attached as a spreadsheet (CSV file), with press contacts included. If information in the spreadsheet shows as ######, please expand that column and full details will appear.</p>
+            <p style="margin: 0;">Follow this link to see the full diary: <a href="https://solt.co.uk/first-night-diary?selectedDate=${params?.RawDate}">SOLT First Night Diary</a>. You can also edit or delete your entry on the diary itself.</p>
+            <p style="margin: 0;">See a full User Guide for the diary here: <a href="https://res.cloudinary.com/solt/image/upload/v1727697464/SOLT_First_Night_Diary_User_Guide_yejiqw.pdf">First Night Diary User Guide</a>
             </br>
 		    <p style="margin: 0;">If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
 		    <br/>
