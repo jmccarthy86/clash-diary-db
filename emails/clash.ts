@@ -24,7 +24,7 @@ export function getClashEmailContent(params: EmailData["params"]): string {
             </br>
 		    <p style="margin: 0;">You are receiving this email because you also have a First Night Diary booking on that date.</p>
 		    <p style="margin: 0;">Full clash details are attached as a CSV file, with press contacts included.</p>
-            <p style="margin: 0;">You can see the full diary here <a href="https://solt.co.uk/clash-diary">SOLT First Night Diary</a> and you can edit or delete your entry on the diary itself.</p>
+            <p style="margin: 0;">You can see the full diary here <a href="https://solt.co.uk/first-night-diary">SOLT First Night Diary</a> and you can edit or delete your entry on the diary itself.</p>
             </br>
 		    <p style="margin: 0;">If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
 		    <br/>

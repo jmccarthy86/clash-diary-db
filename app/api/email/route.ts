@@ -53,7 +53,7 @@ export async function POST(request: Request) {
         sendSmtpEmail.params = params;
         sendSmtpEmail.attachment = [
             {
-                name: "clash-diary.csv",
+                name: "first-night-diary.csv",
                 content: Buffer.from(csvContent).toString("base64"),
             },
         ];
