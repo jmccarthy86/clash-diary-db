@@ -2,8 +2,18 @@ import { EmailData } from "@/lib/types";
 
 export function getClashEmailContent(params: EmailData["params"]): string {
     return `
-	  <html>
-		<body>
+      <html>
+        <head>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+            }
+            strong {
+              font-family: "Century Gothic", sans-serif;
+            }
+          </style>
+        </head>
+        <body>
 		    ${params?.Date ? `<p style="margin: 0;"><strong>Date: </strong>${params.Date}</p>` : ""}
 		    ${params?.Venue ? `<p style="margin: 0;"><strong>Venue: </strong>${params.Venue}</p>` : ""}
 		    ${
@@ -21,8 +31,8 @@ export function getClashEmailContent(params: EmailData["params"]): string {
 		    <p style="margin: 0;">Best wishes,</p>
 		    <p style="margin: 0;">SOLT & UK Theatre</p>
 		</body>
-	  </html>
-	`;
+      </html>
+    `;
 }
 
 function renderShowCategory(params: EmailData["params"]): string {
