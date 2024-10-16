@@ -52,7 +52,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             >
                 <header className="flex items-center justify-center py-4 flex-col">
                     <Image src="/solt-clash-diary.png" alt="Solt Logo" width={100} height={100} />
-                    <h1 className="text-lg text-center font-bold pt-1">Clash Diary</h1>
+                    <h1 className="text-lg text-center font-bold pt-1">First Night Diary</h1>
                 </header>
                 {children}
                 <footer className="flex items-center justify-center p-4 text-center gap-1">

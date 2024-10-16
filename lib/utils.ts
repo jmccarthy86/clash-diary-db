@@ -212,7 +212,7 @@ export async function handleClashEmail(
 
     const emailSent = await sendEmail({
         to: [{ email: user.email, name: user.name }],
-        subject: "Clash Diary Notification",
+        subject: "First Night Diary Notification",
         templateName: "clash",
         sender: { name: "SOLT", email: "noreply@solt.co.uk" },
         params: {
