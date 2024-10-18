@@ -110,7 +110,11 @@ export default function BookingDetail({
         hasAuthCookie === Number(UserId) &&
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
-    console.log(otherDetails);
+    // console.log("Current Venue:", otherDetails.Venue);
+    // console.log(
+    //     "Affiliates:",
+    //     affiliates.map((affiliate) => affiliate.value)
+    // );
 
     return (
         <Card className="w-full pt-6" data-relation={UserId || undefined}>
@@ -156,18 +160,28 @@ export default function BookingDetail({
                     </p>
                 </div>
 
-                {(!!otherDetails.IsSeasonGala ||
-                    !!otherDetails.IsOperaDance ||
-                    !!P ||
-                    !!otherDetails.Venue ||
-                    UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.UKTVenue)) && (
+                {(otherDetails.IsSeasonGala ||
+                    otherDetails.IsOperaDance ||
+                    P ||
+                    venues.some((venue) => venue.value === otherDetails.Venue) ||
+                    UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.Venue) ||
+                    affiliates.some((affiliate) => affiliate.value === otherDetails.Venue)) && (
                     <div className="flex flex-wrap mt-3">
-                        {affiliates.some(
-                            (affiliate) => affiliate.value === otherDetails.AffiliateVenue
-                        ) && <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>}
+                        {/* Check against UKTVenues */}
+                        {affiliates.some((affiliate) => affiliate.value === otherDetails.Venue) && (
+                            <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
+                        )}
+
+                        {/* Check against venues */}
                         {venues.some((venue) => venue.value === otherDetails.Venue) && (
                             <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
+
+                        {/* Check against UKTVenues */}
+                        {UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.Venue) && (
+                            <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
+                        )}
+
                         {P && <BookingBadge type="P">P</BookingBadge>}
                         {otherDetails.IsOperaDance && (
                             <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
@@ -176,9 +190,6 @@ export default function BookingDetail({
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>
-                        )}
-                        {UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.UKTVenue) && (
-                            <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
                     </div>
                 )}
