@@ -59,29 +59,6 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                 <TableCell key={`${index}-${subRow.PressContact}`}>
                                     {subRow.PressContact}
                                 </TableCell>
-
-                                {/*Due to our data coming from a time prior to the tool, 
-					we may recieve a string, therefore we convert first with !! */}
-                                {/* { (!!subRow.IsSeasonGala || !!subRow.IsOperaDance || !!subRow.P) && ( 
-					<TableCell>
-						<div className="flex">
-						{subRow.P && (
-							<BookingBadge type="P">P</BookingBadge>
-						)}
-						{subRow.IsOperaDance && (
-							<BookingBadge type="OPERA_DANCE">
-								Opera/Dance
-							</BookingBadge>
-						)}
-						{subRow.IsSeasonGala && (
-							<BookingBadge type="GALA_NIGHT">
-								Season Announcement/Gala Night
-							</BookingBadge>
-						)}
-						</div>
-					</TableCell>
-					)} */}
-
                                 <TableCell>
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
