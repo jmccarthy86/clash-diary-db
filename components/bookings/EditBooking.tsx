@@ -38,6 +38,7 @@ export default function EditBooking({
         Date: currentSelectedDate,
         P: currentDetail.P || false,
         Venue: venue,
+        UKTVenue: currentDetail.UKTVenue || "",
         OtherVenue: otherVenue,
         VenueIsTba: currentDetail.VenueIsTba || false,
         TitleOfShow: currentDetail.TitleOfShow || "",

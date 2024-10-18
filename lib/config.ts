@@ -3,6 +3,7 @@ export const headers = [
     "Date",
     "P",
     "Venue",
+    "UKTVenue",
     "AffiliateVenue",
     "OtherVenue",
     "VenueIsTba",

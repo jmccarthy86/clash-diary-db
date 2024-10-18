@@ -31,6 +31,7 @@ function MainContent() {
             if (event.origin !== "https://solt.co.uk") return;
 
             const { selectedDate } = event.data;
+            console.log(selectedDate);
 
             // Check if the message contains a valid date
             if (selectedDate && !isNaN(Date.parse(selectedDate))) {

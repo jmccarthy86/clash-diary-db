@@ -21,13 +21,13 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import EditBooking from "@/components/bookings/EditBooking";
-import { unCamelCase } from "@/lib/utils";
 import { useExcel } from "@/context/ExcelContext";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
 import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
+import UKTVenues from "@/lib/uktvenues";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -48,42 +48,25 @@ export default function BookingDetail({
     const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
 
     const { UserId, P, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
-    // const hiddenValues = [
-    //     "IsSeasonGala",
-    //     "IsOperaDance",
-    //     "DateBkd",
-    //     "ShowTitleIsTba",
-    //     "VenueIsTba",
-    //     "range",
-    //     "Venue",
-    //     "OtherVenue",
-    // 	"TimeStamp"
-    // ];
 
     React.useEffect(() => {
-        //console.log('Setting up message event listener in iframe');
-
         const checkAuthCookie = (cookies: string) => {
             const cookieArray = cookies.split(";");
             const clashSyncCookie = cookieArray.find((cookie) =>
                 cookie.trim().startsWith("clash_sync=")
             );
-            //console.log('Clash Sync Cookie:', clashSyncCookie);
             if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             }
         };
 
         const handleMessage = (event: MessageEvent) => {
-            //console.log('Message event received in iframe:', event);
-
             if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }
 
             if (event.data && event.data.cookies) {
-                //console.log('Cookies received in iframe:', event.data.cookies);
                 checkAuthCookie(event.data.cookies);
             } else {
                 console.warn("No cookies in message data:", event.data);
@@ -91,14 +74,9 @@ export default function BookingDetail({
         };
 
         window.addEventListener("message", handleMessage);
-
-        // Notify parent that iframe is ready
-        //console.log('Iframe is ready, notifying parent');
         window.parent.postMessage("iframeReady", "https://solt.co.uk");
 
-        // Clean up the event listener on component unmount
         return () => {
-            //console.log('Cleaning up message event listener in iframe');
             window.removeEventListener("message", handleMessage);
         };
     }, []);
@@ -131,6 +109,8 @@ export default function BookingDetail({
         hasAuthCookie !== 0 &&
         hasAuthCookie === Number(UserId) &&
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+
+    console.log(otherDetails);
 
     return (
         <Card className="w-full pt-6" data-relation={UserId || undefined}>
@@ -168,6 +148,8 @@ export default function BookingDetail({
                             ? otherDetails.OtherVenue
                             : otherDetails.AffiliateVenue
                             ? otherDetails.AffiliateVenue
+                            : otherDetails.UKTVenue
+                            ? otherDetails.UKTVenue
                             : otherDetails.VenueIsTba
                             ? "TBA"
                             : ""}
@@ -177,13 +159,14 @@ export default function BookingDetail({
                 {(!!otherDetails.IsSeasonGala ||
                     !!otherDetails.IsOperaDance ||
                     !!P ||
-                    !!otherDetails.Venue) && (
-                    <div className="flex flex-wrapmt-3">
+                    !!otherDetails.Venue ||
+                    UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.UKTVenue)) && (
+                    <div className="flex flex-wrap mt-3">
                         {affiliates.some(
                             (affiliate) => affiliate.value === otherDetails.AffiliateVenue
                         ) && <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>}
                         {venues.some((venue) => venue.value === otherDetails.Venue) && (
-                            <BookingBadge type="SOLT_MEMBER">Member</BookingBadge>
+                            <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
                         {P && <BookingBadge type="P">P</BookingBadge>}
                         {otherDetails.IsOperaDance && (
@@ -193,6 +176,9 @@ export default function BookingDetail({
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>
+                        )}
+                        {UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.UKTVenue) && (
+                            <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
                     </div>
                 )}

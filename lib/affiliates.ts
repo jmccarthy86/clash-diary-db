@@ -1,11 +1,11 @@
 const affiliates = [
-    { value: "Almeida", label: "Almeida" },
+    { value: "Almeida Theatre", label: "Almeida Theatre" },
     { value: "Arcola", label: "Arcola" },
     { value: "Arts", label: "Arts" },
     { value: "Bloomsbury", label: "Bloomsbury" },
     { value: "Bush", label: "Bush" },
     { value: "Bridge", label: "Bridge" },
-    { value: "Cadogan Hall", label: "Cadogan Hall" },
+    { value: "Cadogan Hall Theatre", label: "Cadogan Hall Theatre" },
     { value: "Charing Cross Theatre", label: "Charing Cross Theatre" },
     { value: "Donmar Warehouse", label: "Donmar Warehouse" },
     { value: "Greenwich", label: "Greenwich" },

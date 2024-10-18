@@ -99,7 +99,16 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                         </div>
                                     )}
                                     {subRow.Venue === "" ? (
-                                        subRow.OtherVenue && subRow.OtherVenue !== "" ? (
+                                        subRow.UKTVenue && subRow.UKTVenue !== "" ? (
+                                            <div key="UKTVenue" className="flex-1 space-y-1 mb-2">
+                                                <p className="font-medium leading-none">
+                                                    UKT Venue
+                                                </p>
+                                                <p className="text-muted-foreground">
+                                                    {subRow.UKTVenue}
+                                                </p>
+                                            </div>
+                                        ) : subRow.OtherVenue && subRow.OtherVenue !== "" ? (
                                             <div key="OtherVenue" className="flex-1 space-y-1 mb-2">
                                                 <p className="font-medium leading-none">
                                                     Other Venue
@@ -133,6 +142,7 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                             <p className="text-muted-foreground">{subRow.Venue}</p>
                                         </div>
                                     )}
+
                                     {subRow.PressContact && (
                                         <div key="PressContact" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">

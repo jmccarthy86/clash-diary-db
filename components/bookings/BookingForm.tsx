@@ -1,5 +1,4 @@
 "use client";
-//
 import * as React from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
+import UKTVenues from "@/lib/uktvenues";
 import {
     Command,
     CommandEmpty,
@@ -39,6 +39,7 @@ export const FormSchema = z.object({
     }),
     P: z.boolean().optional(),
     Venue: z.string().optional(),
+    UKTVenue: z.string().optional(),
     AffiliateVenue: z.string().optional(),
     OtherVenue: z.string().optional(),
     VenueIsTba: z.boolean().optional(),
@@ -70,21 +71,21 @@ export default function BookingForm({
     const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
     const [open, setOpen] = React.useState(false);
     const [openAffiliate, setOpenAffiliate] = React.useState(false);
+    const [openUKTVenue, setOpenUKTVenue] = React.useState(false); // State for UKTVenue select
 
     const defaultValues = React.useMemo(() => {
         if (initialData) {
-            // We're editing, use initialData but override UserId if cookie exists
             return {
                 ...initialData,
                 UserId: hasAuthCookie || initialData.UserId || "",
             };
         } else {
-            // We're creating new, use empty fields except for UserId and other specified fields
             return {
                 Day: "",
                 Date: new Date(),
                 P: false,
                 Venue: "",
+                UKTVenue: "", // Initialize UKTVenue
                 AffiliateVenue: "",
                 OtherVenue: "",
                 VenueIsTba: false,
@@ -97,7 +98,6 @@ export default function BookingForm({
                 IsOperaDance: false,
                 UserId: hasAuthCookie || 0,
                 TimeStamp: format(currentSelectedDate, "dd/MM/yyyy 00:00:00"),
-                MemberLevel: "",
             };
         }
     }, [initialData, hasAuthCookie, currentSelectedDate]);
@@ -134,7 +134,6 @@ export default function BookingForm({
             const clashSyncCookie = cookieArray.find((cookie) =>
                 cookie.trim().startsWith("clash_sync=")
             );
-            console.log("Clash Sync Cookie:", clashSyncCookie);
             if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             }
@@ -155,9 +154,7 @@ export default function BookingForm({
 
         window.addEventListener("message", handleMessage);
 
-        // Clean up the event listener on component unmount
         return () => {
-            //console.log('Cleaning up message event listener in iframe');
             window.removeEventListener("message", handleMessage);
         };
     }, []);
@@ -172,13 +169,6 @@ export default function BookingForm({
     React.useEffect(() => {
         if (currentSelectedDate) {
             const now = new Date();
-            // const combinedDate = setMilliseconds(
-            //     setSeconds(
-            //         setMinutes(setHours(currentSelectedDate, now.getHours()), now.getMinutes()),
-            //         now.getSeconds()
-            //     ),
-            //     now.getMilliseconds()
-            // );
             form.setValue("TimeStamp", format(now, "dd/MM/yyyy HH:mm:ss"));
         }
     }, [currentSelectedDate, form]);
@@ -194,8 +184,6 @@ export default function BookingForm({
     } = form;
 
     const formRef = React.useRef<HTMLFormElement>(null);
-
-    console.log(hasAuthCookie);
 
     return (
         <div className="w-full" style={{ pointerEvents: isCalendarOpen ? "none" : "auto" }}>
@@ -388,7 +376,7 @@ export default function BookingForm({
                                                                                 "AffiliateVenue",
                                                                                 venue.value
                                                                             );
-                                                                            setOpen(false);
+                                                                            setOpenAffiliate(false);
                                                                         }}
                                                                     >
                                                                         <Check
@@ -416,44 +404,129 @@ export default function BookingForm({
                         </div>
                     </div>
 
-                    {/* Other Venue */}
-                    <div className="w-full lg:w-1/2">
-                        <FormLabel>Other Venue</FormLabel>
-                        <FormField
-                            control={form.control}
-                            name="OtherVenue"
-                            render={({ field }) => (
-                                <FormItem className="mb-2 lg:mb-0">
-                                    <FormControl>
-                                        <Input
-                                            id="OtherVenue"
-                                            {...field}
-                                            placeholder="Venue Name"
-                                            disabled={submitting}
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="VenueIsTba"
-                            render={({ field }) => (
-                                <FormItem className="flex items-center">
-                                    <FormControl>
-                                        <Checkbox
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                            disabled={submitting}
-                                            className="mt-2 mr-1"
-                                        />
-                                    </FormControl>
-                                    <FormLabel>Tick box if a TBA</FormLabel>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                    <div className="flex flex-col lg:flex-row gap-2">
+                        {/* UKT Venue */}
+                        <div className="w-full lg:w-1/2">
+                            <FormLabel>UKT Venue</FormLabel>
+                            <FormField
+                                control={form.control}
+                                name="UKTVenue"
+                                render={({ field }) => {
+                                    const displayLabel = field.value
+                                        ? field.value
+                                        : "Select UK venue";
+
+                                    return (
+                                        <FormItem>
+                                            <Popover
+                                                open={openUKTVenue}
+                                                onOpenChange={setOpenUKTVenue}
+                                            >
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full justify-between",
+                                                                !field.value &&
+                                                                    "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {displayLabel
+                                                                ? displayLabel
+                                                                : "Select UK venue"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    className="w-[200px] p-0"
+                                                    asChild
+                                                    containerRef={formRef}
+                                                >
+                                                    <Command>
+                                                        <CommandInput placeholder="Search UK Venues..." />
+                                                        <CommandEmpty>
+                                                            No UK Venue found.
+                                                        </CommandEmpty>
+                                                        <CommandGroup>
+                                                            <CommandList>
+                                                                {UKTVenues.map((venue) => (
+                                                                    <CommandItem
+                                                                        value={venue.value}
+                                                                        key={venue.value}
+                                                                        onSelect={() => {
+                                                                            form.setValue(
+                                                                                "UKTVenue",
+                                                                                venue.value
+                                                                            );
+                                                                            setOpenUKTVenue(false);
+                                                                        }}
+                                                                    >
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                venue.value ===
+                                                                                    field.value
+                                                                                    ? "opacity-100"
+                                                                                    : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                        {venue.label}
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandList>
+                                                        </CommandGroup>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormMessage />
+                                        </FormItem>
+                                    );
+                                }}
+                            />
+                        </div>
+
+                        {/* Other Venue */}
+                        <div className="w-full lg:w-1/2">
+                            <FormLabel>Other Venue</FormLabel>
+                            <FormField
+                                control={form.control}
+                                name="OtherVenue"
+                                render={({ field }) => (
+                                    <FormItem className="mb-2 lg:mb-0">
+                                        <FormControl>
+                                            <Input
+                                                id="OtherVenue"
+                                                {...field}
+                                                placeholder="Venue Name"
+                                                disabled={submitting}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="VenueIsTba"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                disabled={submitting}
+                                                className="mt-2 mr-1"
+                                            />
+                                        </FormControl>
+                                        <FormLabel>Tick box if a TBA</FormLabel>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex flex-col space-y-1.5">
