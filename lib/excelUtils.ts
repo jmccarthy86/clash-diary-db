@@ -51,7 +51,7 @@ export const convertExcelDataToObject = (data: ExcelData, year: string): Result 
         const rowObject: RowData = {};
 
         row.forEach((cell, cellIndex) => {
-            if (cellIndex === 1 || cellIndex === 11 || cellIndex === 15) {
+            if (cellIndex === 1 || cellIndex === 13 || cellIndex === 16) {
                 rowObject[colHeaders[cellIndex]] = processDate(cell);
             } else {
                 rowObject[colHeaders[cellIndex]] = cell;

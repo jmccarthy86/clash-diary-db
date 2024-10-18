@@ -110,7 +110,7 @@ export default function BookingDetail({
         hasAuthCookie === Number(UserId) &&
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
-    // console.log("Current Venue:", otherDetails.Venue);
+    console.log("details", otherDetails);
     // console.log(
     //     "Affiliates:",
     //     affiliates.map((affiliate) => affiliate.value)

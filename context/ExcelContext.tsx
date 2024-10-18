@@ -65,6 +65,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         try {
             setLoading(true);
             const sheetData = await callExcelMethod("getUsedRangeValues");
+            console.log(sheetData);
             const transformedData = convertExcelDataToObject(sheetData, currentYear.toString());
             setYearData(transformedData);
         } catch (err) {
@@ -102,6 +103,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                     // Get the new worksheet's data
                     const newSheetData = await callExcelMethod("getUsedRangeValues");
+                    console.log(newSheetData);
 
                     // Convert the data to our object format
                     const convertedData = convertExcelDataToObject(newSheetData, year.toString());
