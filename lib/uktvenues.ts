@@ -20,9 +20,9 @@ const UKTVenues = [
     { value: "Chipping Norton Theatre", label: "Chipping Norton Theatre" },
     { value: "Churchill Theatre", label: "Churchill Theatre" },
     { value: "Citizens Theatre", label: "Citizens Theatre" },
-    { value: "Cockpit Theatre", label: "Cockpit Theatre" },
+    { value: "Cockpit Theatre", label: "Cockpit Theatre" }, // Is this The Cockpit?
     { value: "Complicite", label: "Complicite" },
-    { value: "Curve Theatre", label: "Curve Theatre" },
+    { value: "Curve Theatre", label: "Curve Theatre" }, // Is this Curve, Leceister
     { value: "Dance Consortium Ltd", label: "Dance Consortium Ltd" },
     { value: "Darlington Hippodrome", label: "Darlington Hippodrome" },
     { value: "Derby Theatre", label: "Derby Theatre" },
@@ -34,7 +34,7 @@ const UKTVenues = [
     { value: "English National Ballet", label: "English National Ballet" },
     { value: "English National Opera", label: "English National Opera" },
     { value: "English Touring Theatre", label: "English Touring Theatre" },
-    { value: "Everyman Theatre", label: "Everyman Theatre" },
+    { value: "Everyman Theatre", label: "Everyman Theatre" }, // Is this Liverpool Everyman?
     { value: "Exeter Northcott Theatre Company", label: "Exeter Northcott Theatre Company" },
     { value: "G Live Guildford", label: "G Live Guildford" },
     { value: "Glyndebourne", label: "Glyndebourne" },
@@ -69,7 +69,7 @@ const UKTVenues = [
     { value: "Marina Theatre", label: "Marina Theatre" },
     { value: "Marlowe Theatre", label: "Marlowe Theatre" },
     { value: "MAST Mayflower Studios", label: "MAST Mayflower Studios" },
-    { value: "Mayflower Theatre", label: "Mayflower Theatre" },
+    { value: "Mayflower Theatre", label: "Mayflower Theatre" }, // Is this Mayflower Southampton
     { value: "Mercury Theatre", label: "Mercury Theatre" },
     { value: "Middlesbrough Theatre", label: "Middlesbrough Theatre" },
     { value: "Midland Arts Centre (MAC)", label: "Midland Arts Centre (MAC)" },
