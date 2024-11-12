@@ -5,53 +5,48 @@ import { startOfMonth, endOfMonth, startOfDay } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListView from "@/components/table/ListView";
 import { CalendarView } from "@/components/calendar/calendar";
-import { ExcelProvider, useExcel } from "@/context/ExcelContext";
+import { ExcelProvider } from "@/context/ExcelContext";
 import { CalendarIcon, TableIcon } from "@radix-ui/react-icons";
 
 function MainContent() {
-    //console.log("MainContent rendered");
-    //const { loading, error } = useExcel();
-
-    // const [dateRange, setDateRange] = React.useState<{ from: Date; to: Date }>({
-    //     from: startOfMonth(new Date()),
-    //     to: endOfMonth(new Date()),
-    // });
-    // const [singleDate, setSingleDate] = React.useState<Date>(new Date());
-
     const [dateRange, setDateRange] = React.useState<{ from: Date; to: Date }>({
         from: startOfMonth(new Date()),
         to: endOfMonth(new Date()),
     });
     const [singleDate, setSingleDate] = React.useState<Date>(new Date());
 
+    // Ref to track if this is the initial mount
+    const isInitialMount = React.useRef(true);
+
     React.useEffect(() => {
-        // Function to handle message from parent window
-        const handleMessage = (event: MessageEvent) => {
-            // Make sure the origin is the expected one
-            if (event.origin !== "https://solt.co.uk") return;
+        // Only run on initial mount
+        if (isInitialMount.current) {
+            isInitialMount.current = false; // Mark that the initial mount has occurred
 
-            const { selectedDate } = event.data;
-            console.log(selectedDate);
+            const handleMessage = (event: MessageEvent) => {
+                if (event.origin !== "https://solt.co.uk") return;
 
-            // Check if the message contains a valid date
-            if (selectedDate && !isNaN(Date.parse(selectedDate))) {
-                const newDate = new Date(selectedDate);
-                setSingleDate(newDate);
-                setDateRange({
-                    from: startOfMonth(newDate),
-                    to: endOfMonth(newDate),
-                });
-            }
-        };
+                const { selectedDate } = event.data;
+                console.log(selectedDate);
 
-        // Add event listener for message
-        window.addEventListener("message", handleMessage);
+                if (selectedDate && !isNaN(Date.parse(selectedDate))) {
+                    const newDate = new Date(selectedDate);
+                    setSingleDate(newDate);
+                    setDateRange({
+                        from: startOfMonth(newDate),
+                        to: endOfMonth(newDate),
+                    });
+                }
+            };
 
-        // Cleanup event listener on component unmount
-        return () => {
-            window.removeEventListener("message", handleMessage);
-        };
-    }, []); // Empty dependency array ensures this runs only on component mount
+            window.addEventListener("message", handleMessage);
+
+            // Cleanup listener on unmount
+            return () => {
+                window.removeEventListener("message", handleMessage);
+            };
+        }
+    }, []);
 
     const handleDateRangeChange = (newRange: { from: Date; to: Date }) => {
         setDateRange(newRange);
