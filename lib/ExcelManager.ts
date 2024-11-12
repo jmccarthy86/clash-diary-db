@@ -163,27 +163,13 @@ export class ExcelManager {
         return this.withRetry(async () => {
             try {
                 await this.lockRange(range);
-
-                // Identify the indices of the 'Date' and 'DateBkd' columns
-                const dateColumnIndex = headers.indexOf("Date");
-                const dateBkdColumnIndex = headers.indexOf("DateBkd");
-
-                // Build numberFormat array: apply `dd/mm/yyyy` to Date and DateBkd, "General" to others
-                const numberFormat = headers.map((header, index) =>
-                    index === dateColumnIndex || index === dateBkdColumnIndex
-                        ? ["dd/mm/yyyy"]
-                        : ["General"]
-                );
-
                 await this.client
                     .api(
                         `/users/${this.userId}/drive/items/${this.workbookId}/workbook/worksheets/${this.worksheetId}/range(address='${range}')`
                     )
                     .patch({
                         values: [newData],
-                        numberFormat: [numberFormat], // Apply selective formatting
                     });
-
                 this.log("EditRow", { range, newData });
             } finally {
                 await this.unlockRange(range);
@@ -205,27 +191,13 @@ export class ExcelManager {
 
             try {
                 await this.lockRange(newRowRange);
-
-                // Identify the indices of the 'Date' and 'DateBkd' columns
-                const dateColumnIndex = headers.indexOf("Date");
-                const dateBkdColumnIndex = headers.indexOf("DateBkd");
-
-                // Build numberFormat array: apply `dd/mm/yyyy` to Date and DateBkd, "General" to others
-                const numberFormat = headers.map((header, index) =>
-                    index === dateColumnIndex || index === dateBkdColumnIndex
-                        ? ["dd/mm/yyyy"]
-                        : ["General"]
-                );
-
                 await this.client
                     .api(
                         `/users/${this.userId}/drive/items/${this.workbookId}/workbook/worksheets/${this.worksheetId}/range(address='${newRowRange}')`
                     )
                     .patch({
                         values: [newData],
-                        numberFormat: [numberFormat], // Apply selective formatting
                     });
-
                 this.log("CreateNewRow", { newRowRange, newData });
                 return newRowRange;
             } finally {
