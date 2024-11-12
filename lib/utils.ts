@@ -143,9 +143,9 @@ export function prepareBookingFormData(data: any) {
         Object.fromEntries(
             headers.map((key) => {
                 if (key === "Date" && data[key] instanceof Date) {
-                    //console.log(format(data[key], "dd/MM/yyyy"));
+                    console.log(format(data[key], "dd/MM/yyyy"));
                     const date = format(data[key], "dd/MM/yyyy");
-                    return [key, `${date}`];
+                    return [key, date];
                 }
                 return [key, data[key]];
             })
