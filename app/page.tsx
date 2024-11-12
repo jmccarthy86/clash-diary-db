@@ -15,30 +15,36 @@ function MainContent() {
     });
     const [singleDate, setSingleDate] = React.useState<Date>(new Date());
 
-    // Ref to track if this is the initial mount
-    const isInitialMount = React.useRef(true);
+    // Ref to indicate that the listener was added
+    const hasListener = React.useRef(false);
 
     React.useEffect(() => {
-        // Only run on initial mount
-        if (isInitialMount.current) {
-            isInitialMount.current = false; // Mark that the initial mount has occurred
+        // Only add event listener once on initial mount
+        if (!hasListener.current) {
+            hasListener.current = true;
 
             const handleMessage = (event: MessageEvent) => {
+                // Verify the origin to make sure it's the expected source
                 if (event.origin !== "https://solt.co.uk") return;
 
                 const { selectedDate } = event.data;
-                console.log(selectedDate);
 
+                // Ensure selectedDate is a valid date and different from the current date
                 if (selectedDate && !isNaN(Date.parse(selectedDate))) {
                     const newDate = new Date(selectedDate);
-                    setSingleDate(newDate);
-                    setDateRange({
-                        from: startOfMonth(newDate),
-                        to: endOfMonth(newDate),
-                    });
+
+                    // Only update if the selected date is actually new
+                    if (newDate.getTime() !== singleDate.getTime()) {
+                        setSingleDate(newDate);
+                        setDateRange({
+                            from: startOfMonth(newDate),
+                            to: endOfMonth(newDate),
+                        });
+                    }
                 }
             };
 
+            // Register message event listener
             window.addEventListener("message", handleMessage);
 
             // Cleanup listener on unmount
@@ -46,7 +52,7 @@ function MainContent() {
                 window.removeEventListener("message", handleMessage);
             };
         }
-    }, []);
+    }, [singleDate]); // Depend on singleDate to ensure it doesn't rerun unless needed
 
     const handleDateRangeChange = (newRange: { from: Date; to: Date }) => {
         setDateRange(newRange);
