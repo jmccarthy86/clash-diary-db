@@ -103,7 +103,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                     // Get the new worksheet's data
                     const newSheetData = await callExcelMethod("getUsedRangeValues");
-                    console.log(newSheetData);
+                    console.log("sheet", newSheetData);
 
                     // Convert the data to our object format
                     const convertedData = convertExcelDataToObject(newSheetData, year.toString());

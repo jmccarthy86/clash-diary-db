@@ -111,6 +111,7 @@ export default function BookingDetail({
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
     console.log("details", otherDetails);
+    // console.log(otherDetails.IsSeasonGala);
     // console.log(
     //     "Affiliates:",
     //     affiliates.map((affiliate) => affiliate.value)
@@ -160,39 +161,34 @@ export default function BookingDetail({
                     </p>
                 </div>
 
-                {(otherDetails.IsSeasonGala ||
-                    otherDetails.IsOperaDance ||
-                    P ||
-                    venues.some((venue) => venue.value === otherDetails.Venue) ||
-                    UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.Venue) ||
-                    affiliates.some((affiliate) => affiliate.value === otherDetails.Venue)) && (
+                <div key="Badges" className="flex-1 space-y-1">
                     <div className="flex flex-wrap mt-3">
-                        {/* Check against UKTVenues */}
+                        <p>{otherDetails.IsSeasonGala}</p>
                         {affiliates.some((affiliate) => affiliate.value === otherDetails.Venue) && (
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
                         )}
 
-                        {/* Check against venues */}
                         {venues.some((venue) => venue.value === otherDetails.Venue) && (
                             <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
 
-                        {/* Check against UKTVenues */}
                         {UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.Venue) && (
                             <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
 
                         {P && <BookingBadge type="P">P</BookingBadge>}
+
                         {otherDetails.IsOperaDance && (
                             <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
                         )}
+
                         {otherDetails.IsSeasonGala && (
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>
                         )}
                     </div>
-                )}
+                </div>
             </CardContent>
             <CardFooter className="flex gap-2">
                 {showEditOptions && (
