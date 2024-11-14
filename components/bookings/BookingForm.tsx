@@ -134,8 +134,24 @@ export default function BookingForm({
             const clashSyncCookie = cookieArray.find((cookie) =>
                 cookie.trim().startsWith("clash_sync=")
             );
+
             if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
+            } else {
+                // Check clashId in parent document as a fallback
+                const clashIdElement = window.parent.document.getElementById("clashId");
+                if (clashIdElement) {
+                    const clashIdValue = Number(clashIdElement.value);
+                    if (clashIdValue) {
+                        setHasAuthCookie(clashIdValue);
+                    } else {
+                        console.warn("No valid auth found in cookies or clashId");
+                        setHasAuthCookie(null); // Set state to indicate no auth
+                    }
+                } else {
+                    console.warn("No valid auth found in cookies or clashId");
+                    setHasAuthCookie(null); // Set state to indicate no auth
+                }
             }
         };
 
