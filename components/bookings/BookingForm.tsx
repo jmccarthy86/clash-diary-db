@@ -139,18 +139,20 @@ export default function BookingForm({
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             } else {
                 // Check clashId in parent document as a fallback
-                const clashIdElement = window.parent.document.getElementById("clashId");
+                const clashIdElement = window.parent.document.getElementById(
+                    "clashId"
+                ) as HTMLInputElement;
                 if (clashIdElement) {
                     const clashIdValue = Number(clashIdElement.value);
                     if (clashIdValue) {
                         setHasAuthCookie(clashIdValue);
                     } else {
                         console.warn("No valid auth found in cookies or clashId");
-                        setHasAuthCookie(null); // Set state to indicate no auth
+                        setHasAuthCookie(0); // Set state to indicate no auth
                     }
                 } else {
                     console.warn("No valid auth found in cookies or clashId");
-                    setHasAuthCookie(null); // Set state to indicate no auth
+                    setHasAuthCookie(0); // Set state to indicate no auth
                 }
             }
         };
@@ -190,7 +192,7 @@ export default function BookingForm({
     }, [currentSelectedDate, form]);
 
     React.useEffect(() => {
-        if (hasAuthCookie) {
+        if (hasAuthCookie && hasAuthCookie !== 0) {
             form.setValue("UserId", hasAuthCookie);
         }
     }, [hasAuthCookie, form]);
@@ -232,7 +234,7 @@ export default function BookingForm({
                                                     onClick={() => setIsCalendarOpen(true)}
                                                 >
                                                     {field.value ? (
-                                                        format(field.value, "do MMMM yyyy")
+                                                        format(field.value, "d MMMM yyyy")
                                                     ) : (
                                                         <span>Pick a date</span>
                                                     )}
