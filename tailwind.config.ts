@@ -33,6 +33,7 @@ const config = {
                 "solt-purple-50": "rgb(111 6 79 / 50%)",
             },
             colors: {
+                gold: "#F5B330",
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",

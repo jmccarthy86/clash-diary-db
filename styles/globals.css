@@ -121,3 +121,16 @@ h5,
 h6 {
     font-family: var(--font-heading), sans-serif;
 }
+
+.header-button {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    color: white;
+    &:not(.header-button-logout) {
+        border: 3px solid white;
+    }
+
+    &.header-button-logout {
+        color: black;
+    }
+}
