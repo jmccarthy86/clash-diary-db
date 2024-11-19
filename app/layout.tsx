@@ -67,6 +67,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                         <a
                             className="header-button header-button-logout bg-solt-gold border-gold border-[3px]"
                             href="https://solt.co.uk/first-night-diary?logout=true"
+                            target="_top"
                         >
                             Log Out
                         </a>
