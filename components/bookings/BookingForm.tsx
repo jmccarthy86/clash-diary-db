@@ -129,21 +129,20 @@ export default function BookingForm({
     };
 
     React.useEffect(() => {
-        const checkAuthCookie = (cookies: string) => {
+        // Function to handle cookie and fallback clashId
+        const checkAuthCookie = (cookies: string, clashIdFromParent: string | null) => {
             const cookieArray = cookies.split(";");
             const clashSyncCookie = cookieArray.find((cookie) =>
                 cookie.trim().startsWith("clash_sync=")
             );
 
+            // If valid clash_sync cookie exists, use it
             if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
             } else {
-                // Check clashId in parent document as a fallback
-                const clashIdElement = window.parent.document.getElementById(
-                    "clashId"
-                ) as HTMLInputElement;
-                if (clashIdElement) {
-                    const clashIdValue = Number(clashIdElement.value);
+                // Fallback to clashId from parent if no valid cookie found
+                if (clashIdFromParent) {
+                    const clashIdValue = Number(clashIdFromParent);
                     if (clashIdValue) {
                         setHasAuthCookie(clashIdValue);
                     } else {
@@ -157,6 +156,7 @@ export default function BookingForm({
             }
         };
 
+        // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
             if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
@@ -164,7 +164,8 @@ export default function BookingForm({
             }
 
             if (event.data && event.data.cookies) {
-                checkAuthCookie(event.data.cookies);
+                const clashIdFromParent = event.data.clashId; // Get clashId from message
+                checkAuthCookie(event.data.cookies, clashIdFromParent);
             } else {
                 console.warn("No cookies in message data:", event.data);
             }
