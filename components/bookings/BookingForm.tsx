@@ -139,20 +139,32 @@ export default function BookingForm({
     const checkAuthCookie = (cookies: string) => {
         const clashSyncCookie = getCookie("clash_sync");
 
+        // Log when we are checking cookies
+        console.log("Checking cookies:", cookies);
+        console.log("clash_sync cookie:", clashSyncCookie);
+
         // If cookie exists and is valid, use it
         if (clashSyncCookie && Number(clashSyncCookie) !== 0) {
+            console.log("Valid clash_sync cookie found:", clashSyncCookie);
             setHasAuthCookie(Number(clashSyncCookie));
         } else {
+            console.log("No valid clash_sync cookie found. Fallback to parent document.");
+
             // If no valid cookie, fall back to parent window
             if (window.parent) {
                 try {
                     const clashIdElement = window.parent.document.getElementById(
                         "clashId"
                     ) as HTMLInputElement;
+
+                    // Log the fallback process
+                    console.log("Checking parent document for clashId:", clashIdElement);
+
                     if (clashIdElement && clashIdElement.value) {
+                        console.log("Found clashId in parent document:", clashIdElement.value);
                         setHasAuthCookie(Number(clashIdElement.value));
                     } else {
-                        console.warn("No valid auth found in cookies or clashId");
+                        console.warn("No valid clashId found in parent document.");
                         setHasAuthCookie(null);
                     }
                 } catch (error) {
@@ -160,6 +172,7 @@ export default function BookingForm({
                     setHasAuthCookie(null);
                 }
             } else {
+                console.warn("Parent window not accessible.");
                 setHasAuthCookie(null);
             }
         }
@@ -167,12 +180,15 @@ export default function BookingForm({
 
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
+            console.log("Received message from parent:", event);
+
             if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }
 
             if (event.data && event.data.cookies) {
+                console.log("Processing cookies from parent message:", event.data.cookies);
                 checkAuthCookie(event.data.cookies);
             } else {
                 console.warn("No cookies in message data:", event.data);
