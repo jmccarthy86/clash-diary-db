@@ -49,11 +49,11 @@ const venues = [
     { value: "Shaftesbury Theatre", label: "Shaftesbury Theatre" },
     { value: "Shakespeare's Globe", label: "Shakespeare's Globe" },
     { value: "Sam Wanamaker Playhouse", label: "Sam Wanamaker Playhouse" },
-    {
-        value: "Southbank Centre Queen Elizabeth Hall",
-        label: "Southbank Centre Queen Elizabeth Hall",
-    },
-    { value: "Southbank Centre Purcell Room", label: "Southbank Centre Purcell Room" },
+    // {
+    //     value: "Southbank Centre Queen Elizabeth Hall",
+    //     label: "Southbank Centre Queen Elizabeth Hall",
+    // },
+    // { value: "Southbank Centre Purcell Room", label: "Southbank Centre Purcell Room" },
     { value: "Southwark Playhouse Borough", label: "Southwark Playhouse Borough" },
     { value: "Southwark Playhouse Elephant", label: "Southwark Playhouse Elephant" },
     { value: "@sohoplace", label: "@sohoplace" },
