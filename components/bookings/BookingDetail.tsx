@@ -52,30 +52,30 @@ export default function BookingDetail({
     React.useEffect(() => {
         // Function to handle cookie and fallback clashId
         const checkAuthCookie = (cookies: string, clashIdFromParent: string | null) => {
-            const cookieArray = cookies.split(";");
-            const clashSyncCookie = cookieArray.find((cookie) =>
-                cookie.trim().startsWith("clash_sync=")
-            );
+            // const cookieArray = cookies.split(";");
+            // const clashSyncCookie = cookieArray.find((cookie) =>
+            //     cookie.trim().startsWith("clash_sync=")
+            // );
 
-            // If valid clash_sync cookie exists, use it
-            if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
-                setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
-            } else {
-                // Fallback to clashId from parent if no valid cookie found
-                if (clashIdFromParent) {
-                    const clashIdValue = Number(clashIdFromParent);
-                    if (clashIdValue) {
-                        setHasAuthCookie(clashIdValue);
-                    } else {
-                        console.warn("No valid auth found in cookies or clashId");
-                        setHasAuthCookie(0); // Set state to indicate no auth
-                    }
+            // // If valid clash_sync cookie exists, use it
+            // if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
+            //     setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
+            // } else {
+            // Fallback to clashId from parent if no valid cookie found
+            if (clashIdFromParent) {
+                const clashIdValue = Number(clashIdFromParent);
+                if (clashIdValue) {
+                    setHasAuthCookie(clashIdValue);
                 } else {
                     console.warn("No valid auth found in cookies or clashId");
                     setHasAuthCookie(0); // Set state to indicate no auth
                 }
+            } else {
+                console.warn("No valid auth found in cookies or clashId");
+                setHasAuthCookie(0); // Set state to indicate no auth
             }
         };
+        // };
 
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
