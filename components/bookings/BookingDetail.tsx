@@ -45,21 +45,39 @@ export default function BookingDetail({
     const { refreshData, callExcelMethod, yearData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
+    const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
 
     const { UserId, P, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
 
     React.useEffect(() => {
-        const checkAuthCookie = (cookies: string) => {
+        // Function to handle cookie and fallback clashId
+        const checkAuthCookie = (cookies: string, clashIdFromParent: string | null) => {
             const cookieArray = cookies.split(";");
             const clashSyncCookie = cookieArray.find((cookie) =>
                 cookie.trim().startsWith("clash_sync=")
             );
+
+            // If valid clash_sync cookie exists, use it
             if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
                 setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
+            } else {
+                // Fallback to clashId from parent if no valid cookie found
+                if (clashIdFromParent) {
+                    const clashIdValue = Number(clashIdFromParent);
+                    if (clashIdValue) {
+                        setHasAuthCookie(clashIdValue);
+                    } else {
+                        console.warn("No valid auth found in cookies or clashId");
+                        setHasAuthCookie(0); // Set state to indicate no auth
+                    }
+                } else {
+                    console.warn("No valid auth found in cookies or clashId");
+                    setHasAuthCookie(0); // Set state to indicate no auth
+                }
             }
         };
 
+        // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
             if (event.origin !== "https://solt.co.uk") {
                 console.warn("Invalid origin:", event.origin);
@@ -67,14 +85,14 @@ export default function BookingDetail({
             }
 
             if (event.data && event.data.cookies) {
-                checkAuthCookie(event.data.cookies);
+                const clashIdFromParent = event.data.clashId; // Get clashId from message
+                checkAuthCookie(event.data.cookies, clashIdFromParent);
             } else {
                 console.warn("No cookies in message data:", event.data);
             }
         };
 
         window.addEventListener("message", handleMessage);
-        window.parent.postMessage("iframeReady", "https://solt.co.uk");
 
         return () => {
             window.removeEventListener("message", handleMessage);
