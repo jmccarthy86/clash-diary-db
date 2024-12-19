@@ -85,7 +85,7 @@ export default function BookingDetail({
             }
 
             if (event.data && event.data.cookies) {
-                const clashIdFromParent = event.data.clashId; // Get clashId from message
+                const clashIdFromParent = event.data.clashId;
                 checkAuthCookie(event.data.cookies, clashIdFromParent);
             } else {
                 console.warn("No cookies in message data:", event.data);
