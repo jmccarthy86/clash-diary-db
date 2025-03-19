@@ -166,6 +166,9 @@ const UKTVenues = [
     { value: "Wyvern Theatre Swindon", label: "Wyvern Theatre Swindon" },
     { value: "York Theatre Royal", label: "York Theatre Royal" },
     { value: "Yvonne Arnaud Theatre", label: "Yvonne Arnaud Theatre" },
+    { value: "Royal Shakespeare Theatre", label: "Royal Shakespeare Theatre" },
+    { value: "Swan Theatre", label: "Swan Theatre" },
+    { value: "The Other Place", label: "The Other Place" },
 ];
 
 export default UKTVenues;
