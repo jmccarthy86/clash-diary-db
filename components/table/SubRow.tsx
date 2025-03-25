@@ -78,26 +78,26 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                             </p>
                                         </div>
                                     )}
-                                    {subRow.Venue?.trim() ? (
+                                    {subRow.Venue ? (
                                         <div key="Venue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Venue</p>
                                             <p className="text-muted-foreground">{subRow.Venue}</p>
                                         </div>
-                                    ) : subRow.UKTVenue?.trim() ? (
+                                    ) : subRow.UKTVenue ? (
                                         <div key="UKTVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">UKT Venue</p>
                                             <p className="text-muted-foreground">
                                                 {subRow.UKTVenue}
                                             </p>
                                         </div>
-                                    ) : subRow.OtherVenue?.trim() ? (
+                                    ) : subRow.OtherVenue ? (
                                         <div key="OtherVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Other Venue</p>
                                             <p className="text-muted-foreground">
                                                 {subRow.OtherVenue}
                                             </p>
                                         </div>
-                                    ) : subRow.AffiliateVenue?.trim() ? (
+                                    ) : subRow.AffiliateVenue ? (
                                         <div key="AffiliateVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
                                                 Affiliate Venue
