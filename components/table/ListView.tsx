@@ -64,7 +64,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
         }
     }, [dateRange, currentYear, changeYear]);
 
-    console.log("dateRange: ", dateRange);
+    //console.log("dateRange: ", dateRange);
 
     const table = useReactTable({
         data: transformedData,

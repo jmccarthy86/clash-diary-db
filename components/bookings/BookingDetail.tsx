@@ -128,8 +128,8 @@ export default function BookingDetail({
         hasAuthCookie === Number(UserId) &&
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
-    console.log("hasAuthCookie", hasAuthCookie);
-    console.log("showEditOptions", showEditOptions);
+    // console.log("hasAuthCookie", hasAuthCookie);
+    // console.log("showEditOptions", showEditOptions);
     //console.log("details", otherDetails);
     // console.log(otherDetails.IsSeasonGala);
     // console.log(

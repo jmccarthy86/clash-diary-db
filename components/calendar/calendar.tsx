@@ -15,8 +15,8 @@ export function CalendarView({ selectedDate, onDateChange }: CalendarViewProps) 
     const [currentMonth, setCurrentMonth] = React.useState<Date>(selectedDate);
     const { yearData, loading, error, currentYear, changeYear } = useExcel();
 
-    console.log("yearData : ", yearData);
-    console.log("rendering calendar");
+    // console.log("yearData : ", yearData);
+    // console.log("rendering calendar");
 
     React.useEffect(() => {
         setCurrentMonth(selectedDate);

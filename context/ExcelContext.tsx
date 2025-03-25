@@ -65,7 +65,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         try {
             setLoading(true);
             const sheetData = await callExcelMethod("getUsedRangeValues");
-            console.log(sheetData);
+            //console.log(sheetData);
             const transformedData = convertExcelDataToObject(sheetData, currentYear.toString());
             setYearData(transformedData);
         } catch (err) {
@@ -103,7 +103,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
                     // Get the new worksheet's data
                     const newSheetData = await callExcelMethod("getUsedRangeValues");
-                    console.log("sheet", newSheetData);
+                    //console.log("sheet", newSheetData);
 
                     // Convert the data to our object format
                     const convertedData = convertExcelDataToObject(newSheetData, year.toString());
@@ -117,11 +117,11 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     // Update the yearData with the new sheet's data
                     setYearData(convertedData);
 
-                    console.log(
-                        `Created new worksheet for year ${year} with ID: ${newWorksheetId}`
-                    );
+                    // console.log(
+                    //     `Created new worksheet for year ${year} with ID: ${newWorksheetId}`
+                    // );
                 } catch (error) {
-                    console.error(`Failed to create worksheet for year ${year}:`, error);
+                    //console.error(`Failed to create worksheet for year ${year}:`, error);
                     throw new Error(`Failed to create worksheet for year ${year}`);
                 } finally {
                     setLoading(false);

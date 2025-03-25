@@ -32,7 +32,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
     const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
 
     const rows = yearData.Dates[selectedDate] || {};
-    console.log("Rows:", rows);
+    //console.log("Rows:", rows);
 
     if (loading) {
         return <p>Loading bookings...</p>;

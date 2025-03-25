@@ -19,16 +19,9 @@ interface SubRowComponentProps {
 }
 
 export function SubRowComponent({ subRows }: SubRowComponentProps) {
-    const { loading, error } = useExcel();
-    //   if (loading) return <p>Loading...</p>;
-    //   if (error) return <p>Error: {error.message}</p>;
     if (subRows.length < 1) return <span>No Bookings have been made for this date.</span>;
-
-    //console.log(subRows);
-    //return <></>;
-
     return (
-        <Table>
+        <Table key={subRows[0].Date}>
             <TableHeader>
                 <TableRow className="hidden lg:table-row">
                     <TableHead key="show-title">Show Title</TableHead>
@@ -42,29 +35,39 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     subRow.TitleOfShow === "" &&
                     subRow.Venue === "" &&
                     subRow.PressContact === "" ? (
-                        <TableRow key={index} className="bg-gray-200">
+                        <TableRow key={`no-data-${index}`} className="bg-gray-200">
                             <TableCell key="subrow-no-data" colSpan={4} className="text-center">
                                 No data available
                             </TableCell>
                         </TableRow>
                     ) : (
-                        <>
-                            <TableRow key={index} className="hidden lg:table-row">
+                        <React.Fragment key={`group-${index}`}>
+                            <TableRow key={`desktop-${index}`} className="hidden lg:table-row">
                                 <TableCell key={`${index}-${subRow.TitleOfShow}`}>
                                     {subRow.TitleOfShow}
                                 </TableCell>
                                 <TableCell key={`${index}-${subRow.Venue}`}>
-                                    {subRow.Venue}
+                                    {subRow.Venue
+                                        ? subRow.Venue
+                                        : subRow.OtherVenue
+                                        ? subRow.OtherVenue
+                                        : subRow.AffiliateVenue
+                                        ? subRow.AffiliateVenue
+                                        : subRow.UKTVenue
+                                        ? subRow.UKTVenue
+                                        : subRow.VenueIsTba
+                                        ? "TBA"
+                                        : ""}
                                 </TableCell>
                                 <TableCell key={`${index}-${subRow.PressContact}`}>
                                     {subRow.PressContact}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell key={`${index}-aciotn`}>
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
                             <TableRow key={`${index}-mobile`} className="lg:hidden">
-                                <TableCell>
+                                <TableCell key={`${index}-mobile-details`}>
                                     {subRow.TitleOfShow && (
                                         <div key="TitleOfShow" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
@@ -75,50 +78,40 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                             </p>
                                         </div>
                                     )}
-                                    {subRow.Venue === "" ? (
-                                        subRow.UKTVenue && subRow.UKTVenue !== "" ? (
-                                            <div key="UKTVenue" className="flex-1 space-y-1 mb-2">
-                                                <p className="font-medium leading-none">
-                                                    UKT Venue
-                                                </p>
-                                                <p className="text-muted-foreground">
-                                                    {subRow.UKTVenue}
-                                                </p>
-                                            </div>
-                                        ) : subRow.OtherVenue && subRow.OtherVenue !== "" ? (
-                                            <div key="OtherVenue" className="flex-1 space-y-1 mb-2">
-                                                <p className="font-medium leading-none">
-                                                    Other Venue
-                                                </p>
-                                                <p className="text-muted-foreground">
-                                                    {subRow.OtherVenue}
-                                                </p>
-                                            </div>
-                                        ) : subRow.AffiliateVenue &&
-                                          subRow.AffiliateVenue !== "" ? (
-                                            <div
-                                                key="AffiliateVenue"
-                                                className="flex-1 space-y-1 mb-2"
-                                            >
-                                                <p className="font-medium leading-none">
-                                                    Affiliate Venue
-                                                </p>
-                                                <p className="text-muted-foreground">
-                                                    {subRow.AffiliateVenue}
-                                                </p>
-                                            </div>
-                                        ) : subRow.VenueIsTba ? (
-                                            <div key="TBA" className="flex-1 space-y-1 mb-2">
-                                                <p className="font-medium leading-none">Venue</p>
-                                                <p className="text-muted-foreground">TBA</p>
-                                            </div>
-                                        ) : null
-                                    ) : (
+                                    {subRow.Venue?.trim() ? (
                                         <div key="Venue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Venue</p>
                                             <p className="text-muted-foreground">{subRow.Venue}</p>
                                         </div>
-                                    )}
+                                    ) : subRow.UKTVenue?.trim() ? (
+                                        <div key="UKTVenue" className="flex-1 space-y-1 mb-2">
+                                            <p className="font-medium leading-none">UKT Venue</p>
+                                            <p className="text-muted-foreground">
+                                                {subRow.UKTVenue}
+                                            </p>
+                                        </div>
+                                    ) : subRow.OtherVenue?.trim() ? (
+                                        <div key="OtherVenue" className="flex-1 space-y-1 mb-2">
+                                            <p className="font-medium leading-none">Other Venue</p>
+                                            <p className="text-muted-foreground">
+                                                {subRow.OtherVenue}
+                                            </p>
+                                        </div>
+                                    ) : subRow.AffiliateVenue?.trim() ? (
+                                        <div key="AffiliateVenue" className="flex-1 space-y-1 mb-2">
+                                            <p className="font-medium leading-none">
+                                                Affiliate Venue
+                                            </p>
+                                            <p className="text-muted-foreground">
+                                                {subRow.AffiliateVenue}
+                                            </p>
+                                        </div>
+                                    ) : subRow.VenueIsTba ? (
+                                        <div key="TBA" className="flex-1 space-y-1 mb-2">
+                                            <p className="font-medium leading-none">Venue</p>
+                                            <p className="text-muted-foreground">TBA</p>
+                                        </div>
+                                    ) : null}
 
                                     {subRow.PressContact && (
                                         <div key="PressContact" className="flex-1 space-y-1 mb-2">
@@ -147,7 +140,7 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
-                        </>
+                        </React.Fragment>
                     )
                 )}
             </TableBody>
