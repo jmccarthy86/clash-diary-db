@@ -24,6 +24,9 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [availableYears, setAvailableYears] = useState<number[]>([]);
 
+    console.log("yearData: ", yearData);
+    console.log("current Year:", currentYear);
+
     const callExcelMethod = useCallback(
         async (method: string, ...args: any[]) => {
             //console.log("Calling Excel method:", method, "with args:", args);
@@ -53,7 +56,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const years = await callExcelMethod("getWorksheets");
             setAvailableYears(years.map(Number).sort((a: number, b: number) => b - a));
 
-            if (!years.includes(currentYear)) {
+            if (!years.includes(currentYear.toString())) {
                 setCurrentYear(Number(years[0]) || new Date().getFullYear());
             }
         } catch (err) {
