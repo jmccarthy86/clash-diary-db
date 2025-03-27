@@ -49,6 +49,7 @@ const venues = [
     { value: "Shaftesbury Theatre", label: "Shaftesbury Theatre" },
     { value: "Shakespeare's Globe", label: "Shakespeare's Globe" },
     { value: "Sam Wanamaker Playhouse", label: "Sam Wanamaker Playhouse" },
+    { value: "Soho", label: "Soho" },
     { value: "Southwark Playhouse Borough", label: "Southwark Playhouse Borough" },
     { value: "Southwark Playhouse Elephant", label: "Southwark Playhouse Elephant" },
     { value: "@sohoplace", label: "@sohoplace" },
