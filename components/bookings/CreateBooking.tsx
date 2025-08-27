@@ -3,6 +3,7 @@
 import React from "react";
 import { useExcel } from "@/context/ExcelContext";
 import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
+import { createBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import BookingForm from "./BookingForm";
@@ -13,12 +14,14 @@ interface CreateBookingProps {
 }
 
 export default function CreateBooking({ currentSelectedDate }: CreateBookingProps) {
-    const { callExcelMethod, refreshData, yearData } = useExcel();
+
     const bookingDataRef = React.useRef<FieldValues | null>(null);
+    const { refreshData } = useExcel();
 
     const handleSubmit = async (data: FieldValues) => {
+        console.log(data);
         try {
-            await callExcelMethod("createNewRow", prepareBookingFormData(data), yearData?.Range);
+            await createBooking(data); 
 
             toast({
                 title: "Booking created successfully",
@@ -34,7 +37,7 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
                 variant: "destructive",
             });
         } finally {
-            handleClashEmails(currentSelectedDate, data);
+            //handleClashEmails(currentSelectedDate, data);
         }
     };
 

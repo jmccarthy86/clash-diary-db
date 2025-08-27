@@ -22,12 +22,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import EditBooking from "@/components/bookings/EditBooking";
 import { useExcel } from "@/context/ExcelContext";
+import { deleteBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
 import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
-import UKTVenues from "@/lib/uktvenues";
+import uktVenues from "@/lib/uktvenues"; 
 
 interface BookingDetailProps {
     rowRange: string;
@@ -42,12 +43,12 @@ export default function BookingDetail({
     currentSelectedDate,
     allowEdit,
 }: BookingDetailProps) {
-    const { refreshData, callExcelMethod, yearData } = useExcel();
+    const { refreshData } = useExcel();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
+    const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
 
-    const { UserId, P, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
+    const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
 
     React.useEffect(() => {
         // Function to handle cookie and fallback clashId
@@ -68,11 +69,11 @@ export default function BookingDetail({
                     setHasAuthCookie(clashIdValue);
                 } else {
                     console.warn("No valid auth found in cookies or clashId");
-                    setHasAuthCookie(0); // Set state to indicate no auth
+                    setHasAuthCookie("0"); // Set state to indicate no auth
                 }
             } else {
                 console.warn("No valid auth found in cookies or clashId");
-                setHasAuthCookie(0); // Set state to indicate no auth
+                setHasAuthCookie("0"); // Set state to indicate no auth
             }
         };
         // };
@@ -103,7 +104,7 @@ export default function BookingDetail({
         setIsDeleting(true);
 
         try {
-            await callExcelMethod("deleteRow", rowRange, yearData!.Range);
+            await deleteBooking(rowRange);
             await refreshData();
 
             toast({
@@ -124,13 +125,13 @@ export default function BookingDetail({
     };
 
     const showEditOptions =
-        hasAuthCookie !== 0 &&
-        hasAuthCookie === Number(UserId) &&
+        hasAuthCookie !== "0" &&
+        hasAuthCookie === userId &&
         (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
 
     // console.log("hasAuthCookie", hasAuthCookie);
     // console.log("showEditOptions", showEditOptions);
-    //console.log("details", otherDetails);
+    console.log("details", otherDetails);
     // console.log(otherDetails.IsSeasonGala);
     // console.log(
     //     "Affiliates:",
@@ -138,7 +139,7 @@ export default function BookingDetail({
     // );
 
     return (
-        <Card className="w-full pt-6" data-relation={UserId || undefined}>
+        <Card className="w-full pt-6" data-relation={userId || undefined}>
             <CardContent className="grid gap-1">
                 <div key="Date" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Date</p>
@@ -148,34 +149,34 @@ export default function BookingDetail({
                 <div key="TitleOfShow" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Title Of Show</p>
                     <p className="text-muted-foreground">
-                        {otherDetails.TitleOfShow
-                            ? otherDetails.TitleOfShow
+                        {otherDetails.titleOfShow
+                            ? otherDetails.titleOfShow
                             : otherDetails.ShowTitleIsTba && "TBA"}
                     </p>
                 </div>
 
                 <div key="Producer" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Producer</p>
-                    <p className="text-muted-foreground">{otherDetails.Producer}</p>
+                    <p className="text-muted-foreground">{otherDetails.producer}</p>
                 </div>
 
                 <div key="PressContact" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Press Contact</p>
-                    <p className="text-muted-foreground">{otherDetails.PressContact}</p>
+                    <p className="text-muted-foreground">{otherDetails.pressContact}</p>
                 </div>
 
                 <div key="OtherVenue" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Venue</p>
                     <p className="text-muted-foreground">
-                        {otherDetails.Venue
-                            ? otherDetails.Venue
-                            : otherDetails.OtherVenue
-                            ? otherDetails.OtherVenue
-                            : otherDetails.AffiliateVenue
-                            ? otherDetails.AffiliateVenue
-                            : otherDetails.UKTVenue
-                            ? otherDetails.UKTVenue
-                            : otherDetails.VenueIsTba
+                        {otherDetails.venue
+                            ? otherDetails.venue
+                            : otherDetails.otherVenue
+                            ? otherDetails.otherVenue
+                            : otherDetails.affiliateVenue
+                            ? otherDetails.affiliateVenue
+                            : otherDetails.uKTVenue
+                            ? otherDetails.uKTVenue
+                            : otherDetails.venueIsTba
                             ? "TBA"
                             : ""}
                     </p>
@@ -183,26 +184,26 @@ export default function BookingDetail({
 
                 <div key="Badges" className="flex-1 space-y-1">
                     <div className="flex flex-wrap mt-3">
-                        <p>{otherDetails.IsSeasonGala}</p>
-                        {affiliates.some((affiliate) => affiliate.value === otherDetails.Venue) && (
+                        {/* <p>{otherDetails.isSeasonGala}</p> */}
+                        {affiliates.some((affiliate) => affiliate.value === otherDetails.venue) && (
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
                         )}
 
-                        {venues.some((venue) => venue.value === otherDetails.Venue) && (
+                        {venues.some((venue) => venue.value === otherDetails.venue) && (
                             <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
 
-                        {UKTVenues.some((uktVenue) => uktVenue.value === otherDetails.Venue) && (
+                        {uktVenues.some((uktVenue) => uktVenue.value === otherDetails.venue) && (
                             <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
 
-                        {P && <BookingBadge type="P">P</BookingBadge>}
+                        {p && <BookingBadge type="P">P</BookingBadge>}
 
-                        {otherDetails.IsOperaDance && (
+                        {otherDetails.isOperaDance && (
                             <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
                         )}
 
-                        {otherDetails.IsSeasonGala && (
+                        {otherDetails.isSeasonGala && (
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>

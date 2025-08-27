@@ -32,9 +32,9 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
             </TableHeader>
             <TableBody>
                 {subRows.map((subRow, index) =>
-                    subRow.TitleOfShow === "" &&
-                    subRow.Venue === "" &&
-                    subRow.PressContact === "" ? (
+                    subRow.titleOfShow === "" &&
+                    subRow.venue === "" &&
+                    subRow.pressContact === "" ? (
                         <TableRow key={`no-data-${index}`} className="bg-gray-200">
                             <TableCell key="subrow-no-data" colSpan={4} className="text-center">
                                 No data available
@@ -43,24 +43,24 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     ) : (
                         <React.Fragment key={`group-${index}`}>
                             <TableRow key={`desktop-${index}`} className="hidden lg:table-row">
-                                <TableCell key={`${index}-${subRow.TitleOfShow}`}>
-                                    {subRow.TitleOfShow}
+                                <TableCell key={`${index}-${subRow.titleOfShow}`}>
+                                    {subRow.titleOfShow}
                                 </TableCell>
-                                <TableCell key={`${index}-${subRow.Venue}`}>
-                                    {subRow.Venue
-                                        ? subRow.Venue
-                                        : subRow.OtherVenue
-                                        ? subRow.OtherVenue
-                                        : subRow.AffiliateVenue
-                                        ? subRow.AffiliateVenue
-                                        : subRow.UKTVenue
-                                        ? subRow.UKTVenue
-                                        : subRow.VenueIsTba
+                                <TableCell key={`${index}-${subRow.venue}`}>
+                                    {subRow.venue
+                                        ? subRow.venue
+                                        : subRow.otherVenue
+                                        ? subRow.otherVenue
+                                        : subRow.affiliateVenue
+                                        ? subRow.affiliateVenue
+                                        : subRow.uKTVenue
+                                        ? subRow.uKTVenue
+                                        : subRow.venueIsTba
                                         ? "TBA"
                                         : ""}
                                 </TableCell>
-                                <TableCell key={`${index}-${subRow.PressContact}`}>
-                                    {subRow.PressContact}
+                                <TableCell key={`${index}-${subRow.pressContact}`}>
+                                    {subRow.pressContact}
                                 </TableCell>
                                 <TableCell key={`${index}-aciotn`}>
                                     <TableRowActions subRow={subRow} />
@@ -68,70 +68,70 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                             </TableRow>
                             <TableRow key={`${index}-mobile`} className="lg:hidden">
                                 <TableCell key={`${index}-mobile-details`}>
-                                    {subRow.TitleOfShow && (
+                                    {subRow.titleOfShow && (
                                         <div key="TitleOfShow" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
                                                 Title Of Show
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {subRow.TitleOfShow}
+                                                {subRow.titleOfShow}
                                             </p>
                                         </div>
                                     )}
-                                    {subRow.Venue ? (
+                                    {subRow.venue ? (
                                         <div key="Venue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Venue</p>
-                                            <p className="text-muted-foreground">{subRow.Venue}</p>
+                                            <p className="text-muted-foreground">{subRow.venue}</p>
                                         </div>
-                                    ) : subRow.UKTVenue ? (
+                                    ) : subRow.uktVenue ? (
                                         <div key="UKTVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">UKT Venue</p>
                                             <p className="text-muted-foreground">
-                                                {subRow.UKTVenue}
+                                                {subRow.uktVenue}
                                             </p>
                                         </div>
-                                    ) : subRow.OtherVenue ? (
+                                    ) : subRow.otherVenue ? (
                                         <div key="OtherVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Other Venue</p>
                                             <p className="text-muted-foreground">
-                                                {subRow.OtherVenue}
+                                                {subRow.otherVenue}
                                             </p>
                                         </div>
-                                    ) : subRow.AffiliateVenue ? (
+                                    ) : subRow.affiliateVenue ? (
                                         <div key="AffiliateVenue" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
                                                 Affiliate Venue
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {subRow.AffiliateVenue}
+                                                {subRow.affiliateVenue}
                                             </p>
                                         </div>
-                                    ) : subRow.VenueIsTba ? (
+                                    ) : subRow.venueIsTba ? (
                                         <div key="TBA" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">Venue</p>
                                             <p className="text-muted-foreground">TBA</p>
                                         </div>
                                     ) : null}
 
-                                    {subRow.PressContact && (
+                                    {subRow.pressContact && (
                                         <div key="PressContact" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
                                                 Press Contact
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {subRow.PressContact}
+                                                {subRow.pressContact}
                                             </p>
                                         </div>
                                     )}
 
                                     <div className="flex gap-2 mb-3">
-                                        {subRow.P && <BookingBadge type="P">P</BookingBadge>}
-                                        {subRow.IsOperaDance && (
+                                        {subRow.p && <BookingBadge type="P">P</BookingBadge>}
+                                        {subRow.isOperaDance && (
                                             <BookingBadge type="OPERA_DANCE">
                                                 Opera/Dance
                                             </BookingBadge>
                                         )}
-                                        {subRow.IsSeasonGala && (
+                                        {subRow.isSeasonGala && (
                                             <BookingBadge type="GALA_NIGHT">
                                                 Season Announcement/Gala Night
                                             </BookingBadge>

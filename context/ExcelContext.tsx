@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { RequestData } from "@/lib/types";
 
 import { convertExcelDataToObject } from "@/lib/excelUtils";
+import { getYearData } from "@/lib/actions/bookings";
+
 
 interface ExcelContextType {
     yearData: RequestData | null;
@@ -12,13 +14,12 @@ interface ExcelContextType {
     availableYears: number[];
     refreshData: () => Promise<void>;
     changeYear: (year: number) => Promise<void>;
-    callExcelMethod: (method: string, ...args: any[]) => Promise<any>;
 }
 
 const ExcelContext = createContext<ExcelContextType | undefined>(undefined);
 
 export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [yearData, setYearData] = useState<RequestData | null>(null);
+    const [yearData, setYearData] = useState<RequestData | undefined>(undefined);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
@@ -27,60 +28,22 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     console.log("yearData: ", yearData);
     console.log("current Year:", currentYear);
 
-    const callExcelMethod = useCallback(
-        async (method: string, ...args: any[]) => {
-            //console.log("Calling Excel method:", method, "with args:", args);
-            try {
-                const response = await fetch("/api/manager", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        method,
-                        year: currentYear.toString(),
-                        args,
-                    }),
-                });
-                if (!response.ok) throw new Error("Failed to call Excel method");
-                const { result } = await response.json();
-                return result;
-            } catch (err) {
-                setError(err as Error);
-                throw err;
-            }
-        },
-        [currentYear]
-    );
-
-    const fetchAvailableYears = useCallback(async () => {
-        try {
-            const years = await callExcelMethod("getWorksheets");
-            setAvailableYears(years.map(Number).sort((a: number, b: number) => b - a));
-
-            if (!years.includes(currentYear.toString())) {
-                setCurrentYear(Number(years[0]) || new Date().getFullYear());
-            }
-        } catch (err) {
-            setError(err as Error);
-        }
-    }, [callExcelMethod, currentYear]);
-
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
-            const sheetData = await callExcelMethod("getUsedRangeValues");
-            //console.log(sheetData);
-            const transformedData = convertExcelDataToObject(sheetData, currentYear.toString());
+            const transformedData = await getYearData(currentYear);
+            console.log(transformedData);
             setYearData(transformedData);
         } catch (err) {
             setError(err as Error);
         } finally {
             setLoading(false);
         }
-    }, [callExcelMethod, currentYear]);
+    }, [currentYear]);
 
-    useEffect(() => {
-        fetchAvailableYears();
-    }, []);
+    // useEffect(() => {
+    //     fetchAvailableYears();
+    // }, []);
 
     useEffect(() => {
         fetchData();
@@ -92,46 +55,10 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const changeYear = useCallback(
         async (year: number) => {
-            if (availableYears.includes(year)) {
-                setCurrentYear(year);
-            } else {
-                try {
-                    setLoading(true);
-
-                    // Attempt to create a new worksheet for the year
-                    const newWorksheetId = await callExcelMethod(
-                        "createWorksheet",
-                        year.toString()
-                    );
-
-                    // Get the new worksheet's data
-                    const newSheetData = await callExcelMethod("getUsedRangeValues");
-                    //console.log("sheet", newSheetData);
-
-                    // Convert the data to our object format
-                    const convertedData = convertExcelDataToObject(newSheetData, year.toString());
-
-                    // Update the available years
-                    setAvailableYears((prevYears) => [...prevYears, year].sort((a, b) => b - a));
-
-                    // Set the current year to the new year
-                    setCurrentYear(year);
-
-                    // Update the yearData with the new sheet's data
-                    setYearData(convertedData);
-
-                    // console.log(
-                    //     `Created new worksheet for year ${year} with ID: ${newWorksheetId}`
-                    // );
-                } catch (error) {
-                    //console.error(`Failed to create worksheet for year ${year}:`, error);
-                    throw new Error(`Failed to create worksheet for year ${year}`);
-                } finally {
-                    setLoading(false);
-                }
-            }
+            setCurrentYear(year);
+            await fetchData();
         },
-        [availableYears, callExcelMethod, setYearData]
+        [fetchData]
     );
 
     return (
@@ -143,8 +70,7 @@ export const ExcelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 currentYear,
                 availableYears,
                 refreshData,
-                changeYear,
-                callExcelMethod,
+                changeYear
             }}
         >
             {children}

@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { format, parse, isSameDay } from "date-fns";
-import { useExcel } from "@/context/ExcelContext";
+//import { useExcel } from "@/context/ExcelContext";
+import { updateBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import BookingForm from "./BookingForm";
 import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
@@ -48,11 +49,11 @@ export default function EditBooking({
         DateBkd: currentDetail.DateBkd || "",
         IsSeasonGala: currentDetail.IsSeasonGala || false,
         IsOperaDance: currentDetail.IsOperaDance || false,
-        UserId: currentDetail.UserId || 0,
+        UserId: currentDetail.userId || "0",
     };
 
     // Context
-    const { callExcelMethod, refreshData, yearData } = useExcel();
+
 
     const handleSubmit = async (data: FieldValues) => {
         // console.log("Row Range : ", rowRange);
@@ -60,7 +61,7 @@ export default function EditBooking({
         // console.log("Current Date", currentSelectedDate );
 
         try {
-            await callExcelMethod("editRow", rowRange, prepareBookingFormData(data));
+            await updateBooking(rowRange, prepareBookingFormData(data));
 
             //console.log("email conditional: ", data, yearData);
             if (yearData) {

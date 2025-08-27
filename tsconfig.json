@@ -34,7 +34,7 @@
 		".next/types/**/*.ts",
 		"components/test/.graph.ts",
 		"lib/iframeMessage.js"
-	],
+, "lib/.archive/.fetchingExcel.ts", "lib/.archive/.ExcelManager.ts", "lib/.archive/.graphClientInitializer.ts"	],
 	"exclude": [
 		"node_modules"
 	]

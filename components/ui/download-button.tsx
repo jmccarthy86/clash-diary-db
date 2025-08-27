@@ -29,13 +29,13 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({ bookingData }, type) =>
 
         // Filter out "Day" and "UserId" from the imported headers
         const filteredHeaders = headers.filter(
-            (header) => header !== "Day" && header !== "UserId" && header !== "DateBkd"
+            (header) => header !== "day" && header !== "userId" && header !== "dateBkd"
         );
 
         rows.push(
             filteredHeaders
                 .map((header) => {
-                    if (header === "TimeStamp") {
+                    if (header === "timeStamp") {
                         return "Date Booked"; // Replace TimeStamp with Date Booked
                     }
                     return unCamelCase(header); // Apply unCamelCase to other headers

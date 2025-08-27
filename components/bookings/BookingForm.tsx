@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
-import UKTVenues from "@/lib/uktvenues";
+import uktVenues from "@/lib/uktvenues";
 import {
     Command,
     CommandEmpty,
@@ -31,27 +31,28 @@ import {
     CommandItem,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { date } from "drizzle-orm/mysql-core";
 
 export const FormSchema = z.object({
-    Day: z.string().optional(),
-    Date: z.date({
+    day: z.string().optional(),
+    date: z.date({
         required_error: "A date is required.",
     }),
-    P: z.boolean().optional(),
-    Venue: z.string().optional(),
-    UKTVenue: z.string().optional(),
-    AffiliateVenue: z.string().optional(),
-    OtherVenue: z.string().optional(),
-    VenueIsTba: z.boolean().optional(),
-    TitleOfShow: z.string().optional(),
-    ShowTitleIsTba: z.boolean().optional(),
-    Producer: z.string().min(1, "Producer is required"),
-    PressContact: z.string().min(1, "Press Contact is required"),
-    IsSeasonGala: z.boolean().optional(),
-    IsOperaDance: z.boolean().optional(),
-    UserId: z.number().optional(),
-    DateBkd: z.string().optional(),
-    TimeStamp: z.string().optional(),
+    p: z.boolean().optional(),
+    venue: z.string().optional(),
+    uktVenue: z.string().optional(),
+    affiliateVenue: z.string().optional(),
+    otherVenue: z.string().optional(),
+    venueIsTba: z.boolean().optional(),
+    titleOfShow: z.string().optional(),
+    showTitleIsTba: z.boolean().optional(),
+    producer: z.string().min(1, "Producer is required"),
+    pressContact: z.string().min(1, "Press Contact is required"),
+    isSeasonGala: z.boolean().optional(),
+    isOperaDance: z.boolean().optional(),
+    userId: z.string().optional(),
+    dateBkd: z.string().optional(),
+    timeStamp: z.number().optional(),
 });
 
 export default function BookingForm({
@@ -68,7 +69,7 @@ export default function BookingForm({
     const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
     const [submitting, setSubmitting] = React.useState(false);
     const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState<number>(0);
+    const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
     const [open, setOpen] = React.useState(false);
     const [openAffiliate, setOpenAffiliate] = React.useState(false);
     const [openUKTVenue, setOpenUKTVenue] = React.useState(false); // State for UKTVenue select
@@ -77,27 +78,27 @@ export default function BookingForm({
         if (initialData) {
             return {
                 ...initialData,
-                UserId: hasAuthCookie || initialData.UserId || "", // Ensure the correct value
+                userId: hasAuthCookie || initialData.userId || "", // Ensure the correct value
             };
         } else {
             return {
-                Day: "",
-                Date: new Date(),
-                P: false,
-                Venue: "",
-                UKTVenue: "",
-                AffiliateVenue: "",
-                OtherVenue: "",
-                VenueIsTba: false,
-                TitleOfShow: "",
-                ShowTitleIsTba: false,
-                Producer: "",
-                PressContact: "",
-                DateBkd: "",
-                IsSeasonGala: false,
-                IsOperaDance: false,
-                UserId: hasAuthCookie || 0, // Default to 0 or use hasAuthCookie
-                TimeStamp: format(currentSelectedDate, "dd/MM/yyyy 00:00:00"),
+                day: "",
+                date: new Date(),
+                p: false,
+                venue: "",
+                uktVenue: "",
+                affiliateVenue: "",
+                otherVenue: "",
+                venueIsTba: false,
+                titleOfShow: "",
+                showTitleIsTba: false,
+                producer: "",
+                pressContact: "",
+                dateBkd: "",
+                isSeasonGala: false,
+                isOperaDance: false,
+                userId: hasAuthCookie || "0", // Default to 0 or use hasAuthCookie
+                timeStamp: Date.now(),
             };
         }
     }, [initialData, hasAuthCookie, currentSelectedDate]);
@@ -124,7 +125,7 @@ export default function BookingForm({
     // Helper function to handle disabling fields
     const isFieldDisabled = (fieldName: string) => {
         if (submitting) return true;
-        if (fieldName === "TitleOfShow") return form.watch("ShowTitleIsTba");
+        if (fieldName === "titleOfShow")    return form.watch("showTitleIsTba");
         return false;
     };
 
@@ -142,16 +143,16 @@ export default function BookingForm({
             // } else {
             // Fallback to clashId from parent if no valid cookie found
             if (clashIdFromParent) {
-                const clashIdValue = Number(clashIdFromParent);
+                const clashIdValue = clashIdFromParent;
                 if (clashIdValue) {
                     setHasAuthCookie(clashIdValue);
                 } else {
                     console.warn("No valid auth found in cookies or clashId");
-                    setHasAuthCookie(0); // Set state to indicate no auth
+                    setHasAuthCookie("0"); // Set state to indicate no auth
                 }
             } else {
                 console.warn("No valid auth found in cookies or clashId");
-                setHasAuthCookie(0); // Set state to indicate no auth
+                setHasAuthCookie("0"); // Set state to indicate no auth
             }
         };
         //};
@@ -180,21 +181,22 @@ export default function BookingForm({
 
     React.useEffect(() => {
         if (currentSelectedDate) {
-            form.setValue("Date", currentSelectedDate);
-            form.setValue("Day", format(currentSelectedDate, "EEEE"));
+            form.setValue("date", currentSelectedDate);
+            form.setValue("day", format(currentSelectedDate, "EEEE"));
         }
     }, [currentSelectedDate, form]);
 
     React.useEffect(() => {
         if (currentSelectedDate) {
-            const now = new Date();
-            form.setValue("TimeStamp", format(now, "dd/MM/yyyy HH:mm:ss"));
+            //const now = new Date();
+            //form.setValue("timeStamp", format(now, "dd/MM/yyyy HH:mm:ss"));
+            form.setValue("timeStamp", Date.now());
         }
     }, [currentSelectedDate, form]);
 
     React.useEffect(() => {
-        if (hasAuthCookie && hasAuthCookie !== 0) {
-            form.setValue("UserId", hasAuthCookie);
+        if (hasAuthCookie && hasAuthCookie !== "0") {
+            form.setValue("userId", hasAuthCookie);
         }
     }, [hasAuthCookie, form]);
 
@@ -212,13 +214,13 @@ export default function BookingForm({
                     className="space-y-6"
                     ref={formRef}
                 >
-                    <input type="hidden" {...form.register("TimeStamp")} />
-                    <input type="hidden" {...form.register("UserId")} />
+                    <input type="hidden" {...form.register("timeStamp")} />
+                    <input type="hidden" {...form.register("userId")} />
 
                     <div className="grid w-full items-center gap-4">
                         <FormField
                             control={form.control}
-                            name="Date"
+                            name="date"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
                                     <FormLabel>Date</FormLabel>
@@ -272,7 +274,7 @@ export default function BookingForm({
                             <FormLabel>SOLT Member Venue</FormLabel>
                             <FormField
                                 control={form.control}
-                                name="Venue"
+                                name="venue"
                                 render={({ field }) => {
                                     const displayLabel = field.value ? field.value : "Select venue";
 
@@ -313,7 +315,7 @@ export default function BookingForm({
                                                                         key={venue.value}
                                                                         onSelect={() => {
                                                                             form.setValue(
-                                                                                "Venue",
+                                                                                "venue",
                                                                                 venue.value
                                                                             );
                                                                             setOpen(false);
@@ -348,7 +350,7 @@ export default function BookingForm({
                             <FormLabel>Affiliate Venues</FormLabel>
                             <FormField
                                 control={form.control}
-                                name="AffiliateVenue"
+                                name="affiliateVenue"
                                 render={({ field }) => {
                                     const displayLabel = field.value ? field.value : "Select venue";
 
@@ -392,7 +394,7 @@ export default function BookingForm({
                                                                         key={venue.value}
                                                                         onSelect={() => {
                                                                             form.setValue(
-                                                                                "AffiliateVenue",
+                                                                                "affiliateVenue",
                                                                                 venue.value
                                                                             );
                                                                             setOpenAffiliate(false);
@@ -429,7 +431,7 @@ export default function BookingForm({
                             <FormLabel>UKT Venue</FormLabel>
                             <FormField
                                 control={form.control}
-                                name="UKTVenue"
+                                name="uktVenue"
                                 render={({ field }) => {
                                     const displayLabel = field.value
                                         ? field.value
@@ -471,13 +473,13 @@ export default function BookingForm({
                                                         </CommandEmpty>
                                                         <CommandGroup>
                                                             <CommandList>
-                                                                {UKTVenues.map((venue) => (
+                                                                {uktVenues.map((venue) => (
                                                                     <CommandItem
                                                                         value={venue.value}
                                                                         key={venue.value}
                                                                         onSelect={() => {
                                                                             form.setValue(
-                                                                                "UKTVenue",
+                                                                                "uktVenue",
                                                                                 venue.value
                                                                             );
                                                                             setOpenUKTVenue(false);
@@ -512,12 +514,12 @@ export default function BookingForm({
                             <FormLabel>Other Venue</FormLabel>
                             <FormField
                                 control={form.control}
-                                name="OtherVenue"
+                                name="otherVenue"
                                 render={({ field }) => (
                                     <FormItem className="mb-2 lg:mb-0">
                                         <FormControl>
                                             <Input
-                                                id="OtherVenue"
+                                                id="otherVenue"
                                                 {...field}
                                                 placeholder="Venue Name"
                                                 disabled={submitting}
@@ -529,7 +531,7 @@ export default function BookingForm({
                             />
                             <FormField
                                 control={form.control}
-                                name="VenueIsTba"
+                                name="venueIsTba"
                                 render={({ field }) => (
                                     <FormItem className="flex items-center">
                                         <FormControl>
@@ -551,7 +553,7 @@ export default function BookingForm({
                     <div className="flex flex-col space-y-1.5">
                         <FormField
                             control={form.control}
-                            name="TitleOfShow"
+                            name="titleOfShow"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Show Title</FormLabel>
@@ -559,7 +561,7 @@ export default function BookingForm({
                                         <Input
                                             id="show-title"
                                             {...field}
-                                            disabled={isFieldDisabled("TitleOfShow")}
+                                            disabled={isFieldDisabled("titleOfShow")}
                                             placeholder="Name of your project"
                                         />
                                     </FormControl>
@@ -569,7 +571,7 @@ export default function BookingForm({
                         />
                         <FormField
                             control={form.control}
-                            name="ShowTitleIsTba"
+                            name="showTitleIsTba"
                             render={({ field }) => (
                                 <FormItem className="flex items-center">
                                     <FormControl>
@@ -591,13 +593,13 @@ export default function BookingForm({
                         <div className="w-full lg:w-1/2">
                             <FormField
                                 control={form.control}
-                                name="Producer"
+                                name="producer"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Producer</FormLabel>
                                         <FormControl>
                                             <Input
-                                                id="Producer"
+                                                id="producer"
                                                 {...field}
                                                 placeholder="Producer(s) Name(s)"
                                                 disabled={submitting}
@@ -611,13 +613,13 @@ export default function BookingForm({
                         <div className="w-full lg:w-1/2">
                             <FormField
                                 control={form.control}
-                                name="PressContact"
+                                name="pressContact"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Press Contact (email)</FormLabel>
                                         <FormControl>
                                             <Input
-                                                id="PressContact"
+                                                id="pressContact"
                                                 {...field}
                                                 placeholder="press@soltukt.co.uk"
                                                 disabled={submitting}
@@ -633,7 +635,7 @@ export default function BookingForm({
                     <div className="flex flex-col space-y-1.5">
                         <FormField
                             control={form.control}
-                            name="P"
+                            name="p"
                             render={({ field }) => (
                                 <FormItem className="flex items-center">
                                     <FormControl>
@@ -651,7 +653,7 @@ export default function BookingForm({
                         />
                         <FormField
                             control={form.control}
-                            name="IsSeasonGala"
+                            name="isSeasonGala"
                             render={({ field }) => (
                                 <FormItem className="flex items-center">
                                     <FormControl>
@@ -671,7 +673,7 @@ export default function BookingForm({
                         />
                         <FormField
                             control={form.control}
-                            name="IsOperaDance"
+                            name="isOperaDance"
                             render={({ field }) => (
                                 <FormItem className="flex items-center">
                                     <FormControl>

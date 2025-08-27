@@ -3,6 +3,7 @@ import * as React from "react";
 import { parse, isAfter, isSameDay } from "date-fns";
 import { enGB } from "date-fns/locale";
 import { LoadingSpinner } from "@/components/ui/loader";
+import { deleteBooking } from "@/lib/actions/bookings";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -42,7 +43,7 @@ interface TableRowActionsProps {
 
 export function TableRowActions({ subRow }: TableRowActionsProps) {
     //console.log("subRow:", subRow);
-    const { refreshData, yearData, callExcelMethod } = useExcel();
+    const { refreshData } = useExcel();
 
     const [openView, setOpenView] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
@@ -70,7 +71,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         setIsDeleting(true);
 
         try {
-            await callExcelMethod("deleteRow", subRow.range, yearData?.Range);
+            await deleteBooking(subRow.range);
             await refreshData();
 
             toast({
