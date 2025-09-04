@@ -137,25 +137,14 @@ function formatDate(date: Date): string {
     return `${day}/${month}/${year}`;
 }
 
-export function prepareBookingFormData(data: any) {
-    console.log(data);
-    return Object.values(
-        Object.fromEntries(
-            headers.map((key) => {
-                if (key === "Date" && data[key] instanceof Date) {
-                    console.log(format(data[key], "dd/MM/yyyy"));
-                    const date = format(data[key], "yyyy-MM-dd");
-                    return [key, date];
-                }
-                return [key, data[key]];
-            })
-        )
-    );
-}
-
 export async function handleClashEmails(currentSelectedDate: Date, newData: FieldValues) {
     const currentYear = currentSelectedDate.getFullYear();
     const yearData = await getYearData(currentYear);
+
+    // Guard against undefined yearData (e.g., db error)
+    if (!yearData || !yearData.Dates) {
+        return false;
+    }
 
     const dateString = format(currentSelectedDate, "dd/MM/yyyy");
     const dateEntries = yearData.Dates[dateString];
@@ -171,16 +160,14 @@ export async function handleClashEmails(currentSelectedDate: Date, newData: Fiel
     if (dateEntries) {
         const emails: string[] = [];
 
-        // Add the new entry's email
-        if (newData.PressContact) {
-            emails.push(newData.PressContact as string);
-        }
+        // Add the new entry's email from DB-style key
+        const newEmail = (newData as any).pressContact as string | undefined;
+        if (newEmail) emails.push(newEmail);
 
         // Add emails from existing entries
-        Object.values(dateEntries).forEach((entry) => {
-            if (entry.PressContact) {
-                emails.push(entry.PressContact as string);
-            }
+        Object.values(dateEntries).forEach((entry: any) => {
+            const pc = entry.pressContact as string | undefined;
+            if (pc) emails.push(pc);
         });
 
         // Remove duplicates
@@ -210,28 +197,31 @@ export async function handleClashEmail(
     console.log("dateEntries: ", dateEntries);
     console.log("filteredEmails: ", filteredEmails);
 
+    // Use DB-style field names consistently in email params
+    const params = {
+        name: user.name,
+        email: user.email,
+        date: format(currentSelectedDate, "dd/MM/yyyy"),
+        rawDate: format(currentSelectedDate, "yyyy-MM-dd"),
+        venue: (data as any).venue ?? "",
+        titleOfShow: (data as any).titleOfShow ?? "",
+        memberLevel: (data as any).memberLevel ?? "",
+        isOperaDance: Boolean((data as any).isOperaDance ?? false),
+        isSeasonGala: Boolean((data as any).isSeasonGala ?? false),
+        clashEmails: filteredEmails.join(", "),
+        dateEntries: JSON.stringify(dateEntries),
+    } as Record<string, any>;
+
     const emailSent = await sendEmail({
         to: [{ email: user.email, name: user.name }],
         subject: "SOLT & UK Theatre First Night Diary clash",
         templateName: "clash",
         sender: { name: "SOLT", email: "noreply@solt.co.uk" },
-        params: {
-            name: user.name,
-            email: user.email,
-            Date: format(currentSelectedDate, "dd/MM/yyyy"),
-            RawDate: format(currentSelectedDate, "yyyy-MM-dd"),
-            Venue: data.Venue,
-            TitleOfShow: data.TitleOfShow,
-            MemberLevel: data.MemberLevel,
-            IsOperaDance: data.IsOperaDance,
-            IsSeasonGala: data.IsSeasonGala,
-            clashEmails: filteredEmails.join(", "),
-            dateEntries: JSON.stringify(dateEntries),
-        },
+        params,
     });
 
     if (emailSent) {
-        //console.log('Clash email sent successfully');
+        console.log("Clash email sent successfully");
     } else {
         console.error("Failed to send clash email");
     }

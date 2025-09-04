@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { Calendar } from "@/components/ui/calendar";
+import { enGB } from "date-fns/locale";
 import { Bookings } from "./Bookings";
 import CalendarSkeleton from "@/components/calendar/Skeleton";
-import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 
 interface CalendarViewProps {
     selectedDate: Date;
@@ -13,7 +14,7 @@ interface CalendarViewProps {
 
 export function CalendarView({ selectedDate, onDateChange }: CalendarViewProps) {
     const [currentMonth, setCurrentMonth] = React.useState<Date>(selectedDate);
-    const { yearData, loading, error, currentYear, changeYear } = useExcel();
+    const { yearData, loading, error, currentYear, changeYear } = useApp();
 
     // console.log("yearData : ", yearData);
     // console.log("rendering calendar");
@@ -74,6 +75,7 @@ export function CalendarView({ selectedDate, onDateChange }: CalendarViewProps) 
                 onMonthChange={handleMonthChange}
                 month={currentMonth}
                 showOutsideDays={false}
+                locale={enGB}
                 className="rounded-md border flex-none mb-2 lg:mb-0"
                 modifiers={{ booked: bookedDates }}
                 modifiersClassNames={{

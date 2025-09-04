@@ -23,7 +23,7 @@ import { Button } from "../ui/button";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { transformData, createYearCalendarWithData, processRangeForCSV } from "@/lib/utils";
 import { columnsConfig } from "@/components/table/ColumnsConfig";
-import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 import DownloadButton from "../ui/download-button";
 
 interface ListViewProps {
@@ -33,7 +33,7 @@ interface ListViewProps {
 
 const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => {
     ////console.log('ListView rendered');
-    const { yearData, loading, error, currentYear, changeYear } = useExcel();
+    const { yearData, loading, error, currentYear, changeYear } = useApp();
 
     //console.log('yearData:', yearData);
     const transformedData = React.useMemo(() => {

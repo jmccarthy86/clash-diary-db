@@ -5,7 +5,7 @@ import { enGB } from "date-fns/locale";
 import { format, isAfter, isBefore, isEqual, isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import BookingDetail from "@/components/bookings/BookingDetail";
-import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 import {
     Dialog,
     DialogDescription,
@@ -23,7 +23,7 @@ interface DetailCardProps {
 }
 
 export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
-    const { loading, error, yearData } = useExcel();
+    const { loading, error, yearData } = useApp();
 
     if (!yearData || !currentSelectedDate) {
         return null;

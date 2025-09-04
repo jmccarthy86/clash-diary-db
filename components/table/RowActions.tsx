@@ -33,7 +33,7 @@ import {
 import BookingDetail from "@/components/bookings/BookingDetail";
 import EditBooking from "@/components/bookings/EditBooking";
 import { SubRowData } from "@/lib/types";
-import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 import { toast } from "@/components/ui/use-toast";
 import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
 
@@ -43,14 +43,14 @@ interface TableRowActionsProps {
 
 export function TableRowActions({ subRow }: TableRowActionsProps) {
     //console.log("subRow:", subRow);
-    const { refreshData } = useExcel();
+    const { refreshData } = useApp();
 
     const [openView, setOpenView] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState(0);
+    const [hasAuthCookie, setHasAuthCookie] = React.useState("0");
 
     const handleViewClick = () => {
         setIsOpen(false);
@@ -93,33 +93,11 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     };
 
     React.useEffect(() => {
-        //console.log('Setting up message event listener in iframe');
-
-        const checkAuthCookie = (cookies: string) => {
-            const cookieArray = cookies.split(";");
-            const clashSyncCookie = cookieArray.find((cookie) =>
-                cookie.trim().startsWith("clash_sync=")
-            );
-            console.log("Clash Sync Cookie:", clashSyncCookie);
-            if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
-                setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
-            }
-        };
-
         const handleMessage = (event: MessageEvent) => {
-            //console.log('Message event received in iframe:', event);
-
-            if (event.origin !== "https://solt.co.uk") {
-                console.warn("Invalid origin:", event.origin);
-                return;
-            }
-
-            if (event.data && event.data.cookies) {
-                //console.log('Cookies received in iframe:', event.data.cookies);
-                checkAuthCookie(event.data.cookies);
-            } else {
-                console.warn("No cookies in message data:", event.data);
-            }
+            if (event.origin !== "https://solt.co.uk") return;
+            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
+            if (clashId == null) return;
+            setHasAuthCookie(String(clashId)); // RowActions uses a number state
         };
 
         window.addEventListener("message", handleMessage);
@@ -138,13 +116,15 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const currentSelectedDate = parse(subRow.Date, "dd/MM/yyyy", new Date(), {
         locale: enGB,
     });
+
+    const isDev = process.env.NODE_ENV !== "production";
+
     const showEditOptions =
-        hasAuthCookie !== 0 &&
-        hasAuthCookie === Number(subRow.UserId) &&
-        (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
-    // console.log("showEditOptions:", showEditOptions)
-    // console.log(hasAuthCookie);
-    // console.log(subRow.UserId);
+        isDev ||
+        (hasAuthCookie !== "0" &&
+            hasAuthCookie === String(subRow.UserId) &&
+            (isAfter(currentSelectedDate, new Date()) ||
+                isSameDay(currentSelectedDate, new Date())));
 
     return (
         <>

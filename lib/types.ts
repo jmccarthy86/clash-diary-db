@@ -49,10 +49,10 @@ export interface EmailSender {
 }
 
 export interface EmailData {
-	to: EmailRecipient[];
-	subject: string;
-	templateName: string;
-	sender: EmailSender;
-	replyTo?: EmailSender;
-	params?: Record<string, string>;
+    to: EmailRecipient[];
+    subject: string;
+    templateName: string;
+    sender: EmailSender;
+    replyTo?: EmailSender;
+    params?: Record<string, any>;
 }

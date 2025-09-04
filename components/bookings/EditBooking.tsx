@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { format, parse, isSameDay } from "date-fns";
-//import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 import { updateBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import BookingForm from "./BookingForm";
-import { prepareBookingFormData, handleClashEmails } from "@/lib/utils";
+import { handleClashEmails } from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import venues from "@/lib/venues";
 
@@ -25,69 +25,55 @@ export default function EditBooking({
     // if Venue is not empty and is not in the venues list, it should be set in the otherVenue field.
     const selectedVenue = venues.find((venue) => venue.value === currentDetail.Venue);
 
-    let venue = currentDetail.Venue;
-    let otherVenue = currentDetail.OtherVenue;
+    let venue = currentDetail.venue;
+    let otherVenue = currentDetail.otherVenue;
 
-    if (currentDetail.Venue !== "" && selectedVenue === undefined) {
-        otherVenue = currentDetail.Venue;
-    } else if (currentDetail.Venue !== "" && selectedVenue) {
-        venue = currentDetail.Venue;
+    if (currentDetail.venue !== "" && selectedVenue === undefined) {
+        otherVenue = currentDetail.venue;
+    } else if (currentDetail.venue !== "" && selectedVenue) {
+        venue = currentDetail.venue;
     }
 
     const initialValues = {
-        Day: format(currentSelectedDate, "EEEE") || "",
-        Date: currentSelectedDate,
-        P: currentDetail.P || false,
-        Venue: venue,
-        UKTVenue: currentDetail.UKTVenue || "",
-        OtherVenue: otherVenue,
-        VenueIsTba: currentDetail.VenueIsTba || false,
-        TitleOfShow: currentDetail.TitleOfShow || "",
-        ShowTitleIsTba: currentDetail.ShowTitleIsTba || false,
-        Producer: currentDetail.Producer || "",
-        PressContact: currentDetail.PressContact || "",
-        DateBkd: currentDetail.DateBkd || "",
-        IsSeasonGala: currentDetail.IsSeasonGala || false,
-        IsOperaDance: currentDetail.IsOperaDance || false,
-        UserId: currentDetail.userId || "0",
+        day: format(currentSelectedDate, "EEEE") || "",
+        date: currentSelectedDate,
+        p: !!currentDetail.p,
+        venue: venue,
+        uktVenue: currentDetail.uktVenue || "",
+        otherVenue: otherVenue,
+        venueIsTba: !!currentDetail.venueIsTba,
+        titleOfShow: currentDetail.titleOfShow || "",
+        showTitleIsTba: !!currentDetail.showTitleIsTba,
+        producer: currentDetail.producer || "",
+        pressContact: currentDetail.pressContact || "",
+        dateBkd: currentDetail.dateBkd || "",
+        isSeasonGala: !!currentDetail.isSeasonGala,
+        isOperaDance: !!currentDetail.isOperaDance,
+        userId: currentDetail.userId || "0",
     };
 
     // Context
-
+    const { refreshData, yearData } = useApp();
 
     const handleSubmit = async (data: FieldValues) => {
-        // console.log("Row Range : ", rowRange);
-        // console.log("Data : ", data);
-        // console.log("Current Date", currentSelectedDate );
-
         try {
-            await updateBooking(rowRange, prepareBookingFormData(data));
+            await updateBooking(rowRange, data);
 
-            //console.log("email conditional: ", data, yearData);
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
-                const newDateFormatted = format(new Date(data.Date), "dd/MM/yyyy");
+                const newDateFormatted = format(new Date(data.date), "dd/MM/yyyy");
 
                 // Check if there are bookings on the new date
                 const newDateEntries = yearData.Dates[newDateFormatted];
 
                 if (newDateEntries && Object.keys(newDateEntries).length > 0) {
-                    //console.log("Bookings found for the new date:", newDateEntries);
-
                     let dateBeforeEdit: Date | null = null;
-                    const dateBeforeEditString: string = yearData.Dates[originalDateFormatted][
-                        rowRange
-                    ].Date
-                        ? (yearData.Dates[originalDateFormatted][rowRange].Date as string)
-                        : "";
+                    const maybeEntry = yearData.Dates[originalDateFormatted]?.[rowRange];
+                    const dateBeforeEditString = maybeEntry?.Date as string | undefined; // dd/MM/yyyy
 
-                    if (dateBeforeEditString !== null) {
+                    if (dateBeforeEditString) {
                         dateBeforeEdit = parse(dateBeforeEditString, "dd/MM/yyyy", new Date());
-                        //console.log("dateBeforeEdit", dateBeforeEdit);
-                        //console.log("data.Date", data.Date);
-
-                        // Ensure data.Date is also a Date object
-                        const dataDate: Date = new Date(data.Date);
+                        const dataDate: Date = new Date(data.date);
 
                         if (dateBeforeEdit && !isSameDay(dateBeforeEdit, dataDate)) {
                             handleClashEmails(currentSelectedDate, data);

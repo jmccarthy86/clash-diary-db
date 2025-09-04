@@ -5,7 +5,7 @@ import { startOfMonth, endOfMonth, startOfDay } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListView from "@/components/table/ListView";
 import { CalendarView } from "@/components/calendar/calendar";
-import { ExcelProvider } from "@/context/ExcelContext";
+import { AppProvider } from "@/context/AppContext";
 import { CalendarIcon, TableIcon } from "@radix-ui/react-icons";
 
 function MainContent() {
@@ -100,8 +100,8 @@ function MainContent() {
 
 export default function Home() {
     return (
-        <ExcelProvider>
+        <AppProvider>
             <MainContent />
-        </ExcelProvider>
+        </AppProvider>
     );
 }

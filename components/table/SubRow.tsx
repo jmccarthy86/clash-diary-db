@@ -11,7 +11,6 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { SubRowData } from "@/lib/types";
-import { useExcel } from "@/context/ExcelContext";
 import BookingBadge from "@/components/bookings/BookingBadge";
 
 interface SubRowComponentProps {
@@ -53,8 +52,8 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                         ? subRow.otherVenue
                                         : subRow.affiliateVenue
                                         ? subRow.affiliateVenue
-                                        : subRow.uKTVenue
-                                        ? subRow.uKTVenue
+                                        : subRow.uktVenue
+                                        ? subRow.uktVenue
                                         : subRow.venueIsTba
                                         ? "TBA"
                                         : ""}
@@ -125,13 +124,13 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                     )}
 
                                     <div className="flex gap-2 mb-3">
-                                        {subRow.p && <BookingBadge type="P">P</BookingBadge>}
-                                        {subRow.isOperaDance && (
+                                        {Boolean(subRow.p) && <BookingBadge type="P">P</BookingBadge>}
+                                        {Boolean(subRow.isOperaDance) && (
                                             <BookingBadge type="OPERA_DANCE">
                                                 Opera/Dance
                                             </BookingBadge>
                                         )}
-                                        {subRow.isSeasonGala && (
+                                        {Boolean(subRow.isSeasonGala) && (
                                             <BookingBadge type="GALA_NIGHT">
                                                 Season Announcement/Gala Night
                                             </BookingBadge>

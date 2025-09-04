@@ -21,14 +21,14 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import EditBooking from "@/components/bookings/EditBooking";
-import { useExcel } from "@/context/ExcelContext";
+import { useApp } from "@/context/AppContext";
 import { deleteBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "../ui/loader";
 import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
-import uktVenues from "@/lib/uktvenues"; 
+import uktVenues from "@/lib/uktvenues";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -43,7 +43,7 @@ export default function BookingDetail({
     currentSelectedDate,
     allowEdit,
 }: BookingDetailProps) {
-    const { refreshData } = useExcel();
+    const { refreshData } = useApp();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
     const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
@@ -51,46 +51,12 @@ export default function BookingDetail({
     const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
 
     React.useEffect(() => {
-        // Function to handle cookie and fallback clashId
-        const checkAuthCookie = (cookies: string, clashIdFromParent: string | null) => {
-            // const cookieArray = cookies.split(";");
-            // const clashSyncCookie = cookieArray.find((cookie) =>
-            //     cookie.trim().startsWith("clash_sync=")
-            // );
-
-            // // If valid clash_sync cookie exists, use it
-            // if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
-            //     setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
-            // } else {
-            // Fallback to clashId from parent if no valid cookie found
-            if (clashIdFromParent) {
-                const clashIdValue = Number(clashIdFromParent);
-                if (clashIdValue) {
-                    setHasAuthCookie(clashIdValue);
-                } else {
-                    console.warn("No valid auth found in cookies or clashId");
-                    setHasAuthCookie("0"); // Set state to indicate no auth
-                }
-            } else {
-                console.warn("No valid auth found in cookies or clashId");
-                setHasAuthCookie("0"); // Set state to indicate no auth
-            }
-        };
-        // };
-
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://solt.co.uk") {
-                console.warn("Invalid origin:", event.origin);
-                return;
-            }
-
-            if (event.data && event.data.cookies) {
-                const clashIdFromParent = event.data.clashId;
-                checkAuthCookie(event.data.cookies, clashIdFromParent);
-            } else {
-                console.warn("No cookies in message data:", event.data);
-            }
+            if (event.origin !== "https://solt.co.uk") return;
+            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
+            if (clashId == null) return;
+            setHasAuthCookie(String(clashId));
         };
 
         window.addEventListener("message", handleMessage);
@@ -124,19 +90,14 @@ export default function BookingDetail({
         setIsDeleting(false);
     };
 
-    const showEditOptions =
-        hasAuthCookie !== "0" &&
-        hasAuthCookie === userId &&
-        (isAfter(currentSelectedDate, new Date()) || isSameDay(currentSelectedDate, new Date()));
+    const isDev = process.env.NODE_ENV !== "production";
 
-    // console.log("hasAuthCookie", hasAuthCookie);
-    // console.log("showEditOptions", showEditOptions);
-    console.log("details", otherDetails);
-    // console.log(otherDetails.IsSeasonGala);
-    // console.log(
-    //     "Affiliates:",
-    //     affiliates.map((affiliate) => affiliate.value)
-    // );
+    const showEditOptions =
+        isDev ||
+        (hasAuthCookie !== "0" &&
+            hasAuthCookie === userId &&
+            (isAfter(currentSelectedDate, new Date()) ||
+                isSameDay(currentSelectedDate, new Date())));
 
     return (
         <Card className="w-full pt-6" data-relation={userId || undefined}>
@@ -151,7 +112,7 @@ export default function BookingDetail({
                     <p className="text-muted-foreground">
                         {otherDetails.titleOfShow
                             ? otherDetails.titleOfShow
-                            : otherDetails.ShowTitleIsTba && "TBA"}
+                            : otherDetails.showTitleIsTba && "TBA"}
                     </p>
                 </div>
 
@@ -171,14 +132,14 @@ export default function BookingDetail({
                         {otherDetails.venue
                             ? otherDetails.venue
                             : otherDetails.otherVenue
-                            ? otherDetails.otherVenue
-                            : otherDetails.affiliateVenue
-                            ? otherDetails.affiliateVenue
-                            : otherDetails.uKTVenue
-                            ? otherDetails.uKTVenue
-                            : otherDetails.venueIsTba
-                            ? "TBA"
-                            : ""}
+                              ? otherDetails.otherVenue
+                              : otherDetails.affiliateVenue
+                                ? otherDetails.affiliateVenue
+                                : otherDetails.uktVenue
+                                  ? otherDetails.uktVenue
+                                  : otherDetails.venueIsTba
+                                    ? "TBA"
+                                    : ""}
                     </p>
                 </div>
 
@@ -197,13 +158,13 @@ export default function BookingDetail({
                             <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
 
-                        {p && <BookingBadge type="P">P</BookingBadge>}
+                        {Boolean(p) && <BookingBadge type="P">P</BookingBadge>}
 
-                        {otherDetails.isOperaDance && (
+                        {Boolean(otherDetails.isOperaDance) && (
                             <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
                         )}
 
-                        {otherDetails.isSeasonGala && (
+                        {Boolean(otherDetails.isSeasonGala) && (
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>

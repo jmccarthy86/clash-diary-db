@@ -14,16 +14,17 @@ export function getClashEmailContent(params: EmailData["params"]): string {
           </style>
         </head>
         <body>
-		    ${params?.Date ? `<p style="margin: 0;"><strong>Date: </strong>${params.Date}</p>` : ""}
+		    ${params?.date ? `<p style="margin: 0;"><strong>Date: </strong>${params.date}</p>` : ""}
 		    ${
-                params?.TitleOfShow
-                    ? `<p style="margin: 0;"><strong>Show Title: </strong>${params.TitleOfShow}</p>`
+                params?.titleOfShow
+                    ? `<p style="margin: 0;"><strong>Show Title: </strong>${params.titleOfShow}</p>`
                     : ""
             }
+            ${renderShowCategory(params)}
             </br>
 		    <p style="margin: 0;">You are receiving this email because you have a booking in the SOLT & UK Theatre First Night Diary on the above date.</p>
-		    <p style="margin: 0;">Full clash details are attached as a spreadsheet (CSV file), with press contacts included. If information in the spreadsheet shows as ######, please expand that column and full details will appear.</p>
-            <p style="margin: 0;">Follow this link to see the full diary: <a href="https://solt.co.uk/first-night-diary?selectedDate=${params?.RawDate}">SOLT First Night Diary</a>. You can also edit or delete your entry on the diary itself.</p>
+            <p style="margin: 0;">Full clash details are attached as an Excel file (.xls), with press contacts included. If information in the spreadsheet shows as ######, please expand that column and full details will appear.</p>
+            <p style="margin: 0;">Follow this link to see the full diary: <a href="https://solt.co.uk/first-night-diary?selectedDate=${params?.rawDate}">SOLT First Night Diary</a>. You can also edit or delete your entry on the diary itself.</p>
             <p style="margin: 0;">See a full User Guide for the diary here: <a href="https://res.cloudinary.com/solt/image/upload/v1727697464/SOLT_First_Night_Diary_User_Guide_yejiqw.pdf">First Night Diary User Guide</a>
             </br>
 		    <p style="margin: 0;">If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
@@ -36,12 +37,12 @@ export function getClashEmailContent(params: EmailData["params"]): string {
 }
 
 function renderShowCategory(params: EmailData["params"]): string {
-    if (params?.IsOperaDance !== undefined || params?.IsSeasonGala !== undefined) {
+    if (params?.isOperaDance !== undefined || params?.isSeasonGala !== undefined) {
         let categories = [];
-        if (params.IsOperaDance) {
+        if (params.isOperaDance) {
             categories.push("Opera/Dance");
         }
-        if (params.IsSeasonGala) {
+        if (params.isSeasonGala) {
             categories.push("Season Announcement or Gala Night");
         }
         if (categories.length > 0) {

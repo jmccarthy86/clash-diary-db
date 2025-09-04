@@ -31,25 +31,24 @@ import {
     CommandItem,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { date } from "drizzle-orm/mysql-core";
 
 export const FormSchema = z.object({
     day: z.string().optional(),
     date: z.date({
         required_error: "A date is required.",
     }),
-    p: z.boolean().optional(),
+    p: z.coerce.boolean().optional(),
     venue: z.string().optional(),
     uktVenue: z.string().optional(),
     affiliateVenue: z.string().optional(),
     otherVenue: z.string().optional(),
-    venueIsTba: z.boolean().optional(),
+    venueIsTba: z.coerce.boolean().optional(),
     titleOfShow: z.string().optional(),
-    showTitleIsTba: z.boolean().optional(),
+    showTitleIsTba: z.coerce.boolean().optional(),
     producer: z.string().min(1, "Producer is required"),
     pressContact: z.string().min(1, "Press Contact is required"),
-    isSeasonGala: z.boolean().optional(),
-    isOperaDance: z.boolean().optional(),
+    isSeasonGala: z.coerce.boolean().optional(),
+    isOperaDance: z.coerce.boolean().optional(),
     userId: z.string().optional(),
     dateBkd: z.string().optional(),
     timeStamp: z.number().optional(),
@@ -78,7 +77,7 @@ export default function BookingForm({
         if (initialData) {
             return {
                 ...initialData,
-                userId: hasAuthCookie || initialData.userId || "", // Ensure the correct value
+                userId: hasAuthCookie || initialData.userId || "0", // Ensure the correct value
             };
         } else {
             return {
@@ -101,12 +100,14 @@ export default function BookingForm({
                 timeStamp: Date.now(),
             };
         }
-    }, [initialData, hasAuthCookie, currentSelectedDate]);
+    }, [initialData, hasAuthCookie]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: defaultValues,
     });
+
+    console.log(defaultValues);
 
     const handleSubmit = async (data: Record<string, any>) => {
         if (!isDirty) {
@@ -125,38 +126,11 @@ export default function BookingForm({
     // Helper function to handle disabling fields
     const isFieldDisabled = (fieldName: string) => {
         if (submitting) return true;
-        if (fieldName === "titleOfShow")    return form.watch("showTitleIsTba");
+        if (fieldName === "titleOfShow") return form.watch("showTitleIsTba");
         return false;
     };
 
     React.useEffect(() => {
-        // Function to handle cookie and fallback clashId
-        const checkAuthCookie = (cookies: string, clashIdFromParent: string | null) => {
-            // const cookieArray = cookies.split(";");
-            // const clashSyncCookie = cookieArray.find((cookie) =>
-            //     cookie.trim().startsWith("clash_sync=")
-            // );
-
-            // // If valid clash_sync cookie exists, use it
-            // if (clashSyncCookie && Number(clashSyncCookie.split("=")[1]) !== 0) {
-            //     setHasAuthCookie(Number(clashSyncCookie.split("=")[1]));
-            // } else {
-            // Fallback to clashId from parent if no valid cookie found
-            if (clashIdFromParent) {
-                const clashIdValue = clashIdFromParent;
-                if (clashIdValue) {
-                    setHasAuthCookie(clashIdValue);
-                } else {
-                    console.warn("No valid auth found in cookies or clashId");
-                    setHasAuthCookie("0"); // Set state to indicate no auth
-                }
-            } else {
-                console.warn("No valid auth found in cookies or clashId");
-                setHasAuthCookie("0"); // Set state to indicate no auth
-            }
-        };
-        //};
-
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
             if (event.origin !== "https://solt.co.uk") {
@@ -164,12 +138,9 @@ export default function BookingForm({
                 return;
             }
 
-            if (event.data && event.data.cookies) {
-                const clashIdFromParent = event.data.clashId; // Get clashId from message
-                checkAuthCookie(event.data.cookies, clashIdFromParent);
-            } else {
-                console.warn("No cookies in message data:", event.data);
-            }
+            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
+            if (clashId == null) return;
+            setHasAuthCookie(String(clashId));
         };
 
         window.addEventListener("message", handleMessage);
