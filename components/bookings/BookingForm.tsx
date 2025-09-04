@@ -133,7 +133,8 @@ export default function BookingForm({
     React.useEffect(() => {
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://solt.co.uk") {
+            const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+            if (!allowed.has(event.origin)) {
                 console.warn("Invalid origin:", event.origin);
                 return;
             }

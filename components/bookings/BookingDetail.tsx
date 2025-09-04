@@ -53,7 +53,8 @@ export default function BookingDetail({
     React.useEffect(() => {
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://solt.co.uk") return;
+            const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+            if (!allowed.has(event.origin)) return;
             const { clashId } = (event.data ?? {}) as { clashId?: string | number };
             if (clashId == null) return;
             setHasAuthCookie(String(clashId));

@@ -24,8 +24,9 @@ function MainContent() {
             hasListener.current = true;
 
             const handleMessage = (event: MessageEvent) => {
-                // Verify the origin to make sure it's the expected source
-                if (event.origin !== "https://solt.co.uk") return;
+                // Verify allowed parent origins
+                const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+                if (!allowed.has(event.origin)) return;
 
                 const { selectedDate } = event.data;
 

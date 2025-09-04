@@ -94,7 +94,8 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            if (event.origin !== "https://solt.co.uk") return;
+            const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+            if (!allowed.has(event.origin)) return;
             const { clashId } = (event.data ?? {}) as { clashId?: string | number };
             if (clashId == null) return;
             setHasAuthCookie(String(clashId)); // RowActions uses a number state
@@ -104,7 +105,13 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
         // Notify parent that iframe is ready
         //console.log('Iframe is ready, notifying parent');
-        window.parent.postMessage("iframeReady", "https://solt.co.uk");
+        try {
+            const ref = document.referrer ? new URL(document.referrer).origin : undefined;
+            const target = ref && (ref === "https://solt.co.uk" || ref === "https://soltdigital.co.uk") ? ref : "https://solt.co.uk";
+            window.parent.postMessage("iframeReady", target);
+        } catch {
+            window.parent.postMessage("iframeReady", "https://solt.co.uk");
+        }
 
         // Clean up the event listener on component unmount
         return () => {

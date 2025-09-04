@@ -2,13 +2,15 @@
     "name": "clash-diary",
     "version": "0.1.0",
     "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint",
-        "flat": "node --trace-warnings scripts/flatten.js"
-    },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "flat": "node --trace-warnings scripts/flatten.js",
+    "seed:csv": "node scripts/seed-from-csv.mjs",
+    "seed:csv:reset": "node scripts/seed-from-csv.mjs --reset"
+  },
     "dependencies": {
         "@azure/identity": "^4.2.0",
         "@getbrevo/brevo": "^2.2.0",
