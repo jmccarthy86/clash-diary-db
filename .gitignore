@@ -40,3 +40,4 @@ next-env.d.ts
 /.drizzle/
 /lib/.db/
 .drizzle.config.ts
+/scripts/.seed.ts
