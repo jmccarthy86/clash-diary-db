@@ -29,30 +29,14 @@ const BookingInput = z.object({
 
 /* ---------- CRUD via WordPress REST ---------- */
 
-// Compute the epoch ms for midnight Europe/London for the user-selected calendar day
-// Uses the local Y/M/D from the Date object (the selected day), then applies the London offset for that day.
-function londonMidnightMs(date: Date): number {
-  const y = date.getFullYear();
-  const m = date.getMonth(); // 0-based
-  const d = date.getDate();
-  const utcMidnight = Date.UTC(y, m, d, 0, 0, 0);
-  // Determine London offset (0 or 1 hours) for that calendar day
-  const hourInLondonAtUtcMidnight = Number(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Europe/London",
-      hour: "numeric",
-      hour12: false,
-    }).format(new Date(utcMidnight))
-  );
-  const offsetMinutes = hourInLondonAtUtcMidnight * 60;
-  return utcMidnight - offsetMinutes * 60 * 1000;
-}
+// Note: The WP plugin/ACF prefer a plain calendar day string (YYYY-MM-DD).
+// The plugin normalizes this to UK midnight and stores both string and ms.
 
 export async function createBooking(raw: unknown) {
     const data = BookingInput.parse(raw);
     const payload = {
-        // Always store as UK midnight for the selected UK calendar day
-        date: londonMidnightMs(data.date),
+        // Send as YYYY-MM-DD; plugin converts to UK midnight and stores date_ms
+        date: format(data.date, "yyyy-MM-dd"),
         day: data.day ?? format(data.date, "EEEE"),
         p: Boolean(data.p ?? false),
         venue: data.venue ?? "",
@@ -79,7 +63,7 @@ export async function createBooking(raw: unknown) {
 export async function updateBooking(id: string, raw: unknown) {
     const data = BookingInput.partial().parse(raw);
     const payload: Record<string, any> = {};
-    if (data.date !== undefined) payload.date = londonMidnightMs(data.date);
+    if (data.date !== undefined) payload.date = format(data.date, "yyyy-MM-dd");
     if (data.day !== undefined) payload.day = data.day;
     if (data.p !== undefined) payload.p = Boolean(data.p);
     if (data.venue !== undefined) payload.venue = data.venue;
