@@ -1,10 +1,8 @@
 "use server";
 
-import { db } from "@/lib/db/db";
-import { bookings } from "@/lib/db/schema";
-import { eq, between } from "drizzle-orm";
 import { startOfYear, endOfYear, format } from "date-fns";
 import { z } from "zod";
+import { wpFetch } from "@/lib/wp/client";
 
 /* ---------- validation ---------- */
 
@@ -29,94 +27,101 @@ const BookingInput = z.object({
     timeStamp: z.number().optional(),
 });
 
-/* ---------- CRUD ---------- */
+/* ---------- CRUD via WordPress REST ---------- */
+
+// Compute the epoch ms for midnight Europe/London for the user-selected calendar day
+// Uses the local Y/M/D from the Date object (the selected day), then applies the London offset for that day.
+function londonMidnightMs(date: Date): number {
+  const y = date.getFullYear();
+  const m = date.getMonth(); // 0-based
+  const d = date.getDate();
+  const utcMidnight = Date.UTC(y, m, d, 0, 0, 0);
+  // Determine London offset (0 or 1 hours) for that calendar day
+  const hourInLondonAtUtcMidnight = Number(
+    new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Europe/London",
+      hour: "numeric",
+      hour12: false,
+    }).format(new Date(utcMidnight))
+  );
+  const offsetMinutes = hourInLondonAtUtcMidnight * 60;
+  return utcMidnight - offsetMinutes * 60 * 1000;
+}
 
 export async function createBooking(raw: unknown) {
     const data = BookingInput.parse(raw);
-
-    await db.insert(bookings).values({
-        ...data,
-        date: data.date.getTime(),
-        p: data.p ? 1 : 0,
-        venueIsTba: data.venueIsTba ? 1 : 0,
-        showTitleIsTba: data.showTitleIsTba ? 1 : 0,
-        isSeasonGala: data.isSeasonGala ? 1 : 0,
-        isOperaDance: data.isOperaDance ? 1 : 0,
-        createdAt: Date.now(),
+    const payload = {
+        // Always store as UK midnight for the selected UK calendar day
+        date: londonMidnightMs(data.date),
+        day: data.day ?? format(data.date, "EEEE"),
+        p: Boolean(data.p ?? false),
+        venue: data.venue ?? "",
+        ukt_venue: data.uktVenue ?? "",
+        affiliate_venue: data.affiliateVenue ?? "",
+        other_venue: data.otherVenue ?? "",
+        venue_is_tba: Boolean(data.venueIsTba ?? false),
+        title_of_show: data.titleOfShow ?? "",
+        show_title_is_tba: Boolean(data.showTitleIsTba ?? false),
+        producer: data.producer ?? "",
+        press_contact: data.pressContact ?? "",
+        date_bkd: data.dateBkd ?? "",
+        is_season_gala: Boolean(data.isSeasonGala ?? false),
+        is_opera_dance: Boolean(data.isOperaDance ?? false),
+        user_id: data.userId ?? "",
+        time_stamp: data.timeStamp ?? Date.now(),
+    };
+    await wpFetch("/wp-json/fnd/v1/bookings", {
+        method: "POST",
+        body: JSON.stringify(payload),
     });
 }
 
 export async function updateBooking(id: string, raw: unknown) {
-    // Accept partial updates; `id` is passed separately
     const data = BookingInput.partial().parse(raw);
+    const payload: Record<string, any> = {};
+    if (data.date !== undefined) payload.date = londonMidnightMs(data.date);
+    if (data.day !== undefined) payload.day = data.day;
+    if (data.p !== undefined) payload.p = Boolean(data.p);
+    if (data.venue !== undefined) payload.venue = data.venue;
+    if (data.uktVenue !== undefined) payload.ukt_venue = data.uktVenue;
+    if (data.affiliateVenue !== undefined) payload.affiliate_venue = data.affiliateVenue;
+    if (data.otherVenue !== undefined) payload.other_venue = data.otherVenue;
+    if (data.venueIsTba !== undefined) payload.venue_is_tba = Boolean(data.venueIsTba);
+    if (data.titleOfShow !== undefined) payload.title_of_show = data.titleOfShow;
+    if (data.showTitleIsTba !== undefined) payload.show_title_is_tba = Boolean(data.showTitleIsTba);
+    if (data.producer !== undefined) payload.producer = data.producer;
+    if (data.pressContact !== undefined) payload.press_contact = data.pressContact;
+    if (data.dateBkd !== undefined) payload.date_bkd = data.dateBkd;
+    if (data.isSeasonGala !== undefined) payload.is_season_gala = Boolean(data.isSeasonGala);
+    if (data.isOperaDance !== undefined) payload.is_opera_dance = Boolean(data.isOperaDance);
+    if (data.userId !== undefined) payload.user_id = data.userId;
+    if (data.timeStamp !== undefined) payload.time_stamp = data.timeStamp;
 
-    // Coerce types to match SQLite schema (ints for booleans, ms timestamp for date)
-    const toUpdate: Record<string, any> = {};
-
-    if (data.date !== undefined) toUpdate.date = data.date.getTime();
-    if (data.day !== undefined) toUpdate.day = data.day;
-    if (data.p !== undefined) toUpdate.p = data.p ? 1 : 0;
-    if (data.venue !== undefined) toUpdate.venue = data.venue;
-    if (data.uktVenue !== undefined) toUpdate.uktVenue = data.uktVenue;
-    if (data.affiliateVenue !== undefined) toUpdate.affiliateVenue = data.affiliateVenue;
-    if (data.otherVenue !== undefined) toUpdate.otherVenue = data.otherVenue;
-    if (data.venueIsTba !== undefined) toUpdate.venueIsTba = data.venueIsTba ? 1 : 0;
-    if (data.titleOfShow !== undefined) toUpdate.titleOfShow = data.titleOfShow;
-    if (data.showTitleIsTba !== undefined) toUpdate.showTitleIsTba = data.showTitleIsTba ? 1 : 0;
-    if (data.producer !== undefined) toUpdate.producer = data.producer;
-    if (data.pressContact !== undefined) toUpdate.pressContact = data.pressContact;
-    if (data.dateBkd !== undefined) toUpdate.dateBkd = data.dateBkd;
-    if (data.isSeasonGala !== undefined) toUpdate.isSeasonGala = data.isSeasonGala ? 1 : 0;
-    if (data.isOperaDance !== undefined) toUpdate.isOperaDance = data.isOperaDance ? 1 : 0;
-    if (data.userId !== undefined) toUpdate.userId = data.userId;
-    if (data.timeStamp !== undefined) toUpdate.timeStamp = data.timeStamp;
-
-    await db
-        .update(bookings)
-        .set(toUpdate)
-        .where(eq(bookings.id, Number(id)));
+    await wpFetch(`/wp-json/fnd/v1/bookings/${id}`, {
+        // Use POST for broader host compatibility; plugin accepts POST or PATCH
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
 }
 
 export async function deleteBooking(id: string) {
-    await db.delete(bookings).where(eq(bookings.id, Number(id)));
+    // Use POST-friendly delete endpoint to avoid blocked DELETE methods
+    await wpFetch(`/wp-json/fnd/v1/bookings/${id}/delete`, {
+        method: "POST",
+    });
 }
 
 /* ---------- reads ---------- */
 
 export async function getYearData(year: number) {
-    const start = startOfYear(new Date(year, 0, 1)).getTime();
-    const end = endOfYear(new Date(year, 0, 1)).getTime();
-
-    try {
-        const rows = await db
-            .select()
-            .from(bookings)
-            .where(between(bookings.date, start, end))
-            .all();
-
-        console.log(rows);
-
-        /* shape identical to convertExcelDataToObject output */
-        const Dates: Record<string, Record<string, any>> = {};
-        rows.forEach((r) => {
-            const ddmmyyyy = format(r.date, "dd/MM/yyyy"); // front‑end keeps same key
-            const range = r.id; // uuid replaces Excel range
-
-            Dates[ddmmyyyy] ??= {};
-            Dates[ddmmyyyy][range] = { ...r, Date: ddmmyyyy, range };
-        });
-
-        return {
-            Year: String(year),
-            Range: "",
-            Dates,
-        };
-    } catch (error) {
-        console.log(error);
-    }
+    // Prefer a WP aggregation endpoint; fallback composes here if needed
+    const data = await wpFetch(`/wp-json/fnd/v1/bookings/year/${year}`, {
+        method: "GET",
+    });
+    return data;
 }
 
-/** optional single‑day query (replaces `searchGetAllRowsMatching`) */
+/** optional single‑day query */
 export async function getDateData(ts: number) {
-    return db.select().from(bookings).where(eq(bookings.date, ts)).all();
+    return wpFetch(`/wp-json/fnd/v1/bookings/date?ts=${encodeURIComponent(ts)}`);
 }

@@ -82,7 +82,8 @@ export default function BookingForm({
         } else {
             return {
                 day: "",
-                date: new Date(),
+                // Default the form's date to the currently selected date in the calendar
+                date: currentSelectedDate ?? new Date(),
                 p: false,
                 venue: "",
                 uktVenue: "",
@@ -100,7 +101,7 @@ export default function BookingForm({
                 timeStamp: Date.now(),
             };
         }
-    }, [initialData, hasAuthCookie]);
+    }, [initialData, hasAuthCookie, currentSelectedDate]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -133,7 +134,11 @@ export default function BookingForm({
     React.useEffect(() => {
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
-            const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+            const allowed = new Set([
+                "https://solt.co.uk",
+                "https://soltdigital.co.uk",
+                "https://soltukt.test",
+            ]);
             if (!allowed.has(event.origin)) {
                 console.warn("Invalid origin:", event.origin);
                 return;

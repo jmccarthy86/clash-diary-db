@@ -53,7 +53,11 @@ export default function BookingDetail({
     React.useEffect(() => {
         // Listen for message from parent
         const handleMessage = (event: MessageEvent) => {
-            const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+            const allowed = new Set([
+                "https://solt.co.uk",
+                "https://soltdigital.co.uk",
+                "https://soltukt.test",
+            ]);
             if (!allowed.has(event.origin)) return;
             const { clashId } = (event.data ?? {}) as { clashId?: string | number };
             if (clashId == null) return;
