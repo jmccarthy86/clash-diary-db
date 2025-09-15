@@ -43,9 +43,12 @@ function selectedDayYmd(date: Date): string {
 
 export async function createBooking(raw: unknown) {
     const data = BookingInput.parse(raw);
+    const ymdFromClient = (raw as any)?.dateYmd;
     const payload = {
-        // Send as YYYY-MM-DD literal day; plugin stores UK midnight in date_ms
-        date: selectedDayYmd(data.date),
+        // Prefer client-provided literal YYYY-MM-DD to avoid timezone drift
+        date: (typeof ymdFromClient === "string" && /^\d{4}-\d{2}-\d{2}$/.test(ymdFromClient))
+            ? ymdFromClient
+            : selectedDayYmd(data.date),
         day: data.day ?? format(data.date, "EEEE"),
         p: Boolean(data.p ?? false),
         venue: data.venue ?? "",
@@ -72,7 +75,13 @@ export async function createBooking(raw: unknown) {
 export async function updateBooking(id: string, raw: unknown) {
     const data = BookingInput.partial().parse(raw);
     const payload: Record<string, any> = {};
-    if (data.date !== undefined) payload.date = selectedDayYmd(data.date);
+    if (data.date !== undefined || (raw as any)?.dateYmd) {
+        const ymdFromClient = (raw as any)?.dateYmd;
+        const ymd = (typeof ymdFromClient === "string" && /^\d{4}-\d{2}-\d{2}$/.test(ymdFromClient))
+            ? ymdFromClient
+            : (data.date !== undefined ? selectedDayYmd(data.date as Date) : undefined);
+        if (ymd) payload.date = ymd;
+    }
     if (data.day !== undefined) payload.day = data.day;
     if (data.p !== undefined) payload.p = Boolean(data.p);
     if (data.venue !== undefined) payload.venue = data.venue;

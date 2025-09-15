@@ -57,7 +57,9 @@ export default function EditBooking({
 
     const handleSubmit = async (data: FieldValues) => {
         try {
-            await updateBooking(rowRange, data);
+            const d: Date = data.date instanceof Date ? (data.date as Date) : currentSelectedDate;
+            const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            await updateBooking(rowRange, { ...data, dateYmd: ymd });
 
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
