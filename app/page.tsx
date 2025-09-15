@@ -25,7 +25,11 @@ function MainContent() {
 
             const handleMessage = (event: MessageEvent) => {
                 // Verify allowed parent origins
-                const allowed = new Set(["https://solt.co.uk", "https://soltdigital.co.uk"]);
+                const allowed = new Set([
+                    "https://solt.co.uk",
+                    "https://soltdigital.co.uk",
+                    "https://soltukt.test",
+                ]);
                 if (!allowed.has(event.origin)) return;
 
                 const { selectedDate } = event.data;
