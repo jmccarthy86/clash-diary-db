@@ -29,17 +29,12 @@ const BookingInput = z.object({
 
 /* ---------- CRUD via WordPress REST ---------- */
 
-// Build YYYY-MM-DD in Europe/London to avoid server/client timezone drift
-function londonYmd(date: Date): string {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/London",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-  const y = parts.find((p) => p.type === "year")?.value ?? String(date.getUTCFullYear());
-  const m = parts.find((p) => p.type === "month")?.value ?? String(date.getUTCMonth() + 1).padStart(2, "0");
-  const d = parts.find((p) => p.type === "day")?.value ?? String(date.getUTCDate()).padStart(2, "0");
+// Build YYYY-MM-DD using the calendar components the user selected.
+// This treats the chosen day as a literal day (no timezone conversion).
+function selectedDayYmd(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
@@ -49,8 +44,8 @@ function londonYmd(date: Date): string {
 export async function createBooking(raw: unknown) {
     const data = BookingInput.parse(raw);
     const payload = {
-        // Send as YYYY-MM-DD computed in Europe/London; plugin stores date_ms
-        date: londonYmd(data.date),
+        // Send as YYYY-MM-DD literal day; plugin stores UK midnight in date_ms
+        date: selectedDayYmd(data.date),
         day: data.day ?? format(data.date, "EEEE"),
         p: Boolean(data.p ?? false),
         venue: data.venue ?? "",
@@ -77,7 +72,7 @@ export async function createBooking(raw: unknown) {
 export async function updateBooking(id: string, raw: unknown) {
     const data = BookingInput.partial().parse(raw);
     const payload: Record<string, any> = {};
-    if (data.date !== undefined) payload.date = londonYmd(data.date);
+    if (data.date !== undefined) payload.date = selectedDayYmd(data.date);
     if (data.day !== undefined) payload.day = data.day;
     if (data.p !== undefined) payload.p = Boolean(data.p);
     if (data.venue !== undefined) payload.venue = data.venue;
