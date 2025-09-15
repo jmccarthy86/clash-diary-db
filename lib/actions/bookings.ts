@@ -29,14 +29,28 @@ const BookingInput = z.object({
 
 /* ---------- CRUD via WordPress REST ---------- */
 
+// Build YYYY-MM-DD in Europe/London to avoid server/client timezone drift
+function londonYmd(date: Date): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const y = parts.find((p) => p.type === "year")?.value ?? String(date.getUTCFullYear());
+  const m = parts.find((p) => p.type === "month")?.value ?? String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = parts.find((p) => p.type === "day")?.value ?? String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 // Note: The WP plugin/ACF prefer a plain calendar day string (YYYY-MM-DD).
 // The plugin normalizes this to UK midnight and stores both string and ms.
 
 export async function createBooking(raw: unknown) {
     const data = BookingInput.parse(raw);
     const payload = {
-        // Send as YYYY-MM-DD; plugin converts to UK midnight and stores date_ms
-        date: format(data.date, "yyyy-MM-dd"),
+        // Send as YYYY-MM-DD computed in Europe/London; plugin stores date_ms
+        date: londonYmd(data.date),
         day: data.day ?? format(data.date, "EEEE"),
         p: Boolean(data.p ?? false),
         venue: data.venue ?? "",
@@ -63,7 +77,7 @@ export async function createBooking(raw: unknown) {
 export async function updateBooking(id: string, raw: unknown) {
     const data = BookingInput.partial().parse(raw);
     const payload: Record<string, any> = {};
-    if (data.date !== undefined) payload.date = format(data.date, "yyyy-MM-dd");
+    if (data.date !== undefined) payload.date = londonYmd(data.date);
     if (data.day !== undefined) payload.day = data.day;
     if (data.p !== undefined) payload.p = Boolean(data.p);
     if (data.venue !== undefined) payload.venue = data.venue;
