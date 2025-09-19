@@ -50,6 +50,20 @@ export async function wpFetch(path: string, init: RequestInit = {}) {
   }
 
   const ct = res.headers.get("content-type") || "";
-  if (ct.includes("application/json")) return res.json();
-  return res.text();
+  if (!ct.includes("application/json")) {
+    return res.text();
+  }
+
+  const raw = await res.text();
+  if (!raw.trim()) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    const snippet = raw.length > 200 ? raw.substring(0, 200) + "..." : raw;
+    throw new Error(`WP fetch returned invalid JSON: ${snippet}`);
+  }
 }
+
