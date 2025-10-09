@@ -12,6 +12,7 @@ import {
     getFilteredRowModel,
     ColumnFiltersState,
     getPaginationRowModel,
+    ExpandedState,
 } from "@tanstack/react-table";
 import SubRowComponent from "./SubRow";
 import DatePickerWithRange from "./FilterDateRange";
@@ -21,7 +22,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Booking, RequestData } from "@/lib/types";
 import { Button } from "../ui/button";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { transformData, createYearCalendarWithData, processRangeForCSV } from "@/lib/utils";
+import { transformData, createYearCalendarWithData, processRangeForCSV, cn } from "@/lib/utils";
 import { columnsConfig } from "@/components/table/ColumnsConfig";
 import { useApp } from "@/context/AppContext";
 import DownloadButton from "../ui/download-button";
@@ -51,7 +52,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     //console.log('transformedData:', transformedData);
     const [sorting, setSorting] = React.useState<SortingState>([{ id: "date", desc: false }]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [expanded, setExpanded] = React.useState({});
+    const [expanded, setExpanded] = React.useState<ExpandedState>(true);
     const [csvData, setCsvData] = React.useState({});
 
     const columns = React.useMemo(() => columnsConfig(), []) as ColumnDef<Booking, any>[];
@@ -69,6 +70,11 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
     const table = useReactTable({
         data: transformedData,
         columns,
+        initialState: {
+            pagination: {
+                pageSize: 40,
+            },
+        },
         state: {
             sorting,
             columnFilters,
@@ -150,7 +156,7 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className="h-10 px-3 py-2 text-sm">
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
@@ -167,14 +173,14 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                             <React.Fragment key={row.id}>
                                 <TableRow
                                     onClick={() => handleRowClick(row)}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer [&>td]:px-3 [&>td]:py-2"
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
-                                            {...(cell.column.id === "bookNow" && {
-                                                className: "text-right",
-                                            })}
+                                            className={cn(
+                                                cell.column.id === "bookNow" ? "text-right" : ""
+                                            )}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
@@ -185,7 +191,10 @@ const ListView: React.FC<ListViewProps> = ({ dateRange, onDateRangeChange }) => 
                                 </TableRow>
                                 {row.getIsExpanded() && (
                                     <TableRow className="bg-muted/40 hover:bg-muted/50">
-                                        <TableCell colSpan={row.getVisibleCells().length}>
+                                        <TableCell
+                                            colSpan={row.getVisibleCells().length}
+                                            className="px-3 py-3"
+                                        >
                                             <SubRowComponent subRows={row.original.subRows} />
                                         </TableCell>
                                     </TableRow>

@@ -75,28 +75,28 @@ function MainContent() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between pb-4 sm:pb-6 md:pb-8 lg:pb-12 xl:pb-24 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-24">
             <Tabs
-                defaultValue="calendar"
+                defaultValue="table"
                 className="w-[960px] max-w-full p-6 rounded-md border bg-background"
             >
                 <TabsList className="w-full lg:w-auto">
-                    <TabsTrigger value="calendar">
-                        <div className="flex items-center gap-1">
-                            <CalendarIcon />
-                            <span>Calendar</span>
-                        </div>
-                    </TabsTrigger>
                     <TabsTrigger value="table">
                         <div className="flex items-center gap-1">
                             <TableIcon />
                             <span>List View</span>
                         </div>
                     </TabsTrigger>
+                    <TabsTrigger value="calendar">
+                        <div className="flex items-center gap-1">
+                            <CalendarIcon />
+                            <span>Calendar</span>
+                        </div>
+                    </TabsTrigger>
                 </TabsList>
-                <TabsContent value="calendar">
-                    <CalendarView selectedDate={singleDate} onDateChange={handleSingleDateChange} />
-                </TabsContent>
                 <TabsContent value="table">
                     <ListView dateRange={dateRange} onDateRangeChange={handleDateRangeChange} />
+                </TabsContent>
+                <TabsContent value="calendar">
+                    <CalendarView selectedDate={singleDate} onDateChange={handleSingleDateChange} />
                 </TabsContent>
             </Tabs>
         </main>

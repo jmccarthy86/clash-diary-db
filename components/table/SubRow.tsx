@@ -23,10 +23,18 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
         <Table key={subRows[0].Date}>
             <TableHeader>
                 <TableRow className="hidden lg:table-row">
-                    <TableHead key="show-title">Show Title</TableHead>
-                    <TableHead key="venue">Venue</TableHead>
-                    <TableHead key="press-contact">Press Contact</TableHead>
-                    <TableHead key="actions">Actions</TableHead>
+                    <TableHead key="show-title" className="h-10 px-3 py-2 text-sm">
+                        Show Title
+                    </TableHead>
+                    <TableHead key="venue" className="h-10 px-3 py-2 text-sm">
+                        Venue
+                    </TableHead>
+                    <TableHead key="press-contact" className="h-10 px-3 py-2 text-sm">
+                        Press Contact
+                    </TableHead>
+                    <TableHead key="actions" className="h-10 px-3 py-2 text-sm">
+                        Actions
+                    </TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -35,17 +43,27 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     subRow.venue === "" &&
                     subRow.pressContact === "" ? (
                         <TableRow key={`no-data-${index}`} className="bg-gray-200">
-                            <TableCell key="subrow-no-data" colSpan={4} className="text-center">
+                            <TableCell
+                                key="subrow-no-data"
+                                colSpan={4}
+                                className="px-3 py-4 text-center text-sm"
+                            >
                                 No data available
                             </TableCell>
                         </TableRow>
                     ) : (
                         <React.Fragment key={`group-${index}`}>
                             <TableRow key={`desktop-${index}`} className="hidden lg:table-row">
-                                <TableCell key={`${index}-${subRow.titleOfShow}`}>
+                                <TableCell
+                                    key={`${index}-${subRow.titleOfShow}`}
+                                    className="px-3 py-2 text-sm"
+                                >
                                     {subRow.titleOfShow}
                                 </TableCell>
-                                <TableCell key={`${index}-${subRow.venue}`}>
+                                <TableCell
+                                    key={`${index}-${subRow.venue}`}
+                                    className="px-3 py-2 text-sm"
+                                >
                                     {subRow.venue
                                         ? subRow.venue
                                         : subRow.otherVenue
@@ -58,15 +76,18 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                         ? "TBA"
                                         : ""}
                                 </TableCell>
-                                <TableCell key={`${index}-${subRow.pressContact}`}>
+                                <TableCell
+                                    key={`${index}-${subRow.pressContact}`}
+                                    className="px-3 py-2 text-sm"
+                                >
                                     {subRow.pressContact}
                                 </TableCell>
-                                <TableCell key={`${index}-aciotn`}>
+                                <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-sm">
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
                             <TableRow key={`${index}-mobile`} className="lg:hidden">
-                                <TableCell key={`${index}-mobile-details`}>
+                                <TableCell key={`${index}-mobile-details`} className="px-3 py-3">
                                     {subRow.titleOfShow && (
                                         <div key="TitleOfShow" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
