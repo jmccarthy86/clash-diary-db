@@ -29,9 +29,6 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     <TableHead key="show-title" className="h-10 px-3 py-2 text-xs">
                         Show Title
                     </TableHead>
-                    <TableHead key="badges" className="h-10 px-3 py-2 text-xs">
-                        Tags
-                    </TableHead>
                     <TableHead key="venue" className="h-10 px-3 py-2 text-xs">
                         Venue
                     </TableHead>
@@ -40,6 +37,9 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     </TableHead>
                     <TableHead key="actions" className="h-10 px-3 py-2 text-xs">
                         Actions
+                    </TableHead>
+                    <TableHead key="badges" className="h-10 px-3 py-2 text-xs">
+                        Tags
                     </TableHead>
                 </TableRow>
             </TableHeader>
@@ -89,6 +89,31 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                 >
                                     <div>{subRow.titleOfShow}</div>
                                 </TableCell>
+                                <TableCell
+                                    key={`${index}-${subRow.venue}`}
+                                    className="px-3 py-2 text-xs"
+                                >
+                                    {subRow.venue
+                                        ? subRow.venue
+                                        : subRow.otherVenue
+                                        ? subRow.otherVenue
+                                        : subRow.affiliateVenue
+                                        ? subRow.affiliateVenue
+                                        : subRow.uktVenue
+                                        ? subRow.uktVenue
+                                        : subRow.venueIsTba
+                                        ? "TBA"
+                                        : ""}
+                                </TableCell>
+                                <TableCell
+                                    key={`${index}-${subRow.pressContact}`}
+                                    className="px-3 py-2 text-xs"
+                                >
+                                    {subRow.pressContact}
+                                </TableCell>
+                                <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-xs">
+                                    <TableRowActions subRow={subRow} />
+                                </TableCell>
                                 <TableCell key={`${index}-badges`} className="px-3 py-2 text-xs">
                                     {showAnyBadge && (
                                         <div className="flex flex-wrap gap-2">
@@ -120,31 +145,6 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                             )}
                                         </div>
                                     )}
-                                </TableCell>
-                                <TableCell
-                                    key={`${index}-${subRow.venue}`}
-                                    className="px-3 py-2 text-xs"
-                                >
-                                    {subRow.venue
-                                        ? subRow.venue
-                                        : subRow.otherVenue
-                                        ? subRow.otherVenue
-                                        : subRow.affiliateVenue
-                                        ? subRow.affiliateVenue
-                                        : subRow.uktVenue
-                                        ? subRow.uktVenue
-                                        : subRow.venueIsTba
-                                        ? "TBA"
-                                        : ""}
-                                </TableCell>
-                                <TableCell
-                                    key={`${index}-${subRow.pressContact}`}
-                                    className="px-3 py-2 text-xs"
-                                >
-                                    {subRow.pressContact}
-                                </TableCell>
-                                <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-xs">
-                                    <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
                             <TableRow key={`${index}-mobile`} className="lg:hidden">
