@@ -3,8 +3,8 @@ import { unCamelCase } from "@/lib/utils";
 
 type RowMap = Record<string, any>;
 
-// Only exclude userId, raw 'date' (we export the human 'Date'), technical 'range', and 'id'
-const EXCLUDE_KEYS = new Set(["userId", "date", "range", "id"]);
+// Exclude technical fields and columns we no longer export
+const EXCLUDE_KEYS = new Set(["userId", "date", "range", "id", "dateBkd", "day"]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
 const PREFERRED_ORDER = [
@@ -20,13 +20,11 @@ const PREFERRED_ORDER = [
   "p",
   "isSeasonGala",
   "isOperaDance",
-  "dateBkd",
   "timeStamp",
   "id",
   "createdAt",
   "range",
   "date",
-  "day",
 ];
 
 const BOOL_FIELDS = new Set([
@@ -81,7 +79,11 @@ function prepareColumns(allRows: Record<string, any>[]): string[] {
 }
 
 function headerLabels(cols: string[]): string[] {
-  return cols.map((h) => (h === "timeStamp" ? "Date Updated" : unCamelCase(h)));
+  return cols.map((h) => {
+    if (h === "timeStamp") return "Date Updated";
+    if (h === "uktVenue") return "UK Theatre Venue";
+    return unCamelCase(h);
+  });
 }
 
 function widthForKey(k: string): number | undefined {

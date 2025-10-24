@@ -6,26 +6,56 @@ import { wpFetch } from "@/lib/wp/client";
 
 /* ---------- validation ---------- */
 
-const BookingInput = z.object({
-    //id:             z.string().uuid(),
-    date: z.coerce.date(),
-    day: z.string().optional(),
-    p: z.boolean().optional(),
-    venue: z.string().min(1),
-    uktVenue: z.string().optional(),
-    affiliateVenue: z.string().optional(),
-    otherVenue: z.string().optional(),
-    venueIsTba: z.boolean().optional(),
-    titleOfShow: z.string().min(1),
-    showTitleIsTba: z.boolean().optional(),
-    producer: z.string().optional(),
-    pressContact: z.string().optional(),
-    dateBkd: z.string().optional(),
-    isSeasonGala: z.boolean().optional(),
-    isOperaDance: z.boolean().optional(),
-    userId: z.string().optional(),
-    timeStamp: z.number().optional(),
+const enforceTitleTbaRule = (data: any, ctx: z.RefinementCtx) => {
+  const hasTitleField = Object.prototype.hasOwnProperty.call(data, "titleOfShow");
+  const hasTbaField = Object.prototype.hasOwnProperty.call(data, "showTitleIsTba");
+
+  if (!hasTitleField && !hasTbaField) return;
+  if (!hasTitleField && hasTbaField) return;
+
+  const title = (data.titleOfShow ?? "").trim();
+  const isTba = Boolean(data.showTitleIsTba);
+
+  if (!isTba && title.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["titleOfShow"],
+      message: "Show title is required unless marked TBA",
+    });
+  }
+
+  if (isTba && title.length > 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["titleOfShow"],
+      message: "Clear the show title when marking as TBA",
+    });
+  }
+};
+
+const BookingBase = z.object({
+  //id:             z.string().uuid(),
+  date: z.coerce.date(),
+  day: z.string().optional(),
+  p: z.boolean().optional(),
+  venue: z.string().min(1),
+  uktVenue: z.string().optional(),
+  affiliateVenue: z.string().optional(),
+  otherVenue: z.string().optional(),
+  venueIsTba: z.boolean().optional(),
+  titleOfShow: z.string().optional(),
+  showTitleIsTba: z.boolean().optional(),
+  producer: z.string().optional(),
+  pressContact: z.string().optional(),
+  dateBkd: z.string().optional(),
+  isSeasonGala: z.boolean().optional(),
+  isOperaDance: z.boolean().optional(),
+  userId: z.string().optional(),
+  timeStamp: z.number().optional(),
 });
+
+const BookingInput = BookingBase.superRefine(enforceTitleTbaRule);
+const BookingPartialInput = BookingBase.partial().superRefine(enforceTitleTbaRule);
 
 /* ---------- CRUD via WordPress REST ---------- */
 
@@ -56,7 +86,7 @@ export async function createBooking(raw: unknown) {
         affiliate_venue: data.affiliateVenue ?? "",
         other_venue: data.otherVenue ?? "",
         venue_is_tba: Boolean(data.venueIsTba ?? false),
-        title_of_show: data.titleOfShow ?? "",
+        title_of_show: (data.titleOfShow ?? "").trim(),
         show_title_is_tba: Boolean(data.showTitleIsTba ?? false),
         producer: data.producer ?? "",
         press_contact: data.pressContact ?? "",
@@ -73,7 +103,7 @@ export async function createBooking(raw: unknown) {
 }
 
 export async function updateBooking(id: string, raw: unknown) {
-    const data = BookingInput.partial().parse(raw);
+    const data = BookingPartialInput.parse(raw);
     const payload: Record<string, any> = {};
     if (data.date !== undefined || (raw as any)?.dateYmd) {
         const ymdFromClient = (raw as any)?.dateYmd;
@@ -89,8 +119,14 @@ export async function updateBooking(id: string, raw: unknown) {
     if (data.affiliateVenue !== undefined) payload.affiliate_venue = data.affiliateVenue;
     if (data.otherVenue !== undefined) payload.other_venue = data.otherVenue;
     if (data.venueIsTba !== undefined) payload.venue_is_tba = Boolean(data.venueIsTba);
-    if (data.titleOfShow !== undefined) payload.title_of_show = data.titleOfShow;
-    if (data.showTitleIsTba !== undefined) payload.show_title_is_tba = Boolean(data.showTitleIsTba);
+    if (data.titleOfShow !== undefined) payload.title_of_show = (data.titleOfShow ?? "").trim();
+    if (data.showTitleIsTba !== undefined) {
+        const isTba = Boolean(data.showTitleIsTba);
+        payload.show_title_is_tba = isTba;
+        if (isTba && data.titleOfShow === undefined) {
+            payload.title_of_show = "";
+        }
+    }
     if (data.producer !== undefined) payload.producer = data.producer;
     if (data.pressContact !== undefined) payload.press_contact = data.pressContact;
     if (data.dateBkd !== undefined) payload.date_bkd = data.dateBkd;

@@ -31,6 +31,7 @@ import {
     CommandItem,
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 
 export const FormSchema = z.object({
     day: z.string().optional(),
@@ -72,6 +73,7 @@ export default function BookingForm({
     const [open, setOpen] = React.useState(false);
     const [openAffiliate, setOpenAffiliate] = React.useState(false);
     const [openUKTVenue, setOpenUKTVenue] = React.useState(false); // State for UKTVenue select
+    const previousTitleRef = React.useRef<string>("");
 
     const defaultValues = React.useMemo(() => {
         if (initialData) {
@@ -107,6 +109,12 @@ export default function BookingForm({
         resolver: zodResolver(FormSchema),
         defaultValues: defaultValues,
     });
+    const titleOfShowValue = form.watch("titleOfShow");
+    React.useEffect(() => {
+        if (titleOfShowValue && titleOfShowValue.trim().length > 0) {
+            previousTitleRef.current = titleOfShowValue;
+        }
+    }, [titleOfShowValue]);
 
     console.log(defaultValues);
 
@@ -554,7 +562,29 @@ export default function BookingForm({
                                     <FormControl>
                                         <Checkbox
                                             checked={field.value}
-                                            onCheckedChange={field.onChange}
+                                            onCheckedChange={(checked: CheckedState) => {
+                                                const isChecked = checked === true;
+                                                field.onChange(isChecked);
+                                                if (isChecked) {
+                                                    const currentTitle =
+                                                        form.getValues("titleOfShow") ?? "";
+                                                    if (currentTitle.trim().length > 0) {
+                                                        previousTitleRef.current = currentTitle;
+                                                    }
+                                                    form.setValue("titleOfShow", "", {
+                                                        shouldDirty: true,
+                                                        shouldTouch: true,
+                                                        shouldValidate: true,
+                                                    });
+                                                } else {
+                                                    const fallback = previousTitleRef.current;
+                                                    form.setValue("titleOfShow", fallback, {
+                                                        shouldDirty: true,
+                                                        shouldTouch: true,
+                                                        shouldValidate: true,
+                                                    });
+                                                }
+                                            }}
                                             disabled={submitting}
                                             className="mt-2 mr-1"
                                         />

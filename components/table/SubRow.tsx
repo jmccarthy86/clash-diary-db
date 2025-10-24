@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/table";
 import { SubRowData } from "@/lib/types";
 import BookingBadge from "@/components/bookings/BookingBadge";
+import venues from "@/lib/venues";
+import affiliates from "@/lib/affiliates";
+import uktVenues from "@/lib/uktvenues";
 
 interface SubRowComponentProps {
     subRows: SubRowData[];
@@ -38,27 +41,80 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {subRows.map((subRow, index) =>
-                    subRow.titleOfShow === "" &&
-                    subRow.venue === "" &&
-                    subRow.pressContact === "" ? (
-                        <TableRow key={`no-data-${index}`} className="bg-gray-200">
-                            <TableCell
-                                key="subrow-no-data"
-                                colSpan={4}
-                                className="px-3 py-4 text-center text-sm"
-                            >
-                                No data available
-                            </TableCell>
-                        </TableRow>
-                    ) : (
+                {subRows.map((subRow, index) => {
+                    const venueValue = subRow.venue;
+                    const showAffiliateBadge = affiliates.some(
+                        (affiliate) => affiliate.value === venueValue
+                    );
+                    const showSoltBadge = venues.some((venue) => venue.value === venueValue);
+                    const showUktBadge = uktVenues.some((uktVenue) => uktVenue.value === venueValue);
+                    const showPBadge = Boolean(subRow.p);
+                    const showOperaBadge = Boolean(subRow.isOperaDance);
+                    const showGalaBadge = Boolean(subRow.isSeasonGala);
+                    const showAnyBadge =
+                        showAffiliateBadge ||
+                        showSoltBadge ||
+                        showUktBadge ||
+                        showPBadge ||
+                        showOperaBadge ||
+                        showGalaBadge;
+
+                    if (
+                        subRow.titleOfShow === "" &&
+                        subRow.venue === "" &&
+                        subRow.pressContact === ""
+                    ) {
+                        return (
+                            <TableRow key={`no-data-${index}`} className="bg-gray-200">
+                                <TableCell
+                                    key="subrow-no-data"
+                                    colSpan={4}
+                                    className="px-3 py-4 text-center text-sm"
+                                >
+                                    No data available
+                                </TableCell>
+                            </TableRow>
+                        );
+                    }
+
+                    return (
                         <React.Fragment key={`group-${index}`}>
                             <TableRow key={`desktop-${index}`} className="hidden lg:table-row">
                                 <TableCell
                                     key={`${index}-${subRow.titleOfShow}`}
                                     className="px-3 py-2 text-sm"
                                 >
-                                    {subRow.titleOfShow}
+                                    <div>{subRow.titleOfShow}</div>
+                                    {showAnyBadge && (
+                                        <div className="flex flex-wrap gap-2 mt-2">
+                                            {showAffiliateBadge && (
+                                                <BookingBadge type="AFFILATE_VENUE">
+                                                    Affiliate
+                                                </BookingBadge>
+                                            )}
+                                            {showSoltBadge && (
+                                                <BookingBadge type="SOLT_MEMBER">
+                                                    SOLT Member
+                                                </BookingBadge>
+                                            )}
+                                            {showUktBadge && (
+                                                <BookingBadge type="UKT_VENUE">
+                                                    UKT Member
+                                                </BookingBadge>
+                                            )}
+                                            {showPBadge && <BookingBadge type="P">P</BookingBadge>}
+                                            {showOperaBadge && (
+                                                <BookingBadge type="OPERA_DANCE">
+                                                    Opera/Dance
+                                                </BookingBadge>
+                                            )}
+                                            {showGalaBadge && (
+                                                <BookingBadge type="GALA_NIGHT">
+                                                    Season Announcement/Gala Night
+                                                </BookingBadge>
+                                            )}
+                                        </div>
+                                    )}
                                 </TableCell>
                                 <TableCell
                                     key={`${index}-${subRow.venue}`}
@@ -144,25 +200,42 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                         </div>
                                     )}
 
-                                    <div className="flex gap-2 mb-3">
-                                        {Boolean(subRow.p) && <BookingBadge type="P">P</BookingBadge>}
-                                        {Boolean(subRow.isOperaDance) && (
-                                            <BookingBadge type="OPERA_DANCE">
-                                                Opera/Dance
-                                            </BookingBadge>
-                                        )}
-                                        {Boolean(subRow.isSeasonGala) && (
-                                            <BookingBadge type="GALA_NIGHT">
-                                                Season Announcement/Gala Night
-                                            </BookingBadge>
-                                        )}
-                                    </div>
+                                    {showAnyBadge && (
+                                        <div className="flex flex-wrap gap-2 mb-3">
+                                            {showAffiliateBadge && (
+                                                <BookingBadge type="AFFILATE_VENUE">
+                                                    Affiliate
+                                                </BookingBadge>
+                                            )}
+                                            {showSoltBadge && (
+                                                <BookingBadge type="SOLT_MEMBER">
+                                                    SOLT Member
+                                                </BookingBadge>
+                                            )}
+                                            {showUktBadge && (
+                                                <BookingBadge type="UKT_VENUE">
+                                                    UKT Member
+                                                </BookingBadge>
+                                            )}
+                                            {showPBadge && <BookingBadge type="P">P</BookingBadge>}
+                                            {showOperaBadge && (
+                                                <BookingBadge type="OPERA_DANCE">
+                                                    Opera/Dance
+                                                </BookingBadge>
+                                            )}
+                                            {showGalaBadge && (
+                                                <BookingBadge type="GALA_NIGHT">
+                                                    Season Announcement/Gala Night
+                                                </BookingBadge>
+                                            )}
+                                        </div>
+                                    )}
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
                         </React.Fragment>
-                    )
-                )}
+                    );
+                })}
             </TableBody>
         </Table>
     );

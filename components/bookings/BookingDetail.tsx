@@ -49,6 +49,16 @@ export default function BookingDetail({
     const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
 
     const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
+    const rawTitleOfShow =
+        typeof otherDetails.titleOfShow === "string" ? otherDetails.titleOfShow : "";
+    const trimmedTitleOfShow = rawTitleOfShow.trim();
+    const hasExplicitTitle =
+        trimmedTitleOfShow.length > 0 && trimmedTitleOfShow.toLowerCase() !== "tba";
+    const titleLooksTba =
+        trimmedTitleOfShow.length > 0 && trimmedTitleOfShow.toLowerCase() === "tba";
+    const shouldDisplayTba =
+        (!hasExplicitTitle && Boolean(otherDetails.showTitleIsTba)) || titleLooksTba;
+    const displayTitleOfShow = shouldDisplayTba ? "TBA" : trimmedTitleOfShow;
 
     React.useEffect(() => {
         // Listen for message from parent
@@ -115,9 +125,7 @@ export default function BookingDetail({
                 <div key="TitleOfShow" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Title Of Show</p>
                     <p className="text-muted-foreground">
-                        {otherDetails.titleOfShow
-                            ? otherDetails.titleOfShow
-                            : otherDetails.showTitleIsTba && "TBA"}
+                        {displayTitleOfShow}
                     </p>
                 </div>
 
