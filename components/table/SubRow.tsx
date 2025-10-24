@@ -105,6 +105,12 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                         ? "TBA"
                                         : ""}
                                 </TableCell>
+                                <TableCell
+                                    key={`${index}-${subRow.pressContact}`}
+                                    className="px-3 py-2 text-xs"
+                                >
+                                    {subRow.pressContact}
+                                </TableCell>
                                 <TableCell key={`${index}-badges`} className="px-3 py-2 text-xs">
                                     {showAnyBadge && (
                                         <div className="flex flex-wrap gap-2">
@@ -136,12 +142,6 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                             )}
                                         </div>
                                     )}
-                                </TableCell>
-                                <TableCell
-                                    key={`${index}-${subRow.pressContact}`}
-                                    className="px-3 py-2 text-xs"
-                                >
-                                    {subRow.pressContact}
                                 </TableCell>
                                 <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-xs">
                                     <TableRowActions subRow={subRow} />
