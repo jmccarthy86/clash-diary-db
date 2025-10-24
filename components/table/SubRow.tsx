@@ -15,6 +15,7 @@ import BookingBadge from "@/components/bookings/BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
 import uktVenues from "@/lib/uktvenues";
+import { resolveTitleOfShow, resolveVenueDisplay } from "@/lib/utils";
 
 interface SubRowComponentProps {
     subRows: SubRowData[];
@@ -45,7 +46,8 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
             </TableHeader>
             <TableBody>
                 {subRows.map((subRow, index) => {
-                    const venueValue = subRow.venue;
+                    const venueValue =
+                        typeof subRow.venue === "string" ? subRow.venue.trim() : "";
                     const showAffiliateBadge = affiliates.some(
                         (affiliate) => affiliate.value === venueValue
                     );
@@ -61,12 +63,24 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                         showPBadge ||
                         showOperaBadge ||
                         showGalaBadge;
+                    const displayTitle = resolveTitleOfShow(
+                        subRow.titleOfShow,
+                        subRow.showTitleIsTba
+                    );
+                    const displayVenue = resolveVenueDisplay({
+                        venue: subRow.venue,
+                        otherVenue: subRow.otherVenue,
+                        affiliateVenue: subRow.affiliateVenue,
+                        uktVenue: subRow.uktVenue,
+                        venueIsTba: subRow.venueIsTba,
+                    });
+                    const pressContact =
+                        typeof subRow.pressContact === "string"
+                            ? subRow.pressContact.trim()
+                            : "";
+                    const rowIsEmpty = !displayTitle && !displayVenue && !pressContact;
 
-                    if (
-                        subRow.titleOfShow === "" &&
-                        subRow.venue === "" &&
-                        subRow.pressContact === ""
-                    ) {
+                    if (rowIsEmpty) {
                         return (
                             <TableRow key={`no-data-${index}`} className="bg-gray-200">
                                 <TableCell
@@ -87,23 +101,13 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                     key={`${index}-${subRow.titleOfShow}`}
                                     className="px-3 py-2 text-xs"
                                 >
-                                    <div>{subRow.titleOfShow}</div>
+                                    <div>{displayTitle}</div>
                                 </TableCell>
                                 <TableCell
                                     key={`${index}-${subRow.venue}`}
                                     className="px-3 py-2 text-xs"
                                 >
-                                    {subRow.venue
-                                        ? subRow.venue
-                                        : subRow.otherVenue
-                                        ? subRow.otherVenue
-                                        : subRow.affiliateVenue
-                                        ? subRow.affiliateVenue
-                                        : subRow.uktVenue
-                                        ? subRow.uktVenue
-                                        : subRow.venueIsTba
-                                        ? "TBA"
-                                        : ""}
+                                    {displayVenue}
                                 </TableCell>
                                 <TableCell
                                     key={`${index}-${subRow.pressContact}`}
@@ -149,13 +153,13 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                             </TableRow>
                             <TableRow key={`${index}-mobile`} className="lg:hidden">
                                 <TableCell key={`${index}-mobile-details`} className="px-3 py-3">
-                                    {subRow.titleOfShow && (
+                                    {displayTitle && (
                                         <div key="TitleOfShow" className="flex-1 space-y-1 mb-2">
                                             <p className="font-medium leading-none">
                                                 Title Of Show
                                             </p>
                                             <p className="text-muted-foreground">
-                                                {subRow.titleOfShow}
+                                                {displayTitle}
                                             </p>
                                         </div>
                                     )}

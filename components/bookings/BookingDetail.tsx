@@ -29,6 +29,7 @@ import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
 import uktVenues from "@/lib/uktvenues";
+import { resolveTitleOfShow, resolveVenueDisplay } from "@/lib/utils";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -49,16 +50,17 @@ export default function BookingDetail({
     const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
 
     const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
-    const rawTitleOfShow =
-        typeof otherDetails.titleOfShow === "string" ? otherDetails.titleOfShow : "";
-    const trimmedTitleOfShow = rawTitleOfShow.trim();
-    const hasExplicitTitle =
-        trimmedTitleOfShow.length > 0 && trimmedTitleOfShow.toLowerCase() !== "tba";
-    const titleLooksTba =
-        trimmedTitleOfShow.length > 0 && trimmedTitleOfShow.toLowerCase() === "tba";
-    const shouldDisplayTba =
-        (!hasExplicitTitle && Boolean(otherDetails.showTitleIsTba)) || titleLooksTba;
-    const displayTitleOfShow = shouldDisplayTba ? "TBA" : trimmedTitleOfShow;
+    const displayTitleOfShow = resolveTitleOfShow(
+        otherDetails.titleOfShow,
+        otherDetails.showTitleIsTba
+    );
+    const displayVenue = resolveVenueDisplay({
+        venue: otherDetails.venue,
+        otherVenue: otherDetails.otherVenue,
+        affiliateVenue: otherDetails.affiliateVenue,
+        uktVenue: otherDetails.uktVenue,
+        venueIsTba: otherDetails.venueIsTba,
+    });
 
     React.useEffect(() => {
         // Listen for message from parent
@@ -142,17 +144,7 @@ export default function BookingDetail({
                 <div key="OtherVenue" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Venue</p>
                     <p className="text-muted-foreground">
-                        {otherDetails.venue
-                            ? otherDetails.venue
-                            : otherDetails.otherVenue
-                              ? otherDetails.otherVenue
-                              : otherDetails.affiliateVenue
-                                ? otherDetails.affiliateVenue
-                                : otherDetails.uktVenue
-                                  ? otherDetails.uktVenue
-                                  : otherDetails.venueIsTba
-                                    ? "TBA"
-                                    : ""}
+                        {displayVenue}
                     </p>
                 </div>
 

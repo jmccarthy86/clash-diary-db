@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { unCamelCase } from "@/lib/utils";
+import { unCamelCase, resolveTitleOfShow, resolveVenueDisplay } from "@/lib/utils";
 
 type RowMap = Record<string, any>;
 
@@ -121,9 +121,13 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
         let d: any = row[k];
         if (!d && row.date) d = new Date(row.date);
         arr.push(d instanceof Date ? d : d ?? "");
+      } else if (k === "titleOfShow") {
+        arr.push(resolveTitleOfShow(row.titleOfShow, row.showTitleIsTba));
       } else if (k === "timeStamp" || k === "createdAt") {
         const v = row[k];
         if (typeof v === "number") arr.push(new Date(v)); else arr.push(v ?? "");
+      } else if (k === "venue") {
+        arr.push(resolveVenueDisplay(row));
       } else if (BOOL_FIELDS.has(k)) {
         arr.push(toYesNo(row[k]));
       } else {

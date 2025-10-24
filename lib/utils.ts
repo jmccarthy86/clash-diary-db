@@ -114,6 +114,40 @@ export function convertToDate(dateString: string): Date | null {
     return isNaN(date.getTime()) ? null : date;
 }
 
+export function resolveTitleOfShow(
+    rawTitle: unknown,
+    showTitleIsTba?: unknown
+): string {
+    const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
+    const looksTba = title.toLowerCase() === "tba";
+    if (title.length > 0) {
+        return looksTba ? "TBA" : title;
+    }
+    return Boolean(showTitleIsTba) || looksTba ? "TBA" : "";
+}
+
+type VenueDisplayInput = {
+    venue?: unknown;
+    otherVenue?: unknown;
+    affiliateVenue?: unknown;
+    uktVenue?: unknown;
+    venueIsTba?: unknown;
+};
+
+export function resolveVenueDisplay(venueData: VenueDisplayInput): string {
+    const pick = (value: unknown) =>
+        typeof value === "string" ? value.trim() : "";
+
+    const venue =
+        pick(venueData.venue) ||
+        pick(venueData.otherVenue) ||
+        pick(venueData.affiliateVenue) ||
+        pick(venueData.uktVenue);
+
+    if (venue) return venue;
+    return Boolean(venueData.venueIsTba) ? "TBA" : "";
+}
+
 export function createYearCalendarWithData(
     year: number,
     existingData: RequestData["Dates"]
@@ -203,8 +237,17 @@ export async function handleClashEmail(
         email: user.email,
         date: format(currentSelectedDate, "dd/MM/yyyy"),
         rawDate: format(currentSelectedDate, "yyyy-MM-dd"),
-        venue: (data as any).venue ?? "",
-        titleOfShow: (data as any).titleOfShow ?? "",
+        venue: resolveVenueDisplay({
+            venue: (data as any).venue,
+            otherVenue: (data as any).otherVenue,
+            affiliateVenue: (data as any).affiliateVenue,
+            uktVenue: (data as any).uktVenue,
+            venueIsTba: (data as any).venueIsTba,
+        }),
+        titleOfShow: resolveTitleOfShow(
+            (data as any).titleOfShow,
+            (data as any).showTitleIsTba
+        ),
         memberLevel: (data as any).memberLevel ?? "",
         isOperaDance: Boolean((data as any).isOperaDance ?? false),
         isSeasonGala: Boolean((data as any).isSeasonGala ?? false),
