@@ -26,16 +26,19 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
         <Table key={subRows[0].Date}>
             <TableHeader>
                 <TableRow className="hidden lg:table-row">
-                    <TableHead key="show-title" className="h-10 px-3 py-2 text-sm">
+                    <TableHead key="show-title" className="h-10 px-3 py-2 text-xs">
                         Show Title
                     </TableHead>
-                    <TableHead key="venue" className="h-10 px-3 py-2 text-sm">
+                    <TableHead key="badges" className="h-10 px-3 py-2 text-xs">
+                        Tags
+                    </TableHead>
+                    <TableHead key="venue" className="h-10 px-3 py-2 text-xs">
                         Venue
                     </TableHead>
-                    <TableHead key="press-contact" className="h-10 px-3 py-2 text-sm">
+                    <TableHead key="press-contact" className="h-10 px-3 py-2 text-xs">
                         Press Contact
                     </TableHead>
-                    <TableHead key="actions" className="h-10 px-3 py-2 text-sm">
+                    <TableHead key="actions" className="h-10 px-3 py-2 text-xs">
                         Actions
                     </TableHead>
                 </TableRow>
@@ -68,8 +71,8 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                             <TableRow key={`no-data-${index}`} className="bg-gray-200">
                                 <TableCell
                                     key="subrow-no-data"
-                                    colSpan={4}
-                                    className="px-3 py-4 text-center text-sm"
+                                    colSpan={5}
+                                    className="px-3 py-4 text-center text-xs"
                                 >
                                     No data available
                                 </TableCell>
@@ -82,11 +85,13 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                             <TableRow key={`desktop-${index}`} className="hidden lg:table-row">
                                 <TableCell
                                     key={`${index}-${subRow.titleOfShow}`}
-                                    className="px-3 py-2 text-sm"
+                                    className="px-3 py-2 text-xs"
                                 >
                                     <div>{subRow.titleOfShow}</div>
+                                </TableCell>
+                                <TableCell key={`${index}-badges`} className="px-3 py-2 text-xs">
                                     {showAnyBadge && (
-                                        <div className="flex flex-wrap gap-2 mt-2">
+                                        <div className="flex flex-wrap gap-2">
                                             {showAffiliateBadge && (
                                                 <BookingBadge type="AFFILATE_VENUE">
                                                     Affiliate
@@ -118,7 +123,7 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                 </TableCell>
                                 <TableCell
                                     key={`${index}-${subRow.venue}`}
-                                    className="px-3 py-2 text-sm"
+                                    className="px-3 py-2 text-xs"
                                 >
                                     {subRow.venue
                                         ? subRow.venue
@@ -134,11 +139,11 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                 </TableCell>
                                 <TableCell
                                     key={`${index}-${subRow.pressContact}`}
-                                    className="px-3 py-2 text-sm"
+                                    className="px-3 py-2 text-xs"
                                 >
                                     {subRow.pressContact}
                                 </TableCell>
-                                <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-sm">
+                                <TableCell key={`${index}-aciotn`} className="px-3 py-2 text-xs">
                                     <TableRowActions subRow={subRow} />
                                 </TableCell>
                             </TableRow>
