@@ -33,12 +33,36 @@ const enforceTitleTbaRule = (data: any, ctx: z.RefinementCtx) => {
   }
 };
 
+const enforceVenueTbaRule = (data: any, ctx: z.RefinementCtx) => {
+  const hasVenueField = Object.prototype.hasOwnProperty.call(data, "venue");
+  if (!hasVenueField) return;
+
+  const venue = (data.venue ?? "").trim();
+  const isTba = Boolean(data.venueIsTba);
+
+  if (!isTba && venue.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["venue"],
+      message: "Venue is required unless marked TBA",
+    });
+  }
+
+  if (isTba && venue.length > 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["venue"],
+      message: "Clear the venue when marking as TBA",
+    });
+  }
+};
+
 const BookingBase = z.object({
   //id:             z.string().uuid(),
   date: z.coerce.date(),
   day: z.string().optional(),
   p: z.boolean().optional(),
-  venue: z.string().min(1),
+  venue: z.string(),
   uktVenue: z.string().optional(),
   affiliateVenue: z.string().optional(),
   otherVenue: z.string().optional(),
@@ -54,8 +78,14 @@ const BookingBase = z.object({
   timeStamp: z.number().optional(),
 });
 
-const BookingInput = BookingBase.superRefine(enforceTitleTbaRule);
-const BookingPartialInput = BookingBase.partial().superRefine(enforceTitleTbaRule);
+const BookingInput = BookingBase.superRefine((data, ctx) => {
+  enforceTitleTbaRule(data, ctx);
+  enforceVenueTbaRule(data, ctx);
+});
+const BookingPartialInput = BookingBase.partial().superRefine((data, ctx) => {
+  enforceTitleTbaRule(data, ctx);
+  enforceVenueTbaRule(data, ctx);
+});
 
 /* ---------- CRUD via WordPress REST ---------- */
 
@@ -118,7 +148,13 @@ export async function updateBooking(id: string, raw: unknown) {
     if (data.uktVenue !== undefined) payload.ukt_venue = data.uktVenue;
     if (data.affiliateVenue !== undefined) payload.affiliate_venue = data.affiliateVenue;
     if (data.otherVenue !== undefined) payload.other_venue = data.otherVenue;
-    if (data.venueIsTba !== undefined) payload.venue_is_tba = Boolean(data.venueIsTba);
+    if (data.venueIsTba !== undefined) {
+        const isTba = Boolean(data.venueIsTba);
+        payload.venue_is_tba = isTba;
+        if (isTba && data.venue === undefined) {
+            payload.venue = "";
+        }
+    }
     if (data.titleOfShow !== undefined) payload.title_of_show = (data.titleOfShow ?? "").trim();
     if (data.showTitleIsTba !== undefined) {
         const isTba = Boolean(data.showTitleIsTba);
