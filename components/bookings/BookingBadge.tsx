@@ -20,7 +20,7 @@ export default function BookingBadge({
     return (
         <Badge
             variant="outline"
-            className={`mr-2 ${BadgeVariants[type].bg} ${BadgeVariants[type].text} px-3 py-2 rounded-md  whitespace-nowrap`}
+            className={`mr-2 ${BadgeVariants[type].bg} ${BadgeVariants[type].text} px-2 py-0.5 text-[10px] leading-tight rounded-md whitespace-nowrap`}
         >
             {children}
         </Badge>
