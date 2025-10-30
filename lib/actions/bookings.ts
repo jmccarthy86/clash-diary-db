@@ -38,9 +38,17 @@ const enforceVenueTbaRule = (data: any, ctx: z.RefinementCtx) => {
   if (!hasVenueField) return;
 
   const venue = (data.venue ?? "").trim();
+  const affiliateVenue = (data.affiliateVenue ?? "").trim();
+  const uktVenue = (data.uktVenue ?? "").trim();
+  const otherVenue = (data.otherVenue ?? "").trim();
   const isTba = Boolean(data.venueIsTba);
+  const hasAnyVenue =
+    venue.length > 0 ||
+    affiliateVenue.length > 0 ||
+    uktVenue.length > 0 ||
+    otherVenue.length > 0;
 
-  if (!isTba && venue.length === 0) {
+  if (!isTba && !hasAnyVenue) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["venue"],
@@ -48,11 +56,11 @@ const enforceVenueTbaRule = (data: any, ctx: z.RefinementCtx) => {
     });
   }
 
-  if (isTba && venue.length > 0) {
+  if (isTba && hasAnyVenue) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["venue"],
-      message: "Clear the venue when marking as TBA",
+      message: "Clear venue fields when marking as TBA",
     });
   }
 };
