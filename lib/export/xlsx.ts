@@ -91,6 +91,8 @@ function headerLabels(cols: string[]): string[] {
   return cols.map((h) => {
     if (h === "timeStamp") return "Date Updated";
     if (h === "uktVenue") return "UK Theatre Venue";
+    if (h === "p") return "Pencilled";
+    if (h === "createdAt") return "Date Created";
     return unCamelCase(h);
   });
 }
