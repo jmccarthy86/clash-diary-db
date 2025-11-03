@@ -21,6 +21,7 @@ const EXCLUDE_KEYS = new Set([
   "combinedVenue",
   "isSeasonGala",
   "isOperaDance",
+  "showTitleIsTba",
 ]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
@@ -29,7 +30,6 @@ const PREFERRED_ORDER = [
   "titleOfShow",
   "venue",
   "membership",
-  "venueIsTba",
   "producer",
   "pressContact",
   "p",
@@ -43,8 +43,6 @@ const PREFERRED_ORDER = [
 
 const BOOL_FIELDS = new Set([
   "p",
-  "venueIsTba",
-  "showTitleIsTba",
 ]);
 
 function toYesNo(v: any): string {
@@ -122,10 +120,8 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
     const venueInfo = resolveVenueInfo(row);
     const venue = venueInfo.venue;
     const membership = venueInfo.membership;
-    const venueIsTba = venueInfo.isTba;
     const resolvedTitle = resolveTitleOfShow(row.titleOfShow, row.showTitleIsTba);
     const titleDisplay = resolvedTitle || "TBA";
-    const showTitleIsTba = titleDisplay === "TBA";
     const isSeasonGala = toBoolean(row.isSeasonGala);
     const isOperaDance = toBoolean(row.isOperaDance);
     const tags = [
@@ -138,9 +134,7 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
       ...row,
       venue,
       membership,
-      venueIsTba,
       titleOfShow: titleDisplay,
-      showTitleIsTba,
       isSeasonGala,
       isOperaDance,
       tags,
