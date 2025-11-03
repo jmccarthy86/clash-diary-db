@@ -15,6 +15,8 @@ const EXCLUDE_KEYS = new Set([
   "affiliateVenue",
   "otherVenue",
   "combinedVenue",
+  "isSeasonGala",
+  "isOperaDance",
 ]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
@@ -27,8 +29,7 @@ const PREFERRED_ORDER = [
   "producer",
   "pressContact",
   "p",
-  "isSeasonGala",
-  "isOperaDance",
+  "tags",
   "timeStamp",
   "id",
   "createdAt",
@@ -108,10 +109,17 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const normalizedEntries = (entries as Record<string, any>[]).map((row) => {
     const venue = resolveVenueDisplay(row);
     const membership = resolveVenueMembership(row);
+    const tags = [
+      row.isSeasonGala ? "Season Announcement/Gala Night" : "",
+      row.isOperaDance ? "Opera/Dance" : "",
+    ]
+      .filter(Boolean)
+      .join(", ");
     return {
       ...row,
       venue,
       membership,
+      tags,
     };
   });
   const wb = XLSX.utils.book_new();
