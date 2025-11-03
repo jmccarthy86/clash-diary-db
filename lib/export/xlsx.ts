@@ -1,19 +1,28 @@
 import * as XLSX from "xlsx";
-import { unCamelCase, resolveTitleOfShow, resolveVenueDisplay } from "@/lib/utils";
+import { unCamelCase, resolveTitleOfShow, resolveVenueDisplay, resolveVenueMembership } from "@/lib/utils";
 
 type RowMap = Record<string, any>;
 
 // Exclude technical fields and columns we no longer export
-const EXCLUDE_KEYS = new Set(["userId", "date", "range", "id", "dateBkd", "day"]);
+const EXCLUDE_KEYS = new Set([
+  "userId",
+  "date",
+  "range",
+  "id",
+  "dateBkd",
+  "day",
+  "uktVenue",
+  "affiliateVenue",
+  "otherVenue",
+  "combinedVenue",
+]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
 const PREFERRED_ORDER = [
   "Date",
   "titleOfShow",
   "venue",
-  "uktVenue",
-  "affiliateVenue",
-  "otherVenue",
+  "membership",
   "venueIsTba",
   "producer",
   "pressContact",
@@ -94,8 +103,17 @@ function widthForKey(k: string): number | undefined {
 
 export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const entries = Object.values(rowsMap ?? {});
+  const normalizedEntries = (entries as Record<string, any>[]).map((row) => {
+    const venue = resolveVenueDisplay(row);
+    const membership = resolveVenueMembership(row);
+    return {
+      ...row,
+      venue,
+      membership,
+    };
+  });
   const wb = XLSX.utils.book_new();
-  if (!entries.length) {
+  if (!normalizedEntries.length) {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["No data"]]), "First Night Diary");
     return wb;
   }
@@ -103,10 +121,10 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   // debug: surface shape in dev consoles
   try {
     // eslint-disable-next-line no-console
-    console.log("xlsx entries[0] keys:", Object.keys(entries[0] || {}));
+    console.log("xlsx entries[0] keys:", Object.keys(normalizedEntries[0] || {}));
   } catch {}
 
-  const columns = prepareColumns(entries as Record<string, any>[]);
+  const columns = prepareColumns(normalizedEntries as Record<string, any>[]);
   try {
     // eslint-disable-next-line no-console
     console.log("xlsx columns:", columns);
@@ -114,7 +132,7 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const header = headerLabels(columns);
   const aoa: any[][] = [header];
 
-  for (const row of entries as any[]) {
+  for (const row of normalizedEntries as any[]) {
     const arr: any[] = [];
     for (const k of columns) {
       if (k === "Date") {

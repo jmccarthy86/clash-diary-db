@@ -134,18 +134,41 @@ type VenueDisplayInput = {
     venueIsTba?: unknown;
 };
 
+type VenueInfo = {
+    venue: string;
+    membership: string;
+};
+
+const VENUE_SOURCES: Array<[keyof VenueDisplayInput, string]> = [
+    ["venue", "SOLT Venue"],
+    ["uktVenue", "UK Theatre Venue"],
+    ["affiliateVenue", "Affiliate Venue"],
+    ["otherVenue", "Other"],
+];
+
+const pickVenue = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+
+export function resolveVenueInfo(venueData: VenueDisplayInput): VenueInfo {
+    for (const [key, membership] of VENUE_SOURCES) {
+        const value = pickVenue(venueData[key]);
+        if (value) {
+            return { venue: value, membership };
+        }
+    }
+
+    if (Boolean(venueData.venueIsTba)) {
+        return { venue: "TBA", membership: "" };
+    }
+
+    return { venue: "", membership: "" };
+}
+
 export function resolveVenueDisplay(venueData: VenueDisplayInput): string {
-    const pick = (value: unknown) =>
-        typeof value === "string" ? value.trim() : "";
+    return resolveVenueInfo(venueData).venue;
+}
 
-    const venue =
-        pick(venueData.venue) ||
-        pick(venueData.otherVenue) ||
-        pick(venueData.affiliateVenue) ||
-        pick(venueData.uktVenue);
-
-    if (venue) return venue;
-    return Boolean(venueData.venueIsTba) ? "TBA" : "";
+export function resolveVenueMembership(venueData: VenueDisplayInput): string {
+    return resolveVenueInfo(venueData).membership;
 }
 
 export function createYearCalendarWithData(
