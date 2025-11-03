@@ -1,5 +1,9 @@
 import * as XLSX from "xlsx";
-import { unCamelCase, resolveTitleOfShow, resolveVenueDisplay, resolveVenueMembership } from "@/lib/utils";
+import {
+  unCamelCase,
+  resolveTitleOfShow,
+  resolveVenueInfo,
+} from "@/lib/utils";
 
 type RowMap = Record<string, any>;
 
@@ -41,8 +45,6 @@ const BOOL_FIELDS = new Set([
   "p",
   "venueIsTba",
   "showTitleIsTba",
-  "isSeasonGala",
-  "isOperaDance",
 ]);
 
 function toYesNo(v: any): string {
@@ -55,6 +57,17 @@ function toYesNo(v: any): string {
     if (t === "0" || t === "false" || t === "no") return "No";
   }
   return String(v);
+}
+
+function toBoolean(v: any): boolean {
+  if (v === null || v === undefined) return false;
+  if (typeof v === "boolean") return v;
+  if (typeof v === "number") return v !== 0;
+  if (typeof v === "string") {
+    const t = v.trim().toLowerCase();
+    return t === "1" || t === "true" || t === "yes" || t === "y" || t === "on";
+  }
+  return false;
 }
 
 function prepareColumns(allRows: Record<string, any>[]): string[] {
@@ -91,7 +104,6 @@ function prepareColumns(allRows: Record<string, any>[]): string[] {
 function headerLabels(cols: string[]): string[] {
   return cols.map((h) => {
     if (h === "timeStamp") return "Date Updated";
-    if (h === "uktVenue") return "UK Theatre Venue";
     if (h === "p") return "Pencilled";
     if (h === "createdAt") return "Date Created";
     return unCamelCase(h);
@@ -107,11 +119,18 @@ function widthForKey(k: string): number | undefined {
 export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const entries = Object.values(rowsMap ?? {});
   const normalizedEntries = (entries as Record<string, any>[]).map((row) => {
-    const venue = resolveVenueDisplay(row);
-    const membership = resolveVenueMembership(row);
+    const venueInfo = resolveVenueInfo(row);
+    const venue = venueInfo.venue;
+    const membership = venueInfo.membership;
+    const venueIsTba = venueInfo.isTba;
+    const resolvedTitle = resolveTitleOfShow(row.titleOfShow, row.showTitleIsTba);
+    const titleDisplay = resolvedTitle || "TBA";
+    const showTitleIsTba = titleDisplay === "TBA";
+    const isSeasonGala = toBoolean(row.isSeasonGala);
+    const isOperaDance = toBoolean(row.isOperaDance);
     const tags = [
-      row.isSeasonGala ? "Season Announcement/Gala Night" : "",
-      row.isOperaDance ? "Opera/Dance" : "",
+      isSeasonGala ? "Season Announcement/Gala Night" : "",
+      isOperaDance ? "Opera/Dance" : "",
     ]
       .filter(Boolean)
       .join(", ");
@@ -119,6 +138,11 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
       ...row,
       venue,
       membership,
+      venueIsTba,
+      titleOfShow: titleDisplay,
+      showTitleIsTba,
+      isSeasonGala,
+      isOperaDance,
       tags,
     };
   });
@@ -150,12 +174,12 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
         if (!d && row.date) d = new Date(row.date);
         arr.push(d instanceof Date ? d : d ?? "");
       } else if (k === "titleOfShow") {
-        arr.push(resolveTitleOfShow(row.titleOfShow, row.showTitleIsTba));
+        arr.push(row.titleOfShow ?? "");
       } else if (k === "timeStamp" || k === "createdAt") {
         const v = row[k];
         if (typeof v === "number") arr.push(new Date(v)); else arr.push(v ?? "");
       } else if (k === "venue") {
-        arr.push(resolveVenueDisplay(row));
+        arr.push(row.venue ?? "");
       } else if (BOOL_FIELDS.has(k)) {
         arr.push(toYesNo(row[k]));
       } else {
@@ -192,3 +216,4 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   XLSX.utils.book_append_sheet(wb, ws, "First Night Diary");
   return wb;
 }
+

@@ -137,6 +137,7 @@ type VenueDisplayInput = {
 type VenueInfo = {
     venue: string;
     membership: string;
+    isTba: boolean;
 };
 
 const VENUE_SOURCES: Array<[keyof VenueDisplayInput, string]> = [
@@ -149,18 +150,22 @@ const VENUE_SOURCES: Array<[keyof VenueDisplayInput, string]> = [
 const pickVenue = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
 export function resolveVenueInfo(venueData: VenueDisplayInput): VenueInfo {
+    if (Boolean(venueData.venueIsTba)) {
+        return { venue: "TBA", membership: "", isTba: true };
+    }
+
     for (const [key, membership] of VENUE_SOURCES) {
         const value = pickVenue(venueData[key]);
         if (value) {
-            return { venue: value, membership };
+            return { venue: value, membership, isTba: false };
         }
     }
 
     if (Boolean(venueData.venueIsTba)) {
-        return { venue: "TBA", membership: "" };
+        return { venue: "TBA", membership: "", isTba: true };
     }
 
-    return { venue: "", membership: "" };
+    return { venue: "", membership: "", isTba: false };
 }
 
 export function resolveVenueDisplay(venueData: VenueDisplayInput): string {
