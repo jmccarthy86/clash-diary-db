@@ -192,7 +192,17 @@ async function wpRequest(wp, path, init = {}) {
     throw new Error(`WP ${init.method || 'GET'} ${url} failed ${res.status}: ${text}`);
   }
   const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
+  if (ct.includes('application/json')) {
+    const raw = await res.text();
+    if (!raw.trim()) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      const preview = raw.length > 200 ? `${raw.slice(0, 200)}...` : raw;
+      throw new Error(`WP ${init.method || 'GET'} ${url} returned invalid JSON: ${err.message}; body: ${preview}`);
+    }
+  }
+  return res.text();
 }
 
 async function purgeAll(wp) {

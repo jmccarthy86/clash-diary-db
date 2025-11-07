@@ -114,6 +114,28 @@ function widthForKey(k: string): number | undefined {
   return undefined;
 }
 
+function cellStringLength(value: any): number {
+  if (value === null || value === undefined) return 0;
+  if (value instanceof Date) return 10; // dd/mm/yyyy
+  const str = typeof value === "string" ? value : String(value);
+  return str.length;
+}
+
+function autoColumnWidths(aoa: any[][], columns: string[]): ({ wch: number } | undefined)[] {
+  return columns.map((key, index) => {
+    let maxLen = 0;
+    for (const row of aoa) {
+      const value = Array.isArray(row) ? row[index] : undefined;
+      const len = cellStringLength(value);
+      if (len > maxLen) maxLen = len;
+    }
+    const preferred = widthForKey(key) ?? 0;
+    const padded = maxLen > 0 ? maxLen + 2 : 0; // small padding keeps text readable
+    const width = Math.max(preferred, padded);
+    return width ? { wch: Math.min(width, 255) } : undefined;
+  });
+}
+
 export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const entries = Object.values(rowsMap ?? {});
   const normalizedEntries = (entries as Record<string, any>[]).map((row) => {
@@ -130,8 +152,9 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
     ]
       .filter(Boolean)
       .join(", ");
+    const { venueIsTba: _venueIsTba, showTitleIsTba: _showTitleIsTba, ...rest } = row;
     return {
-      ...row,
+      ...rest,
       venue,
       membership,
       titleOfShow: titleDisplay,
@@ -185,10 +208,7 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   // Column widths
-  (ws as any)["!cols"] = columns.map((c) => {
-    const wch = widthForKey(c);
-    return wch ? { wch } : undefined as any; // leave others unset to use default width
-  });
+  (ws as any)["!cols"] = autoColumnWidths(aoa, columns);
 
   // Date column formatting (Date, timeStamp => Date Booked, createdAt)
   const dateCols = [
