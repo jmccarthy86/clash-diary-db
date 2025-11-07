@@ -22,6 +22,9 @@ const EXCLUDE_KEYS = new Set([
   "isSeasonGala",
   "isOperaDance",
   "showTitleIsTba",
+  "venueIsTba",
+  "VenueIsTba",
+  "venue_is_tba",
 ]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
@@ -41,21 +44,9 @@ const PREFERRED_ORDER = [
   "date",
 ];
 
-const BOOL_FIELDS = new Set([
-  "p",
+const BOOL_FIELD_RENDERERS = new Map<string, (value: any) => string>([
+  ["p", (value: any) => (toBoolean(value) ? "Yes" : "")],
 ]);
-
-function toYesNo(v: any): string {
-  if (v === null || v === undefined) return "";
-  if (typeof v === "boolean") return v ? "Yes" : "No";
-  if (typeof v === "number") return v !== 0 ? "Yes" : "No";
-  if (typeof v === "string") {
-    const t = v.trim().toLowerCase();
-    if (t === "1" || t === "true" || t === "yes") return "Yes";
-    if (t === "0" || t === "false" || t === "no") return "No";
-  }
-  return String(v);
-}
 
 function toBoolean(v: any): boolean {
   if (v === null || v === undefined) return false;
@@ -66,6 +57,44 @@ function toBoolean(v: any): boolean {
     return t === "1" || t === "true" || t === "yes" || t === "y" || t === "on";
   }
   return false;
+}
+
+function coerceDateValue(v: any): number | null {
+  if (v === null || v === undefined) return null;
+  if (v instanceof Date && !Number.isNaN(v.getTime())) return v.getTime();
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const trimmed = v.trim();
+    if (!trimmed) return null;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(trimmed)) {
+      const [dd, mm, yyyy] = trimmed.split("/").map((val) => Number(val));
+      const parsed = new Date(yyyy, mm - 1, dd);
+      return Number.isNaN(parsed.getTime()) ? null : parsed.getTime();
+    }
+    const parsed = Date.parse(trimmed);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+}
+
+function rowDateTimestamp(row: Record<string, any>): number {
+  const candidates = [row.Date, row.date, row.timeStamp, row.createdAt];
+  for (const candidate of candidates) {
+    const ts = coerceDateValue(candidate);
+    if (ts !== null) return ts;
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function sortByDate(rows: Record<string, any>[]): Record<string, any>[] {
+  return [...rows].sort((a, b) => {
+    const aTs = rowDateTimestamp(a);
+    const bTs = rowDateTimestamp(b);
+    if (aTs === bTs) {
+      return String(a.titleOfShow ?? "").localeCompare(String(b.titleOfShow ?? ""));
+    }
+    return aTs - bTs;
+  });
 }
 
 function prepareColumns(allRows: Record<string, any>[]): string[] {
@@ -152,7 +181,14 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
     ]
       .filter(Boolean)
       .join(", ");
-    const { venueIsTba: _venueIsTba, showTitleIsTba: _showTitleIsTba, ...rest } = row;
+    const {
+      venueIsTba: _venueIsTba,
+      VenueIsTba: _VenueIsTba,
+      venue_is_tba: _venue_is_tba,
+      showTitleIsTba: _showTitleIsTba,
+      show_title_is_tba: _show_title_is_tba,
+      ...rest
+    } = row;
     return {
       ...rest,
       venue,
@@ -163,8 +199,9 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
       tags,
     };
   });
+  const orderedEntries = sortByDate(normalizedEntries as Record<string, any>[]);
   const wb = XLSX.utils.book_new();
-  if (!normalizedEntries.length) {
+  if (!orderedEntries.length) {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([["No data"]]), "First Night Diary");
     return wb;
   }
@@ -172,10 +209,10 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   // debug: surface shape in dev consoles
   try {
     // eslint-disable-next-line no-console
-    console.log("xlsx entries[0] keys:", Object.keys(normalizedEntries[0] || {}));
+    console.log("xlsx entries[0] keys:", Object.keys(orderedEntries[0] || {}));
   } catch {}
 
-  const columns = prepareColumns(normalizedEntries as Record<string, any>[]);
+  const columns = prepareColumns(orderedEntries as Record<string, any>[]);
   try {
     // eslint-disable-next-line no-console
     console.log("xlsx columns:", columns);
@@ -183,7 +220,7 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
   const header = headerLabels(columns);
   const aoa: any[][] = [header];
 
-  for (const row of normalizedEntries as any[]) {
+  for (const row of orderedEntries as any[]) {
     const arr: any[] = [];
     for (const k of columns) {
       if (k === "Date") {
@@ -197,8 +234,8 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
         if (typeof v === "number") arr.push(new Date(v)); else arr.push(v ?? "");
       } else if (k === "venue") {
         arr.push(row.venue ?? "");
-      } else if (BOOL_FIELDS.has(k)) {
-        arr.push(toYesNo(row[k]));
+      } else if (BOOL_FIELD_RENDERERS.has(k)) {
+        arr.push(BOOL_FIELD_RENDERERS.get(k)!(row[k]));
       } else {
         arr.push(row[k] ?? "");
       }
