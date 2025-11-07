@@ -123,7 +123,8 @@ export function resolveTitleOfShow(
     if (title.length > 0) {
         return looksTba ? "TBA" : title;
     }
-    return Boolean(showTitleIsTba) || looksTba ? "TBA" : "";
+    // Treat empty title as TBA so UI always reflects unknown titles
+    return Boolean(showTitleIsTba) || looksTba || title.length === 0 ? "TBA" : "";
 }
 
 type VenueDisplayInput = {
@@ -165,7 +166,8 @@ export function resolveVenueInfo(venueData: VenueDisplayInput): VenueInfo {
         return { venue: "TBA", membership: "", isTba: true };
     }
 
-    return { venue: "", membership: "", isTba: false };
+    // When nothing is provided, treat venue as TBA for display consistency
+    return { venue: "TBA", membership: "", isTba: true };
 }
 
 export function resolveVenueDisplay(venueData: VenueDisplayInput): string {
