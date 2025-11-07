@@ -156,6 +156,10 @@ function coerceRow(raw) {
   const title = out['title_of_show'] != null ? normalizeAndCount('title_of_show', out['title_of_show']) : '';
   const venue = out['venue'] != null ? normalizeAndCount('venue', out['venue']) : '';
 
+  const timeStamp = out['time_stamp'] ? toTimestamp(out['time_stamp']) : undefined;
+  const createdAtSource = out['created_at'] ? toTimestamp(out['created_at']) : undefined;
+  const createdAt = createdAtSource ?? timeStamp ?? undefined;
+
   return {
     date: dateTs,
     day: day ?? '',
@@ -173,7 +177,8 @@ function coerceRow(raw) {
     is_season_gala: toBoolean(out['is_season_gala']),
     is_opera_dance: toBoolean(out['is_opera_dance']),
     user_id: out['user_id'] ? String(out['user_id']) : '',
-    time_stamp: out['time_stamp'] ? toTimestamp(out['time_stamp']) : undefined,
+    time_stamp: timeStamp,
+    created_at: createdAt,
   };
 }
 

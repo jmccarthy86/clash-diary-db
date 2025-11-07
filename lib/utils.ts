@@ -176,6 +176,37 @@ export function resolveVenueMembership(venueData: VenueDisplayInput): string {
     return resolveVenueInfo(venueData).membership;
 }
 
+export function toBooleanLike(value: unknown): boolean {
+    if (value === null || value === undefined) return false;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    if (typeof value === "string") {
+        const normalized = value.trim().toLowerCase();
+        if (!normalized) return false;
+        return (
+            normalized === "1" ||
+            normalized === "true" ||
+            normalized === "yes" ||
+            normalized === "y" ||
+            normalized === "on"
+        );
+    }
+    return false;
+}
+
+export function coalesceString(...values: unknown[]): string {
+    for (const value of values) {
+        if (typeof value === "string" && value.trim().length > 0) {
+            return value;
+        }
+    }
+    for (const value of values) {
+        if (typeof value === "string") return value;
+        if (value !== null && value !== undefined) return String(value);
+    }
+    return "";
+}
+
 export function createYearCalendarWithData(
     year: number,
     existingData: RequestData["Dates"]

@@ -29,7 +29,12 @@ import BookingBadge from "./BookingBadge";
 import venues from "@/lib/venues";
 import affiliates from "@/lib/affiliates";
 import uktVenues from "@/lib/uktvenues";
-import { resolveTitleOfShow, resolveVenueDisplay } from "@/lib/utils";
+import {
+    resolveTitleOfShow,
+    resolveVenueDisplay,
+    coalesceString,
+    toBooleanLike,
+} from "@/lib/utils";
 
 interface BookingDetailProps {
     rowRange: string;
@@ -50,17 +55,29 @@ export default function BookingDetail({
     const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
 
     const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
-    const displayTitleOfShow = resolveTitleOfShow(
+    const normalizedTitle = coalesceString(
         otherDetails.titleOfShow,
-        otherDetails.showTitleIsTba
+        otherDetails.TitleOfShow
     );
+    const displayTitleOfShow = resolveTitleOfShow(
+        normalizedTitle,
+        toBooleanLike(otherDetails.showTitleIsTba ?? otherDetails.ShowTitleIsTba)
+    );
+    const normalizedVenue = coalesceString(otherDetails.venue, otherDetails.Venue);
     const displayVenue = resolveVenueDisplay({
-        venue: otherDetails.venue,
-        otherVenue: otherDetails.otherVenue,
-        affiliateVenue: otherDetails.affiliateVenue,
-        uktVenue: otherDetails.uktVenue,
-        venueIsTba: otherDetails.venueIsTba,
+        venue: normalizedVenue,
+        otherVenue: coalesceString(otherDetails.otherVenue, otherDetails.OtherVenue),
+        affiliateVenue: coalesceString(
+            otherDetails.affiliateVenue,
+            otherDetails.AffiliateVenue
+        ),
+        uktVenue: coalesceString(otherDetails.uktVenue, otherDetails.UKTVenue),
+        venueIsTba: toBooleanLike(otherDetails.venueIsTba ?? otherDetails.VenueIsTba),
     });
+    const normalizedPressContact = coalesceString(
+        otherDetails.pressContact,
+        otherDetails.PressContact
+    );
 
     React.useEffect(() => {
         // Listen for message from parent
@@ -133,12 +150,14 @@ export default function BookingDetail({
 
                 <div key="Producer" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Producer</p>
-                    <p className="text-muted-foreground">{otherDetails.producer}</p>
+                    <p className="text-muted-foreground">
+                        {coalesceString(otherDetails.producer, otherDetails.Producer)}
+                    </p>
                 </div>
 
                 <div key="PressContact" className="flex-1 space-y-1">
                     <p className="font-medium leading-none">Press Contact</p>
-                    <p className="text-muted-foreground">{otherDetails.pressContact}</p>
+                    <p className="text-muted-foreground">{normalizedPressContact}</p>
                 </div>
 
                 <div key="OtherVenue" className="flex-1 space-y-1">
@@ -151,25 +170,31 @@ export default function BookingDetail({
                 <div key="Badges" className="flex-1 space-y-1">
                     <div className="flex flex-wrap mt-3">
                         {/* <p>{otherDetails.isSeasonGala}</p> */}
-                        {affiliates.some((affiliate) => affiliate.value === otherDetails.venue) && (
+                        {affiliates.some((affiliate) => affiliate.value === normalizedVenue) && (
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
                         )}
 
-                        {venues.some((venue) => venue.value === otherDetails.venue) && (
+                        {venues.some((venue) => venue.value === normalizedVenue) && (
                             <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
 
-                        {uktVenues.some((uktVenue) => uktVenue.value === otherDetails.venue) && (
+                        {uktVenues.some((uktVenue) => uktVenue.value === normalizedVenue) && (
                             <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}
 
-                        {Boolean(p) && <BookingBadge type="P">P</BookingBadge>}
+                        {toBooleanLike(p ?? otherDetails.p ?? otherDetails.P) && (
+                            <BookingBadge type="P">P</BookingBadge>
+                        )}
 
-                        {Boolean(otherDetails.isOperaDance) && (
+                        {toBooleanLike(
+                            otherDetails.isOperaDance ?? otherDetails.IsOperaDance
+                        ) && (
                             <BookingBadge type="OPERA_DANCE">Opera/Dance</BookingBadge>
                         )}
 
-                        {Boolean(otherDetails.isSeasonGala) && (
+                        {toBooleanLike(
+                            otherDetails.isSeasonGala ?? otherDetails.IsSeasonGala
+                        ) && (
                             <BookingBadge type="GALA_NIGHT">
                                 Season Announcement/Gala Night
                             </BookingBadge>
