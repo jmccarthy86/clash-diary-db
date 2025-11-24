@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { enGB } from "date-fns/locale";
-import { isAfter, isBefore, isEqual, isSameDay } from "date-fns";
+import { isAfter, isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import BookingDetail from "@/components/bookings/BookingDetail";
 import { useApp } from "@/context/AppContext";
@@ -30,7 +30,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
         return null;
     }
 
-    const selectedDate = format(currentSelectedDate, "dd/MM/yyyy");
+    const selectedDate = formatLondonDateShort(currentSelectedDate);
 
     const rows = yearData.Dates[selectedDate] || {};
     //console.log("Rows:", rows);
