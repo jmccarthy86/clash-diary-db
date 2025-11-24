@@ -42,6 +42,11 @@ export default function EditBooking({
         uktVenue: currentDetail.uktVenue || "",
         otherVenue: otherVenue,
         venueIsTba: !!currentDetail.venueIsTba,
+        soltMemberNonSoltVenue: !!(
+            (currentDetail as any).soltMemberNonSoltVenue ??
+            (currentDetail as any).SoltMemberNonSoltVenue ??
+            (currentDetail as any).solt_member_non_solt_venue
+        ),
         titleOfShow: currentDetail.titleOfShow || "",
         showTitleIsTba: !!currentDetail.showTitleIsTba,
         producer: currentDetail.producer || "",

@@ -133,12 +133,14 @@ type VenueDisplayInput = {
     affiliateVenue?: unknown;
     uktVenue?: unknown;
     venueIsTba?: unknown;
+    soltMemberNonSoltVenue?: unknown;
 };
 
 type VenueInfo = {
     venue: string;
     membership: string;
     isTba: boolean;
+    isSoltMemberNonSoltVenue: boolean;
 };
 
 const VENUE_SOURCES: Array<[keyof VenueDisplayInput, string]> = [
@@ -152,22 +154,42 @@ const pickVenue = (value: unknown) => (typeof value === "string" ? value.trim() 
 
 export function resolveVenueInfo(venueData: VenueDisplayInput): VenueInfo {
     if (Boolean(venueData.venueIsTba)) {
-        return { venue: "TBA", membership: "", isTba: true };
+        return { venue: "TBA", membership: "", isTba: true, isSoltMemberNonSoltVenue: false };
+    }
+
+    const isSoltMemberNonSolt = Boolean(venueData.soltMemberNonSoltVenue);
+    if (isSoltMemberNonSolt) {
+        const picked =
+            pickVenue(venueData.uktVenue) ||
+            pickVenue(venueData.affiliateVenue) ||
+            pickVenue(venueData.otherVenue) ||
+            pickVenue(venueData.venue);
+        return {
+            venue: picked || "TBA",
+            membership: "SOLT Member (non-SOLT venue)",
+            isTba: false,
+            isSoltMemberNonSoltVenue: true,
+        };
     }
 
     for (const [key, membership] of VENUE_SOURCES) {
         const value = pickVenue(venueData[key]);
         if (value) {
-            return { venue: value, membership, isTba: false };
+            return {
+                venue: value,
+                membership,
+                isTba: false,
+                isSoltMemberNonSoltVenue: false,
+            };
         }
     }
 
     if (Boolean(venueData.venueIsTba)) {
-        return { venue: "TBA", membership: "", isTba: true };
+        return { venue: "TBA", membership: "", isTba: true, isSoltMemberNonSoltVenue: false };
     }
 
     // When nothing is provided, treat venue as TBA for display consistency
-    return { venue: "TBA", membership: "", isTba: true };
+    return { venue: "TBA", membership: "", isTba: true, isSoltMemberNonSoltVenue: false };
 }
 
 export function resolveVenueDisplay(venueData: VenueDisplayInput): string {
@@ -304,12 +326,26 @@ export async function handleClashEmail(
             affiliateVenue: (data as any).affiliateVenue,
             uktVenue: (data as any).uktVenue,
             venueIsTba: (data as any).venueIsTba,
+            soltMemberNonSoltVenue:
+                (data as any).soltMemberNonSoltVenue ??
+                (data as any).SoltMemberNonSoltVenue ??
+                (data as any).solt_member_non_solt_venue,
         }),
         titleOfShow: resolveTitleOfShow(
             (data as any).titleOfShow,
             (data as any).showTitleIsTba
         ),
-        memberLevel: (data as any).memberLevel ?? "",
+        memberLevel: resolveVenueMembership({
+            venue: (data as any).venue,
+            otherVenue: (data as any).otherVenue,
+            affiliateVenue: (data as any).affiliateVenue,
+            uktVenue: (data as any).uktVenue,
+            venueIsTba: (data as any).venueIsTba,
+            soltMemberNonSoltVenue:
+                (data as any).soltMemberNonSoltVenue ??
+                (data as any).SoltMemberNonSoltVenue ??
+                (data as any).solt_member_non_solt_venue,
+        }),
         isOperaDance: Boolean((data as any).isOperaDance ?? false),
         isSeasonGala: Boolean((data as any).isSeasonGala ?? false),
         clashEmails: filteredEmails.join(", "),

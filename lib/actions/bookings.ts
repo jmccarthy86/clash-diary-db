@@ -65,6 +65,42 @@ const enforceVenueTbaRule = (data: any, ctx: z.RefinementCtx) => {
   }
 };
 
+const enforceSoltMemberNonSoltRule = (data: any, ctx: z.RefinementCtx) => {
+  const isSpecial = Boolean(data.soltMemberNonSoltVenue);
+  if (!isSpecial) return;
+
+  const venue = (data.venue ?? "").trim();
+  const venueIsTba = Boolean(data.venueIsTba);
+  const affiliateVenue = (data.affiliateVenue ?? "").trim();
+  const uktVenue = (data.uktVenue ?? "").trim();
+  const otherVenue = (data.otherVenue ?? "").trim();
+  const hasNonSoltVenue = affiliateVenue.length > 0 || uktVenue.length > 0 || otherVenue.length > 0;
+
+  if (venue) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["venue"],
+      message: "Leave SOLT Member Venue empty when using the non-SOLT venue flag",
+    });
+  }
+
+  if (venueIsTba) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["venueIsTba"],
+      message: "TBA cannot be selected with the non-SOLT venue flag",
+    });
+  }
+
+  if (!hasNonSoltVenue) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["otherVenue"],
+      message: "Select UKT/Affiliate/Other venue when using the non-SOLT venue flag",
+    });
+  }
+};
+
 const BookingBase = z.object({
   //id:             z.string().uuid(),
   date: z.coerce.date(),
@@ -75,6 +111,7 @@ const BookingBase = z.object({
   affiliateVenue: z.string().optional(),
   otherVenue: z.string().optional(),
   venueIsTba: z.boolean().optional(),
+  soltMemberNonSoltVenue: z.boolean().optional(),
   titleOfShow: z.string().optional(),
   showTitleIsTba: z.boolean().optional(),
   producer: z.string().optional(),
@@ -89,10 +126,12 @@ const BookingBase = z.object({
 const BookingInput = BookingBase.superRefine((data, ctx) => {
   enforceTitleTbaRule(data, ctx);
   enforceVenueTbaRule(data, ctx);
+  enforceSoltMemberNonSoltRule(data, ctx);
 });
 const BookingPartialInput = BookingBase.partial().superRefine((data, ctx) => {
   enforceTitleTbaRule(data, ctx);
   enforceVenueTbaRule(data, ctx);
+  enforceSoltMemberNonSoltRule(data, ctx);
 });
 
 /* ---------- CRUD via WordPress REST ---------- */
@@ -124,6 +163,7 @@ export async function createBooking(raw: unknown) {
         affiliate_venue: data.affiliateVenue ?? "",
         other_venue: data.otherVenue ?? "",
         venue_is_tba: Boolean(data.venueIsTba ?? false),
+        solt_member_non_solt_venue: Boolean(data.soltMemberNonSoltVenue ?? false),
         title_of_show: (data.titleOfShow ?? "").trim(),
         show_title_is_tba: Boolean(data.showTitleIsTba ?? false),
         producer: data.producer ?? "",
@@ -161,6 +201,14 @@ export async function updateBooking(id: string, raw: unknown) {
         payload.venue_is_tba = isTba;
         if (isTba && data.venue === undefined) {
             payload.venue = "";
+        }
+    }
+    if (data.soltMemberNonSoltVenue !== undefined) {
+        const flagged = Boolean(data.soltMemberNonSoltVenue);
+        payload.solt_member_non_solt_venue = flagged;
+        if (flagged) {
+            if (data.venue === undefined) payload.venue = "";
+            if (data.venueIsTba === undefined) payload.venue_is_tba = false;
         }
     }
     if (data.titleOfShow !== undefined) payload.title_of_show = (data.titleOfShow ?? "").trim();

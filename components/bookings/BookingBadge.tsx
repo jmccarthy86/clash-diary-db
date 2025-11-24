@@ -6,6 +6,7 @@ export const BadgeVariants = {
     OPERA_DANCE: { bg: "bg-blue-500", text: "text-white" },
     GALA_NIGHT: { bg: "bg-green-500", text: "text-white" },
     SOLT_MEMBER: { bg: "bg-solt-purple", text: "text-white" },
+    SOLT_MEMBER_NON_SOLT: { bg: "bg-yellow-200", text: "text-black" },
     AFFILATE_VENUE: { bg: "bg-solt-gold", text: "text-black" },
     UKT_VENUE: { bg: "bg-solt-red", text: "text-white" },
 };

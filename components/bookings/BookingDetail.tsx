@@ -73,10 +73,20 @@ export default function BookingDetail({
         ),
         uktVenue: coalesceString(otherDetails.uktVenue, otherDetails.UKTVenue),
         venueIsTba: toBooleanLike(otherDetails.venueIsTba ?? otherDetails.VenueIsTba),
+        soltMemberNonSoltVenue: toBooleanLike(
+            (otherDetails as any).soltMemberNonSoltVenue ??
+                (otherDetails as any).SoltMemberNonSoltVenue ??
+                (otherDetails as any).solt_member_non_solt_venue
+        ),
     });
     const normalizedPressContact = coalesceString(
         otherDetails.pressContact,
         otherDetails.PressContact
+    );
+    const isSoltMemberNonSoltVenue = toBooleanLike(
+        (otherDetails as any).soltMemberNonSoltVenue ??
+            (otherDetails as any).SoltMemberNonSoltVenue ??
+            (otherDetails as any).solt_member_non_solt_venue
     );
 
     React.useEffect(() => {
@@ -170,6 +180,11 @@ export default function BookingDetail({
                 <div key="Badges" className="flex-1 space-y-1">
                     <div className="flex flex-wrap mt-3">
                         {/* <p>{otherDetails.isSeasonGala}</p> */}
+                        {isSoltMemberNonSoltVenue && (
+                            <BookingBadge type="SOLT_MEMBER_NON_SOLT">
+                                SOLT Member (non-SOLT venue)
+                            </BookingBadge>
+                        )}
                         {affiliates.some((affiliate) => affiliate.value === normalizedVenue) && (
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
                         )}

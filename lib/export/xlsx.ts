@@ -25,6 +25,9 @@ const EXCLUDE_KEYS = new Set([
   "venueIsTba",
   "VenueIsTba",
   "venue_is_tba",
+  "soltMemberNonSoltVenue",
+  "SoltMemberNonSoltVenue",
+  "solt_member_non_solt_venue",
 ]);
 
 // Preferred ordering of columns (lowerCamel where applicable)
@@ -185,6 +188,9 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
       venueIsTba: _venueIsTba,
       VenueIsTba: _VenueIsTba,
       venue_is_tba: _venue_is_tba,
+      soltMemberNonSoltVenue: _soltMemberNonSoltVenue,
+      SoltMemberNonSoltVenue: _SoltMemberNonSoltVenue,
+      solt_member_non_solt_venue: _solt_member_non_solt_venue,
       showTitleIsTba: _showTitleIsTba,
       show_title_is_tba: _show_title_is_tba,
       ...rest

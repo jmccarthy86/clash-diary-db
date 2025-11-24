@@ -44,6 +44,7 @@ export const FormSchema = z.object({
     affiliateVenue: z.string().optional(),
     otherVenue: z.string().optional(),
     venueIsTba: z.coerce.boolean().optional(),
+    soltMemberNonSoltVenue: z.coerce.boolean().optional(),
     titleOfShow: z.string().optional(),
     showTitleIsTba: z.coerce.boolean().optional(),
     producer: z.string().min(1, "Producer is required"),
@@ -53,6 +54,75 @@ export const FormSchema = z.object({
     userId: z.string().optional(),
     dateBkd: z.string().optional(),
     timeStamp: z.number().optional(),
+}).superRefine((data, ctx) => {
+    const title = (data.titleOfShow ?? "").trim();
+    const isTitleTba = Boolean(data.showTitleIsTba);
+    if (!isTitleTba && title.length === 0) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["titleOfShow"],
+            message: "Show title is required unless marked TBA",
+        });
+    }
+    if (isTitleTba && title.length > 0) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["titleOfShow"],
+            message: "Clear the show title when marking as TBA",
+        });
+    }
+
+    const venue = (data.venue ?? "").trim();
+    const affiliateVenue = (data.affiliateVenue ?? "").trim();
+    const uktVenue = (data.uktVenue ?? "").trim();
+    const otherVenue = (data.otherVenue ?? "").trim();
+    const venueIsTba = Boolean(data.venueIsTba);
+    const hasAnyVenue =
+        venue.length > 0 ||
+        affiliateVenue.length > 0 ||
+        uktVenue.length > 0 ||
+        otherVenue.length > 0;
+
+    if (!venueIsTba && !hasAnyVenue) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["venue"],
+            message: "Venue is required unless marked TBA",
+        });
+    }
+
+    if (venueIsTba && hasAnyVenue) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["venue"],
+            message: "Clear venue fields when marking as TBA",
+        });
+    }
+
+    const isSoltMemberNonSolt = Boolean(data.soltMemberNonSoltVenue);
+    if (isSoltMemberNonSolt) {
+        if (venue) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["venue"],
+                message: "Leave SOLT Member Venue empty when using this flag",
+            });
+        }
+        if (venueIsTba) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["venueIsTba"],
+                message: "TBA cannot be selected with this flag",
+            });
+        }
+        if (!(affiliateVenue || uktVenue || otherVenue)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["otherVenue"],
+                message: "Provide UKT/Affiliate/Other venue when using this flag",
+            });
+        }
+    }
 });
 
 export default function BookingForm({
@@ -79,6 +149,7 @@ export default function BookingForm({
         if (initialData) {
             return {
                 ...initialData,
+                soltMemberNonSoltVenue: initialData.soltMemberNonSoltVenue ?? false,
                 userId: hasAuthCookie || initialData.userId || "0", // Ensure the correct value
             };
         } else {
@@ -92,6 +163,7 @@ export default function BookingForm({
                 affiliateVenue: "",
                 otherVenue: "",
                 venueIsTba: false,
+                soltMemberNonSoltVenue: false,
                 titleOfShow: "",
                 showTitleIsTba: false,
                 producer: "",
@@ -110,6 +182,9 @@ export default function BookingForm({
         defaultValues: defaultValues,
     });
     const titleOfShowValue = form.watch("titleOfShow");
+    const venueValue = form.watch("venue");
+    const venueIsTbaValue = form.watch("venueIsTba");
+    const soltMemberNonSoltVenueValue = form.watch("soltMemberNonSoltVenue");
     React.useEffect(() => {
         if (titleOfShowValue && titleOfShowValue.trim().length > 0) {
             previousTitleRef.current = titleOfShowValue;
@@ -136,8 +211,24 @@ export default function BookingForm({
     const isFieldDisabled = (fieldName: string) => {
         if (submitting) return true;
         if (fieldName === "titleOfShow") return form.watch("showTitleIsTba");
+        if (fieldName === "soltMemberNonSoltVenue") {
+            return Boolean(venueValue) || Boolean(venueIsTbaValue);
+        }
         return false;
     };
+
+    // Keep SOLT/non-SOLT flag consistent with venue selections
+    React.useEffect(() => {
+        if (venueValue && soltMemberNonSoltVenueValue) {
+            form.setValue("soltMemberNonSoltVenue", false, { shouldDirty: true });
+        }
+    }, [venueValue, soltMemberNonSoltVenueValue, form]);
+
+    React.useEffect(() => {
+        if (venueIsTbaValue && soltMemberNonSoltVenueValue) {
+            form.setValue("soltMemberNonSoltVenue", false, { shouldDirty: true });
+        }
+    }, [venueIsTbaValue, soltMemberNonSoltVenueValue, form]);
 
     React.useEffect(() => {
         // Listen for message from parent
@@ -528,6 +619,38 @@ export default function BookingForm({
                                             />
                                         </FormControl>
                                         <FormLabel>Tick box if a TBA</FormLabel>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="soltMemberNonSoltVenue"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-center">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={(checked: CheckedState) => {
+                                                    const isChecked = checked === true;
+                                                    field.onChange(isChecked);
+                                                    if (isChecked) {
+                                                        form.setValue("venue", "", {
+                                                            shouldDirty: true,
+                                                        });
+                                                        form.setValue("venueIsTba", false, {
+                                                            shouldDirty: true,
+                                                        });
+                                                    }
+                                                }}
+                                                disabled={isFieldDisabled("soltMemberNonSoltVenue")}
+                                                className="mt-2 mr-1"
+                                            />
+                                        </FormControl>
+                                        <FormLabel>
+                                            Tick here if you are a SOLT Member but your show is
+                                            playing at a non-SOLT venue
+                                        </FormLabel>
                                         <FormMessage />
                                     </FormItem>
                                 )}

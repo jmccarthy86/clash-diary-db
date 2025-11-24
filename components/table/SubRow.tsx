@@ -58,6 +58,11 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     const showSoltBadge = venues.some((venue) => venue.value === venueValue);
                     const showUktBadge = uktVenues.some((uktVenue) => uktVenue.value === venueValue);
                     const showPBadge = toBooleanLike(subRow.p ?? (subRow as any).P);
+                    const showSoltNonSoltBadge = toBooleanLike(
+                        subRow.soltMemberNonSoltVenue ??
+                            (subRow as any).SoltMemberNonSoltVenue ??
+                            (subRow as any).solt_member_non_solt_venue
+                    );
                     const showOperaBadge = toBooleanLike(
                         subRow.isOperaDance ?? (subRow as any).IsOperaDance
                     );
@@ -67,6 +72,7 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                     const showAnyBadge =
                         showAffiliateBadge ||
                         showSoltBadge ||
+                        showSoltNonSoltBadge ||
                         showUktBadge ||
                         showPBadge ||
                         showOperaBadge ||
@@ -135,6 +141,11 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
                                 <TableCell key={`${index}-badges`} className="px-3 py-2 text-xs">
                                     {showAnyBadge && (
                                         <div className="flex flex-wrap gap-2">
+                                            {showSoltNonSoltBadge && (
+                                                <BookingBadge type="SOLT_MEMBER_NON_SOLT">
+                                                    SOLT Member (non-SOLT venue)
+                                                </BookingBadge>
+                                            )}
                                             {showAffiliateBadge && (
                                                 <BookingBadge type="AFFILATE_VENUE">
                                                     Affiliate
@@ -200,6 +211,11 @@ export function SubRowComponent({ subRows }: SubRowComponentProps) {
 
                                     {showAnyBadge && (
                                         <div className="flex flex-wrap gap-2 mb-3">
+                                            {showSoltNonSoltBadge && (
+                                                <BookingBadge type="SOLT_MEMBER_NON_SOLT">
+                                                    SOLT Member (non-SOLT venue)
+                                                </BookingBadge>
+                                            )}
                                             {showAffiliateBadge && (
                                                 <BookingBadge type="AFFILATE_VENUE">
                                                     Affiliate
