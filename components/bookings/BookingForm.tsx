@@ -55,6 +55,7 @@ export const FormSchema = z.object({
     dateBkd: z.string().optional(),
     timeStamp: z.number().optional(),
 }).superRefine((data, ctx) => {
+    const isSoltMemberNonSolt = Boolean(data.soltMemberNonSoltVenue);
     const title = (data.titleOfShow ?? "").trim();
     const isTitleTba = Boolean(data.showTitleIsTba);
     if (!isTitleTba && title.length === 0) {
@@ -83,23 +84,6 @@ export const FormSchema = z.object({
         uktVenue.length > 0 ||
         otherVenue.length > 0;
 
-    if (!venueIsTba && !hasAnyVenue) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["venue"],
-            message: "Venue is required unless marked TBA",
-        });
-    }
-
-    if (venueIsTba && hasAnyVenue) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ["venue"],
-            message: "Clear venue fields when marking as TBA",
-        });
-    }
-
-    const isSoltMemberNonSolt = Boolean(data.soltMemberNonSoltVenue);
     if (isSoltMemberNonSolt) {
         if (venue) {
             ctx.addIssue({
@@ -115,13 +99,31 @@ export const FormSchema = z.object({
                 message: "TBA cannot be selected with this flag",
             });
         }
-        if (!(affiliateVenue || uktVenue || otherVenue)) {
+        if (!otherVenue) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ["otherVenue"],
-                message: "Provide UKT/Affiliate/Other venue when using this flag",
+                message: "Provide an Other Venue when using this flag",
             });
         }
+        // Skip base venue/TBA rule when special flag is on; handled above
+        return;
+    }
+
+    if (!venueIsTba && !hasAnyVenue) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["venue"],
+            message: "Venue is required unless marked TBA",
+        });
+    }
+
+    if (venueIsTba && hasAnyVenue) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["venue"],
+            message: "Clear venue fields when marking as TBA",
+        });
     }
 });
 

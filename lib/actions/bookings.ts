@@ -37,6 +37,11 @@ const enforceVenueTbaRule = (data: any, ctx: z.RefinementCtx) => {
   const hasVenueField = Object.prototype.hasOwnProperty.call(data, "venue");
   if (!hasVenueField) return;
 
+  if (Boolean(data.soltMemberNonSoltVenue)) {
+    // Special flag handles its own constraints elsewhere
+    return;
+  }
+
   const venue = (data.venue ?? "").trim();
   const affiliateVenue = (data.affiliateVenue ?? "").trim();
   const uktVenue = (data.uktVenue ?? "").trim();
@@ -71,10 +76,7 @@ const enforceSoltMemberNonSoltRule = (data: any, ctx: z.RefinementCtx) => {
 
   const venue = (data.venue ?? "").trim();
   const venueIsTba = Boolean(data.venueIsTba);
-  const affiliateVenue = (data.affiliateVenue ?? "").trim();
-  const uktVenue = (data.uktVenue ?? "").trim();
   const otherVenue = (data.otherVenue ?? "").trim();
-  const hasNonSoltVenue = affiliateVenue.length > 0 || uktVenue.length > 0 || otherVenue.length > 0;
 
   if (venue) {
     ctx.addIssue({
@@ -92,11 +94,11 @@ const enforceSoltMemberNonSoltRule = (data: any, ctx: z.RefinementCtx) => {
     });
   }
 
-  if (!hasNonSoltVenue) {
+  if (!otherVenue) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["otherVenue"],
-      message: "Select UKT/Affiliate/Other venue when using the non-SOLT venue flag",
+      message: "Provide an Other Venue when using the non-SOLT venue flag",
     });
   }
 };
