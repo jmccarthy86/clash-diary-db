@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { enGB } from "date-fns/locale";
-import { format, isAfter, isBefore, isEqual, isSameDay } from "date-fns";
+import { isAfter, isBefore, isEqual, isSameDay } from "date-fns";
 import { Button } from "@/components/ui/button";
 import BookingDetail from "@/components/bookings/BookingDetail";
 import { useApp } from "@/context/AppContext";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import CreateBooking from "@/components/bookings/CreateBooking";
 import DownloadButton from "../ui/download-button";
+import { formatLondonDate, formatLondonDateShort } from "@/lib/utils";
 
 interface DetailCardProps {
     currentSelectedDate: Date | undefined;
@@ -45,7 +46,7 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
     return (
         <div className="flex flex-col gap-2">
             <div className="rounded-md border pl-6 pr-3 py-3 flex items-center justify-between">
-                <h2 className="text-xl font-bold">{format(currentSelectedDate, "d MMMM yyyy")}</h2>
+                <h2 className="text-xl font-bold">{formatLondonDate(currentSelectedDate)}</h2>
                 <div className="flex gap-2">
                     <DownloadButton bookingData={rows} type="cal" />
                     <Dialog>
@@ -62,15 +63,15 @@ export function Bookings({ currentSelectedDate, allowEdit }: DetailCardProps) {
                                 </Button>
                             )}
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                            <DialogHeader>
-                                <DialogTitle>Book Now</DialogTitle>
-                                <DialogDescription>
-                                    Complete your booking for{" "}
-                                    {format(currentSelectedDate, "dd/MM/yyyy")}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <CreateBooking currentSelectedDate={currentSelectedDate} />
+                            <DialogContent className="sm:max-w-[600px]">
+                                <DialogHeader>
+                                    <DialogTitle>Book Now</DialogTitle>
+                                    <DialogDescription>
+                                        Complete your booking for{" "}
+                                        {formatLondonDateShort(currentSelectedDate)}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <CreateBooking currentSelectedDate={currentSelectedDate} />
                         </DialogContent>
                     </Dialog>
                 </div>

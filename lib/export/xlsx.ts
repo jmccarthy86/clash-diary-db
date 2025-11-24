@@ -3,6 +3,7 @@ import {
   unCamelCase,
   resolveTitleOfShow,
   resolveVenueInfo,
+  formatLondonDateShort,
 } from "@/lib/utils";
 
 type RowMap = Record<string, any>;
@@ -230,14 +231,23 @@ export function buildWorkbook(rowsMap: RowMap): XLSX.WorkBook {
     const arr: any[] = [];
     for (const k of columns) {
       if (k === "Date") {
-        let d: any = row[k];
-        if (!d && row.date) d = new Date(row.date);
-        arr.push(d instanceof Date ? d : d ?? "");
+        const explicit = row[k];
+        if (typeof explicit === "string" && explicit.trim()) {
+          arr.push(explicit);
+        } else if (row.date) {
+          arr.push(formatLondonDateShort(row.date));
+        } else {
+          arr.push("");
+        }
       } else if (k === "titleOfShow") {
         arr.push(row.titleOfShow ?? "");
       } else if (k === "timeStamp" || k === "createdAt") {
         const v = row[k];
-        if (typeof v === "number") arr.push(new Date(v)); else arr.push(v ?? "");
+        if (v) {
+          arr.push(formatLondonDateShort(v));
+        } else {
+          arr.push("");
+        }
       } else if (k === "venue") {
         arr.push(row.venue ?? "");
       } else if (BOOL_FIELD_RENDERERS.has(k)) {

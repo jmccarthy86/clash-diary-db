@@ -47,6 +47,44 @@ export function getGMTDateFormattedDayOfTheMonth(date: Date | undefined): string
     return formatter.format(date);
 }
 
+// London-aware date formatting helpers (use the UK site timezone)
+const LONDON_TZ = "Europe/London";
+
+function normalizeDateInput(value: Date | number | string): Date | null {
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    if (typeof value === "number") {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof value === "string") {
+        const d = new Date(value);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+}
+
+export function formatLondonDate(value: Date | number | string): string {
+    const d = normalizeDateInput(value);
+    if (!d) return "";
+    return new Intl.DateTimeFormat("en-GB", {
+        timeZone: LONDON_TZ,
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    }).format(d);
+}
+
+export function formatLondonDateShort(value: Date | number | string): string {
+    const d = normalizeDateInput(value);
+    if (!d) return "";
+    return new Intl.DateTimeFormat("en-GB", {
+        timeZone: LONDON_TZ,
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    }).format(d);
+}
+
 export function transformData(inputData: RequestData): Booking[] {
     const result: Booking[] = [];
 
