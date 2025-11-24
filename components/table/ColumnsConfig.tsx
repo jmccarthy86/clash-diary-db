@@ -1,12 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { parse, parseISO, compareAsc } from "date-fns"
+import { parse, parseISO, compareAsc, format } from "date-fns"
 import { enGB } from "date-fns/locale";
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown, ChevronDown, ChevronUp, CalendarCheck } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { parseDate, formatLondonDate } from "@/lib/utils"
+import { parseDate } from "@/lib/utils"
 import {
   Dialog,
   DialogContent,
@@ -45,7 +45,7 @@ export const columnsConfig = (): ColumnDef<Booking, any>[] => [
 		//console.log("Row:", row);
 
 		const parsed = parse( row.getValue("date"), 'dd/MM/yyyy', new Date() );
-		const formattedDate = formatLondonDate(parsed);
+		const formattedDate = format(parsed, 'd MMMM yyyy');
 		return (
 
      		<div className="flex items-center gap-1">

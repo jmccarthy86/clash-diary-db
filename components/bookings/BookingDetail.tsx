@@ -188,10 +188,6 @@ export default function BookingDetail({
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
                         )}
 
-                        {venues.some((venue) => venue.value === normalizedVenue) && (
-                            <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
-                        )}
-
                         {uktVenues.some((uktVenue) => uktVenue.value === normalizedVenue) && (
                             <BookingBadge type="UKT_VENUE">UKT Member</BookingBadge>
                         )}

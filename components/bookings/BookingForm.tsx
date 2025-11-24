@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { cn, formatLondonDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -315,7 +315,7 @@ export default function BookingForm({
                                                     onClick={() => setIsCalendarOpen(true)}
                                                 >
                                                     {field.value ? (
-                                                        formatLondonDate(field.value)
+                                                        format(field.value, "d MMMM yyyy")
                                                     ) : (
                                                         <span>Pick a date</span>
                                                     )}
