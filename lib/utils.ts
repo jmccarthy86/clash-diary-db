@@ -47,6 +47,36 @@ export function getGMTDateFormattedDayOfTheMonth(date: Date | undefined): string
     return formatter.format(date);
 }
 
+// Date-only formatting (ignores timezones by using local date parts)
+const MONTH_NAMES = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+];
+
+export function formatDateLiteralDDMMYYYY(date: Date): string {
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+export function formatDateLiteralLong(date: Date): string {
+    const day = date.getDate();
+    const monthName = MONTH_NAMES[date.getMonth()] ?? "";
+    const year = date.getFullYear();
+    return `${day} ${monthName} ${year}`;
+}
+
 // London-aware date formatting helpers (use the UK site timezone)
 const LONDON_TZ = "Europe/London";
 
