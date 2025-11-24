@@ -180,10 +180,9 @@ export default function BookingDetail({
                 <div key="Badges" className="flex-1 space-y-1">
                     <div className="flex flex-wrap mt-3">
                         {/* <p>{otherDetails.isSeasonGala}</p> */}
-                        {isSoltMemberNonSoltVenue && (
-                            <BookingBadge type="SOLT_MEMBER_NON_SOLT">
-                                SOLT Member (non-SOLT venue)
-                            </BookingBadge>
+                        {(isSoltMemberNonSoltVenue ||
+                            venues.some((venue) => venue.value === normalizedVenue)) && (
+                            <BookingBadge type="SOLT_MEMBER">SOLT Member</BookingBadge>
                         )}
                         {affiliates.some((affiliate) => affiliate.value === normalizedVenue) && (
                             <BookingBadge type="AFFILATE_VENUE">Affiliate</BookingBadge>
