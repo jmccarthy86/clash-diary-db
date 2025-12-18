@@ -1,0 +1,324 @@
+,Date,P,Venue,UKTVenue,AffiliateVenue,OtherVenue,VenueIsTba,TitleOfShow,ShowIsTitleTba,Producer,PressContact,DateBkd,IsSeasonGala,IsOperaDance,UserId,TimeStamp
+,30/01/2026,TRUE,,,,,TRUE,,TRUE,Troupe Productions,hayleigh@katemorleypr.com,,FALSE,FALSE,1270,17/12/2024 13:12:44
+,30/01/2026,FALSE,,,,,TRUE,,TRUE,TBA,holly@joallanpr.com,,FALSE,FALSE,1534,17/02/2025 10:28:28
+,02/02/2026,TRUE,,,,,TRUE,,TRUE,Troupe Productions,hayleigh@katemorleypr.com,,FALSE,FALSE,1270,17/12/2024 13:13:34
+,03/02/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,,TRUE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,0,11/11/2024 12:35
+,03/02/2026,FALSE,,Sheffield Theatres,,,FALSE,Crown of Blood - A Yoruba Adaptation of Macbeth,FALSE,Sheffield Theatres and Utopia Theatre,benw@breadandbutterpr.uk,,FALSE,FALSE,1534,8/4/2025 12:35
+,04/02/2026,FALSE,,The Other Place,,THE OTHER PLACE,FALSE,"ALL IS BUT FANTASY Lady Macbeth, Emilia (14:30) / Juliet, Richard II (19:00)",FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,3/6/2025 11:42
+,10/02/2026,FALSE,National Theatre Dorfman,,,,FALSE,Man and Boy,FALSE,National Theatre,AChakrapani@nationaltheatre.org.uk,,FALSE,FALSE,1459,9/10/2025 14:06
+,19/02/2026,FALSE,,,Kiln Theatre,,FALSE,Seagulls,FALSE,Kiln Theatre,freya@joallanpr.com,,FALSE,FALSE,1252,14/02/2025 12:44:28
+,19/02/2026,FALSE,,Swan Theatre,,SWAN THEATRE,FALSE,THE BOY WHO HARNESSED THE WIND,FALSE,RSC in association with Kenny Wax Productions and Chuchu Nwagu Productions ,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,3/6/2025 11:51
+,24/02/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,14/11/2024 15:09:36
+,03/03/2026,FALSE,,,Young Vic,,FALSE,,TRUE,Young Vic,Kate@breadandbutterpr.uk,,FALSE,FALSE,1317,3/12/2024 19:11
+,05/03/2026,FALSE,National Theatre Lyttelton,,,,FALSE,Gala night ,FALSE,National Theatre,scornell@nationaltheatre.org.uk,,TRUE,FALSE,1459,30/07/2025 15:16:57
+,05/03/2026,FALSE,,Sheffield Theatres,,,FALSE,The Ladies Football Club,FALSE,Sheffield Theatres,benw@breadandbutterpr.uk,,FALSE,FALSE,1534,8/4/2025 12:37
+,19/03/2026,FALSE,,,,,TRUE,,TRUE,TBA,holly@joallanpr.com,,FALSE,FALSE,1534,14/02/2025 12:52:58
+,01/04/2026,FALSE,National Theatre Lyttelton,,,,FALSE,Les Liaisons Dangereuses,FALSE,National Theatre,ERitchie@nationaltheatre.org.uk,,FALSE,FALSE,1459,9/10/2025 14:12
+,02/04/2026,FALSE,National Theatre Dorfman,,,,FALSE,The Authenticator,FALSE,National Theatre,Jlever@nationaltheatre.org.uk,,FALSE,FALSE,1459,9/10/2025 14:13
+,21/04/2026,FALSE,,Royal Shakespeare Company,,SWAN THEATRE,FALSE,THE RESISTIBLE RISE OF ARTURO UI,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:04:44
+,23/04/2026,FALSE,,,Kiln Theatre,,FALSE,Please Please Please,FALSE,Kiln Theatre,freya@joallanpr.com,,FALSE,FALSE,1252,24/01/2025 13:45:07
+,19/05/2026,FALSE,,,Young Vic,,FALSE,,TRUE,Young Vic,Kate@breadandbutterpr.uk,,FALSE,FALSE,1317,3/12/2024 19:11
+,21/05/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,5/2/2025 10:34
+,25/06/2026,FALSE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,13/08/2025 09:18:08
+,25/06/2026,FALSE,,Sheffield Theatres,,,FALSE,Summer Holiday,FALSE,Sheffield Theatres ,benw@breadandbutterpr.uk,,FALSE,FALSE,1534,8/4/2025 12:38
+,30/06/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,13/08/2025 09:18:45
+,02/09/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,1/10/2024 17:10
+,03/09/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,1/10/2024 17:11
+,08/09/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,5/2/2025 10:39
+,01/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,27/11/2024 10:01:00
+,06/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,27/11/2024 10:01:31
+,19/11/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,5/2/2025 10:45
+,24/11/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,5/2/2025 10:44
+,25/11/2026,TRUE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:16:47
+,07/01/2026,TRUE,,,Bridge Theatre,,FALSE,Into The Woods,FALSE,London Theatre Company,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1219,27/02/2025 16:05:59
+,04/02/2026,TRUE,,,Orange Tree Theatre,,FALSE,,TRUE,TBA,katiemd@katemorleypr.com,,FALSE,FALSE,1328,7/3/2025 16:47
+,24/03/2026,FALSE,,Royal Shakespeare Theatre,,ROYAL SHAKESPEARE THEATRE,FALSE,HENRY V,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,3/6/2025 11:58
+,06/05/2026,FALSE,,York Theatre Royal,,,FALSE,The Psychic,FALSE,York Theatre Royal,press@yorktheatreroyal.co.uk,,FALSE,FALSE,1865,11/3/2025 14:57
+,15/01/2026,FALSE,London Coliseum,,,,FALSE,Akram Khan's Giselle,FALSE,English National Ballet,ines.carvalho@ballet.org.uk,,FALSE,TRUE,1279,18/03/2025 12:51:11
+,19/03/2026,FALSE,Sadler's Wells,,,,FALSE,Body & Soul,FALSE,English National Ballet,ines.carvalho@ballet.org.uk,,FALSE,TRUE,1279,18/03/2025 12:53:05
+,02/04/2026,FALSE,,,Peacock Theatre,,FALSE,My First Ballet,FALSE,English National Ballet,ines.carvalho@ballet.org.uk,,FALSE,TRUE,1279,18/03/2025 12:55:15
+,30/04/2026,FALSE,,Theatre Royal Plymouth,,,FALSE,Body & Soul,FALSE,English National Ballet,ines.carvalho@ballet.org.uk,,FALSE,TRUE,1279,18/03/2025 12:56:58
+,25/06/2026,FALSE,,,,Royal Albert Hall,FALSE,Sleeping Beauty,FALSE,English National Ballet,ines.carvalho@ballet.org.uk,,FALSE,TRUE,1279,18/03/2025 12:58:25
+,13/02/2026,FALSE,,,Bush Theatre,,FALSE,Sweetmeats,FALSE,A Bush Theatre and Tara Theatre co-production,martinshippen@bushtheatre.co.uk,,FALSE,FALSE,1377,20/03/2025 14:03:13
+,10/04/2026,FALSE,,,Bush Theatre,,FALSE,HEART WALL,FALSE,A Bush Theatre and Oldham Coliseum Co-commission,martinshippen@bushtheatre.co.uk,,FALSE,FALSE,1377,20/03/2025 14:06:22
+,02/02/2026,FALSE,,,Bush Theatre,,FALSE,Maggots,FALSE,Jessie Anand Productions in association with Bush Theatre,martinshippen@bushtheatre.co.uk,,FALSE,FALSE,1377,20/03/2025 14:11:17
+,11/05/2026,FALSE,,,Bush Theatre,,FALSE,I'm Not Being Funny,FALSE,Prentice Productions in association with Bush Theatre,martinshippen@bushtheatre.co.uk,,FALSE,FALSE,1377,20/03/2025 14:12:30
+Wednesday,26/02/2026,FALSE,,Royal & Derngate Northampton,,,FALSE,Top G's Like Me,FALSE,"Royal & Derngate, Northampton",amanda.howson@royalandderngate.co.uk,,FALSE,FALSE,1148,20/10/2025 14:56:00
+,04/03/2026,FALSE,,,Rose Theatre,,FALSE,Our Town,FALSE,A Rose Theatre and Welsh National Theatre production,burte@joallanpr.com,,FALSE,FALSE,1535,27/08/2025 08:56:39
+,17/02/2026,FALSE,Shakespeare's Globe,,,,FALSE,Deep Azure,FALSE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,17/09/2025 15:58:23
+,15/12/2026,FALSE,,,,TBC,TRUE,TBC,FALSE,TBC,james@katemorleypr.com,,FALSE,FALSE,1753,2/4/2025 12:29
+,20/10/2026,FALSE,,,,TBC,FALSE,TBC,FALSE,TBC,james@katemorleypr.com,,FALSE,FALSE,1753,2/4/2025 12:30
+,25/08/2026,FALSE,,,,TBC,FALSE,TBC,FALSE,TBC,james@katemorleypr.com,,FALSE,FALSE,1753,2/4/2025 12:30
+,11/03/2026,FALSE,,,,,FALSE,I’m Every Woman - The Musical,FALSE, Adrian Grant Productions,alex@buchananpr.co.uk,,FALSE,FALSE,1135,6/8/2025 17:09
+,12/02/2026,FALSE,Apollo Theatre,,,,FALSE,"I'm Sorry, Prime Minister",FALSE,Mark Goucher Productions,jocasta@breadandbutterpr.uk,,FALSE,FALSE,1574,16/05/2025 14:17:56
+,08/01/2026,FALSE,,,Hampstead Theatre,,FALSE,A GHOST IN YOUR EAR,FALSE,Hampstead Downstairs,liv@katemorleypr.com,,FALSE,FALSE,1753,3/9/2025 15:49
+,07/04/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,8/4/2025 12:35
+,08/04/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,8/4/2025 12:35
+,04/02/2026,FALSE,The Old Vic,,,,FALSE,,TRUE,The Old Vic,ella.reeves@oldvictheatre.com,,FALSE,FALSE,1325,22/04/2025 11:39:13
+,10/12/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:03:00
+,09/12/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:03:37
+,26/08/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:09:15
+,27/08/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:09:43
+,01/09/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:10:07
+,10/11/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:14:42
+,11/11/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/04/2025 10:15:18
+,12/11/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,24/04/2025 14:46:21
+,11/05/2025,FALSE,,,Peacock Theatre,,FALSE,,TRUE,Adrian Grant Productions,Alex@buchananpr.co.uk,,FALSE,FALSE,1135,7/5/2025 10:37
+,12/02/2026,TRUE,,Curve Theatre,,,FALSE,,TRUE,Curve,f.moore@curvetheatre.co.uk,,FALSE,FALSE,759,2/5/2025 10:09
+,07/02/2026,FALSE,,,,"Cast, Doncaster",FALSE,War of the Worlds (2.30pm),FALSE,imitating the dog,duncanclarkepr@gmail.com,,FALSE,FALSE,1223,1/5/2025 14:53
+,06/02/2026,FALSE,,,Orange Tree Theatre,,TRUE,,TRUE,Orange Tree Theatre ,katiemd@katemorleypr.com,,FALSE,FALSE,1328,2/5/2025 14:17
+,07/05/2026,FALSE,,,,,TRUE,,TRUE,Bowness Theatre Festival Ltd.,publicity@dgpr.co.uk,,FALSE,FALSE,1428,6/5/2025 12:57
+,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+LOCKED,,,,,,,,,,,,,,,,
+,09/06/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,9/5/2025 12:17
+,28/07/2026,TRUE,,,,,TRUE,,FALSE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,16/05/2025 10:24:34
+,17/11/2026,FALSE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,9/5/2025 12:22
+LOCKED,,,,,,,,,,,,,,,,
+,23/02/2026,FALSE,,,Hampstead Theatre,,FALSE,,TRUE,Hampstead Theatre,clarejh@hampsteadtheatre.com,,FALSE,FALSE,1202,14/05/2025 12:30:08
+,11/02/2026,FALSE,,,Peacock Theatre,,FALSE,TUTU,FALSE,Chicos Mambo,freddie.toddfordham@sadlerswells.com  ,,FALSE,TRUE,1130,14/05/2025 16:44:10
+,24/02/2026,FALSE,,,Peacock Theatre,,FALSE,The Opera Locos,FALSE,Yllana,freddie.toddfordham@sadlerswells.com  ,,FALSE,TRUE,1130,14/05/2025 16:45:57
+,17/09/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,16/05/2025 10:22:09
+,16/09/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,16/05/2025 10:22:42
+,29/07/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,16/05/2025 10:24:55
+,10/06/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,16/05/2025 10:26:35
+,20/03/2026,FALSE,,,,Orange Tree Theatre ,FALSE,Vincent in Brixton,FALSE,Orange Tree Theatre,liv@katemorleypr.com,,FALSE,FALSE,1889,15/09/2025 12:05:50
+,06/02/2026,FALSE,,,,Cast Doncaster,FALSE,War of the Worlds,FALSE,imitating the dog,DUNCAN CLARKE PR - duncanclarkepr@gmail.com,,FALSE,FALSE,1223,20/05/2025 18:52:27
+,26/03/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,Jaja's African Hair Braiding,FALSE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,15/09/2025 09:28:58
+,07/04/2026,TRUE,The Old Vic,,,,FALSE,,TRUE,The Old Vic,Katie.marsh@oldvictheatre.com,,FALSE,FALSE,1325,27/05/2025 11:41:39
+,02/04/2026,TRUE,The Old Vic,,,,FALSE,,TRUE,The Old Vic,Katie.marsh@oldvictheatre.com,,FALSE,FALSE,1325,27/05/2025 11:43:20
+,02/04/2026,FALSE,,Derby Theatre,,,FALSE,Macbeth - 7pm,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,9/6/2025 12:01
+,24/06/2026,FALSE,,,,THE OTHER PLACE,FALSE,A MIDSUMMER NIGHT'S DREAM ,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,23/09/2025 12:59:35
+,21/07/2026,FALSE,,,,SWAN THEATRE,FALSE,THE CHERRY ORCHARD,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,23/09/2025 12:58:52
+,04/08/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:18
+,05/08/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:18
+,06/10/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:19
+,07/10/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:20
+,14/10/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:20
+,28/10/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:21
+,29/10/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:21
+,08/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:21
+,03/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,9/6/2025 13:24
+,26/05/2026,FALSE,,,,RST,FALSE,THE TEMPEST,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:07:02
+,06/02/2026,FALSE,London Coliseum,,,,FALSE,Cosi fan tutte ,FALSE,English National Opera ,mediaenquiries@eno.org,,FALSE,TRUE,1404,10/6/2025 11:50
+,16/02/2026,FALSE,London Coliseum,,,,FALSE,RISE AND FALL OF THE CITY OF MAHAGONNY,FALSE,English National Opera ,mediaenquiries@eno.org,,FALSE,TRUE,1404,10/6/2025 11:50
+,01/04/2026,FALSE,,Wales Millennium Centre,,,FALSE,Blaze of Glory!,FALSE,Welsh National Opera,christina.blakeman@wno.org.uk,,FALSE,TRUE,408,13/06/2025 11:23:21
+,16/04/2026,FALSE,,Wales Millennium Centre,,,FALSE,The Flying Dutchman,FALSE,Welsh National Opera,christina.blakeman@wno.org.uk,,FALSE,TRUE,408,13/06/2025 11:32:09
+,16/04/2026,FALSE,,,,"The Cut Theatre, and assorted venues in Halesworth",FALSE,INK International Short Play Festival,FALSE,Julia Sowerbutts,Julia@inkfestival.org,,FALSE,FALSE,1695,26/06/2025 15:52:41
+,08/01/2026,FALSE,Ambassadors Theatre,,,,FALSE,Paranormal Activity,FALSE,Melting Pot,rebecca.byers@storyhousepr.co.uk,,FALSE,FALSE,1434,11/7/2025 16:07
+,14/12/2026,TRUE,,,Hampstead Theatre,,FALSE,,TRUE,Hampstead Theatre,Clarejh@hampsteadtheatre.com,,FALSE,FALSE,1202,1/7/2025 11:02
+,14/05/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,,TRUE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,1/7/2025 11:52
+,24/06/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,Relics,FALSE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,15/09/2025 09:30:32
+,10/09/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,,TRUE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,1/7/2025 11:56
+,09/10/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,,TRUE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,1/7/2025 11:57
+,21/11/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,,TRUE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,1/7/2025 11:57
+,28/04/2026,FALSE,,,,THE OTHER PLACE,FALSE,DRIFTWOOD,FALSE,RSC,dean.asker@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:05:58
+,24/02/2026,FALSE,,,Donmar Warehouse,,FALSE,,TRUE,Donmar Warehouse,katiemd@katemorleypr.com,,FALSE,FALSE,1328,3/7/2025 13:43
+,29/03/2026,FALSE,London Coliseum,,,,TRUE,Kinky Boots,FALSE,ROYO,alex@buchananpr.co.uk,,FALSE,FALSE,1135,27/10/2025 13:22:36
+,12/02/2026,FALSE,,Nottingham Playhouse,,,FALSE,The Beekeeper of Aleppo,FALSE,UK Productions and Nottingham Playhouse,david@davidburnspr.com,,FALSE,FALSE,1216,14/07/2025 18:13:55
+,05/03/2026,FALSE,,,,Southbank Centre's Queen Elizabeth Hall,FALSE,Ballet de Lorraine: Acid Gems and a Folia,FALSE,Ballet de Lorraine: Acid Gems and a Folia,louise.gilbert@southbankcentre.co.uk,,FALSE,TRUE,1354,22/07/2025 13:38:48
+,17/02/2026,FALSE,Noël Coward Theatre,,,,FALSE,Dracula,FALSE,Michael Cassel & Adam Kenwright,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1219,24/07/2025 08:51:16
+,06/01/2026,FALSE,Duke of York's Theatre,,,,FALSE,Woman in Mind,FALSE,Wessex Grove,simon@rawpr.co.uk,,FALSE,FALSE,1353,18/09/2025 10:58:55
+,03/03/2026,FALSE,,Curve Theatre,,,FALSE,INSIDE AMERICAN PIE,FALSE,"A Harmony House, Mirvish and Curve co-production",f.moore@curvetheatre.co.uk,,FALSE,FALSE,759,1/8/2025 11:58
+,08/04/2026,FALSE,,Curve Theatre,,,FALSE,KISS OF THE SPIDER WOMAN,FALSE,"Curve, Bristol Old Vic and Mayflower Southampton",f.moore@curvetheatre.co.uk,,FALSE,FALSE,759,1/8/2025 11:59
+,29/01/2026,FALSE,Shakespeare's Globe,,,,FALSE,The Tempest,FALSE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,17/09/2025 15:57:49
+,08/01/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,La traviata,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:39
+,29/01/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Boris Godunov,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:40
+,17/03/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Siegfried,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:42
+,25/03/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Rigoletto,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:44
+,26/03/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,The Turn of The Screw,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:44
+,01/05/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Jette Parker Artists: Three Chamber Operas,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:45
+,05/05/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Peter Grimes,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:46
+,13/05/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Samson et Dalila,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:47
+,14/05/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Royal Ballet/Royal Opera Gala,FALSE,The Royal Ballet/The Royal Opera,ruth.haines@roh.org.uk,,TRUE,TRUE,1411,8/8/2025 13:48
+,04/06/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,RBO/Shift,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:49
+,04/06/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,The Marriage of Figaro,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:50
+,24/06/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Anna Netrebko Recital,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:51
+,30/06/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,I puritani,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:52
+,01/07/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,La boheme,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:52
+,07/07/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,La Fille du Regiment,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:53
+,26/07/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Jette Parker Artists Summer Performance,FALSE,The Royal Opera,ruth.haines@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 13:53
+,17/01/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Woolf Works,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:22
+,19/01/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Yorke Dance Project: Modern Milestones,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:24
+,27/01/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Paul Taylor Dance Company: Brandenburgs & Piazzolla Caldera,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:25
+,10/02/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Pierrot Lunaire,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:26
+,14/02/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Giselle,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:27
+,03/03/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Ballet Black,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:28
+,30/03/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Mayerling,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:29
+,16/04/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,International Draft Works,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:29
+,18/04/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Wayne McGregor: Alchemies,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:30
+,13/05/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Tulsa Ballet: Made in America,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:31
+,23/05/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,La fille mal gardee,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:32
+,11/06/2026,FALSE,Royal Opera House Linbury Theatre,Royal Opera House,,,FALSE,Next Generation Festival,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:33
+,11/06/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,So Are We: Leon and Lightfoot,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:34
+,29/07/2026,FALSE,Royal Opera House Main Stage,Royal Opera House,,,FALSE,Carnage and the Divine,FALSE,The Royal Ballet,ashley.woodfield@roh.org.uk,,FALSE,TRUE,1411,8/8/2025 15:35
+,25/02/2026,FALSE,,,,King's Head Theatre,FALSE,TBC,FALSE,Metal Rabbit Productions,mia@miawalkerpr.com,,FALSE,FALSE,1908,10/8/2025 17:08
+,10/03/2026,FALSE,,,Kiln Theatre,,FALSE,Manic Street Creature,FALSE,Kiln Theatre and Gary Beestone Associates,freya@joallanpr.com,,FALSE,FALSE,1252,7/10/2025 11:12
+,31/07/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,New Adventures,louisa@rawpr.co.uk,,FALSE,TRUE,1353,20/08/2025 16:48:15
+,07/05/2026,FALSE,,,,TBC ,FALSE,TBC ,FALSE,TBC,emma@katemorleypr.com,,FALSE,FALSE,1754,14/08/2025 12:14:57
+,09/06/2026,FALSE,,,Kiln Theatre,,FALSE,Driftwood,FALSE,The Royal Shakespeare Company in association with Kiln Theatre,burte@joallanpr.com,,FALSE,FALSE,1535,24/09/2025 17:54:04
+,06/05/2026,FALSE,,,,TBC ,FALSE,TBC ,FALSE,TBC,emma@katemorleypr.com,,FALSE,FALSE,1754,14/08/2025 13:06:16
+,29/01/2026,FALSE,,,,Southwark Playhouse,FALSE,Ballad Lines,FALSE,Aria Entertainment / KT Producing ,jocasta@breadandbutterpr.uk,,FALSE,FALSE,1574,2/9/2025 13:46
+,19/03/2026,FALSE,,York Theatre Royal,,York Theatre Royal,FALSE,THE SECRET GARDEN – THE MUSICAL ,FALSE,York Theatre Royal,james@katemorleypr.com,,FALSE,FALSE,1753,16/09/2025 12:00:55
+,12/05/2026,FALSE,Sadler's Wells,,,,FALSE,,TRUE,TBA,freddie.toddfordham@sadlerswells.com,,FALSE,TRUE,1251,19/08/2025 11:17:33
+,15/04/2026,FALSE,The Old Vic,,,,FALSE,,TRUE,The Old Vic ,ella.reeves@oldvictheatre.com,,FALSE,FALSE,1954,8/10/2025 14:45
+,22/01/2026,FALSE,,,,Alexandra Palace ,FALSE,Sunny Afternoon,FALSE,Sonia Friedman Productions and ATG Productions,daniel@rawpr.co.uk,,FALSE,FALSE,1211,20/08/2025 17:36:27
+,22/01/2026,FALSE,,,,Southwark Playhouse Borough,FALSE,Beautiful Little Fool ,FALSE,"Mark Cortale, Jonathan Murray, Harvey Reese",arabella@anrpr.co.uk,,FALSE,FALSE,1165,26/08/2025 08:22:51
+,21/01/2026,TRUE,,,,,TRUE,,TRUE,TBA,burte@joallanpr.com,,FALSE,FALSE,1535,27/08/2025 10:21:24
+,05/02/2026,FALSE,Soho,,,,FALSE,TBC,TRUE,Soho Theatre,augustin@sohotheatre.com,,FALSE,FALSE,1752,27/08/2025 12:47:47
+,18/03/2026,FALSE,Soho,,,,FALSE,TBC,TRUE,Soho Theatre,augustin@sohotheatre.com,,FALSE,FALSE,1752,27/08/2025 12:44:31
+,30/04/2026,FALSE,Soho,,,,FALSE,,TRUE,Soho Theatre,augustin@sohotheatre.com,,FALSE,FALSE,1752,27/08/2025 12:45:28
+,18/06/2026,TRUE,Soho,,,,FALSE,,TRUE,Soho Theatre,augustin@sohotheatre.com,,FALSE,FALSE,1752,27/08/2025 12:46:49
+,24/11/2026,TRUE,The Old Vic,,,,FALSE,,TRUE,The Old Vic ,ella.reeves@oldvictheatre.com,,FALSE,FALSE,1954,29/08/2025 12:40:59
+,25/11/2026,TRUE,The Old Vic,,,,FALSE,,TRUE,The Old Vic ,ella.reeves@oldvictheatre.com,,FALSE,FALSE,1954,29/08/2025 13:13:47
+,09/01/2026,FALSE,Harold Pinter Theatre,,,,FALSE,High Noon,FALSE,Paula Wagner and Tom Werner,simon@rawpr.co.uk,,FALSE,FALSE,1353,15/09/2025 13:41:36
+,18/02/2026,TRUE,,,,tbc,TRUE,tbc,TRUE,tbc,olivia@chloenelkinconsulting.com,,FALSE,FALSE,1412,1/9/2025 15:31
+,22/04/2026,FALSE,,,,,TRUE,,TRUE,tbc,georgina@chloenelkinconsulting.com,,FALSE,FALSE,1412,1/9/2025 15:32
+,13/05/2026,FALSE,,,Lyric Hammersmith Theatre,,FALSE,An Ideal Husband,FALSE,Lyric Hammersmith Theatre,press@lyric.co.uk,,FALSE,FALSE,1261,15/09/2025 09:29:46
+,02/06/2026,FALSE,,Derby Theatre,,,FALSE,Little Shop of Horrors - 7:30PM,FALSE,"Derby Theatre, Northern Stage",k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,2/9/2025 12:48
+,08/03/2026,FALSE,London Palladium,,,,FALSE,The 26th Annual WhatsOnStage Awards,FALSE,WhatsOnStage ,awood@whatsonstage.com,,FALSE,FALSE,1552,2/9/2025 17:23
+,17/03/2026,FALSE,National Theatre Olivier,,,,FALSE,Summerfolk,FALSE,National Theatre,Jlever@nationaltheatre.org.uk,,FALSE,FALSE,1459,9/10/2025 14:10
+,30/01/2026,TRUE,,,Almeida Theatre,,FALSE,,TRUE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1152,9/9/2025 11:34
+,03/02/2026,FALSE,,,,,TRUE,,TRUE,Wessex Grove,louisa@rawpr.co.uk,,TRUE,FALSE,1353,9/9/2025 14:15
+,,,,,,,,,,,,,,,,
+,25/03/2026,FALSE,,,,,TRUE,,TRUE,Wessex Grove,louisa@rawpr.co.uk,,FALSE,FALSE,1353,9/9/2025 14:43
+,05/03/2026,FALSE,,,Park Theatre,,FALSE,tell me straight / aggy ,FALSE,"SH Productions, telling tales",liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 12:19:10
+,06/03/2026,FALSE,,,,,TRUE,,TRUE,TBA,jo@joallanpr.com,,FALSE,FALSE,1303,10/9/2025 10:17
+,03/06/2026,FALSE,,,,Grange Festival,FALSE,,TRUE,Grange Festival,clair@breadandbutterpr.uk,,FALSE,TRUE,1201,11/9/2025 13:30
+,07/06/2026,FALSE,,,,Grange Festival,FALSE,,TRUE,Grange Festival,clair@breadandbutterpr.uk,,FALSE,TRUE,1201,11/9/2025 13:32
+,26/06/2026,FALSE,,,,Grange Festival,FALSE,,TRUE,Grange Festival,clair@breadandbutterpr.uk,,FALSE,TRUE,1201,11/9/2025 13:32
+,22/01/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:53
+,12/02/2026,FALSE,Royal Court (Jerwood Theatre Upstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:57
+,26/03/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:58
+,20/04/2026,FALSE,Royal Court (Jerwood Theatre Upstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:58
+,11/05/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:59
+,04/06/2026,FALSE,Royal Court (Jerwood Theatre Upstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 9:59
+,26/06/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 10:00
+,11/09/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 10:01
+,07/10/2026,FALSE,Royal Court (Jerwood Theatre Upstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 10:01
+,23/11/2026,FALSE,Royal Court (Jerwood Theatre Downstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,15/10/2025 09:15:32
+,09/12/2026,TRUE,Royal Court (Jerwood Theatre Upstairs),,,,FALSE,,TRUE,Royal Court Theatre,NatashaRyszka-Onions@royalcourttheatre.com,,FALSE,FALSE,1369,12/9/2025 10:03
+,13/03/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,12/9/2025 12:33
+,02/02/2026,FALSE,,,Park Theatre,,FALSE,The Rat Trap,FALSE,Ashley Cook for Troupe in association with Park Theatre,james@katemorleypr.com,,FALSE,FALSE,1753,15/09/2025 12:36:15
+,18/05/2026,FALSE,,,Menier Chocolate Factory,,FALSE,EQUUS,FALSE,Menier Chocolate Factory in co-production with Theatre Royal Bath,james@katemorleypr.com,,FALSE,FALSE,1753,17/09/2025 12:37:26
+,09/03/2026,FALSE,,,Menier Chocolate Factory,,FALSE,THE HOLY ROSENBERGS,FALSE,Menier Chocolate Factory,james@katemorleypr.com,,FALSE,FALSE,1753,17/09/2025 12:35:57
+,15/01/2026,FALSE,,,,king's head theatre,FALSE,Already Perfect,FALSE,Larry Lelli,kevin wilson KWPR kevinwilsonpr@gmail.com 07884368697,,FALSE,FALSE,1330,19/09/2025 15:41:04
+,29/09/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:55:14
+,10/11/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:56:14
+,11/11/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:57:22
+,02/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:57:54
+,10/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 11:59:47
+,15/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 12:02:05
+,16/12/2026,TRUE,,,,,TRUE,,TRUE,RSC,rachel.wall@rsc.org.uk,,FALSE,FALSE,1432,22/09/2025 12:02:34
+,27/01/2026,FALSE,,,Charing Cross Theatre,,FALSE,Mrs President ,FALSE,Aria Entertainment ,diana@fourthwallpr.co.uk,,FALSE,FALSE,1220,22/09/2025 13:06:03
+,27/04/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,23/09/2025 15:08:13
+,30/06/2026,FALSE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 17:46:59
+,01/07/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 17:48:27
+,01/09/2026,FALSE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 18:01:22
+,02/09/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 18:02:34
+,03/09/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 18:10:57
+,15/12/2026,FALSE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 18:06:34
+,16/12/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,22/09/2025 18:07:13
+Wednesday,29/04/2026,TRUE,,,Donmar Warehouse,,FALSE,,TRUE,TBA,liv@katemorleypr.com,,FALSE,FALSE,1889,23/09/2025 15:06:03
+,06/08/2026,FALSE,,,,,TRUE,,TRUE,TBA,jo@joallanpr.com,,FALSE,FALSE,1303,24/09/2025 06:13:22
+,02/03/2026,FALSE,,,,,TRUE,,TRUE,Nicolas Kent,didi@emmahollandpr.com,,FALSE,FALSE,1221,24/09/2025 14:08:46
+,13/01/2026,TRUE,,,,,TRUE,,TRUE,Wessex Grove,louisa@rawpr.co.uk,,FALSE,FALSE,1353,24/09/2025 14:30:38
+,28/04/2026,FALSE,,,Arcola Theatre,,FALSE,,TRUE,Arcola Theatre,press@arcolatheatre.com,,FALSE,FALSE,1991,24/09/2025 15:14:31
+,19/01/2026,FALSE,,,Arcola Theatre,,FALSE,,TRUE,Arcola Theatre,press@arcolatheatre.com,,FALSE,FALSE,1991,24/09/2025 15:27:05
+,25/02/2026,FALSE,,,Arcola Theatre,,FALSE,,TRUE,Arcola Theatre,press@arcolatheatre.com,,FALSE,FALSE,1991,24/09/2025 15:37:42
+,09/04/2026,FALSE,,,Arcola Theatre,,FALSE,,TRUE,Arcola Theatre,press@arcolatheatre.com,,FALSE,FALSE,1991,24/09/2025 16:10:26
+,14/07/2026,TRUE,,,Bridge Theatre,,TRUE,,TRUE,London Theatre Company,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1219,24/09/2025 16:33:46
+,13/02/2026,FALSE,,,Park Theatre,,FALSE,After Miss Julie,FALSE,KB Theatre Productions in association with Park Theatre,annabelle@mobiusindustries.com,,FALSE,FALSE,1236,25/09/2025 13:03:37
+,17/03/2026,FALSE,,Leeds Playhouse,,,FALSE,Small Island,FALSE,"A Leeds Playhouse, Birmingham Rep and Nottingham Playhouse production, in association with Actors Touring Company",rachel.marriner@leedsplayhouse.org.uk,,FALSE,FALSE,310,30/09/2025 08:00:28
+,06/02/2026,TRUE,,,,,TRUE,,TRUE,TBA,chloe@aboutgracepr.com,,FALSE,FALSE,1196,30/09/2025 09:37:36
+,11/02/2026,FALSE,,,,,TRUE,,TRUE,TBA,chloe@aboutgracepr.com,,FALSE,FALSE,1196,30/09/2025 09:39:06
+,31/03/2026,FALSE,,,,,TRUE,,TRUE,TBC,chloe@aboutgracepr.com,,FALSE,FALSE,1196,30/09/2025 10:04:41
+,21/01/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Gecko,will.ferreiradyke@sadlerswells.com ,,FALSE,FALSE,1130,30/09/2025 11:26:19
+,28/01/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,Le Fils du Grand Reseau,laura.neil@sadlerswells.com ,,FALSE,FALSE,1130,30/09/2025 11:30:41
+,11/02/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Tanztheater Wuppertal Pina Bausch ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 11:31:44
+,05/03/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Scottish Ballet,niall.walker@scottishballet.co.uk ,,FALSE,TRUE,1130,30/09/2025 12:04:30
+,11/03/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Russell Maliphant Dance Company ,laura.neil@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 12:05:26
+,18/03/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Alexander Whitley Dance Company ,will.ferreiradyke@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 12:06:11
+,02/04/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Paco Peña Flamenco Dance Company ,Sophia.Ikirmawi@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 12:07:18
+,07/04/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Sadler’s Wells Producing & Touring ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:08:45
+,17/04/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Dorrance Dance,laura.neil@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 12:09:26
+,21/04/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Shobana Jeyasingh Dance,martha@marthaoakespr.co.uk ,,FALSE,TRUE,1130,30/09/2025 12:10:36
+,22/04/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Birmingham Royal Ballet ,clair@breadandbutterpr.uk,,FALSE,TRUE,1130,30/09/2025 12:11:27
+,01/05/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,The Julliard School ,laura.neil@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:12:26
+,02/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Breakin’ Convention ,will.ferreiradyke@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:13:11
+,03/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Breakin' Convention,will.ferreiradyke@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:13:46
+,05/05/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,Les Ballets Trockadero de Monte Carlo ,martha@marthaoakespr.co.uk,,FALSE,TRUE,1130,30/09/2025 12:14:27
+,07/05/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,BULLYACHE ,sophia.ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:15:55
+,08/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,"Anne Teresa De Keersmaeker, Radouan Mriziga, Rosas ",Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:16:34
+,12/05/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,YAMATO the Drummers of Japan ,Freddie.ToddFordham@sadlerswells.com,,FALSE,FALSE,1130,30/09/2025 12:20:13
+,14/05/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Jefta van Dinther ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 12:21:57
+,19/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Northern Ballet,liz.rose@northernballet.com,,FALSE,TRUE,1130,30/09/2025 12:24:35
+,25/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Dada Masilo / The Dance Factory ,will.ferreiradyke@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:22:39
+,28/05/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Theatre-Rites ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:24:18
+,30/05/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,NYDC,laura.neil@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:25:12
+,02/06/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,Onyx Productions,Sophia.Ikirmawi@sadlerswells.com,,FALSE,FALSE,1130,30/09/2025 15:27:25
+Wednesday,10/06/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Rambert,alexandra.desvignes@rambert.org.uk,,FALSE,TRUE,1130,30/09/2025 15:28:34
+,04/06/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Marco da Silva Ferreira ,will.ferreiradyke@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:30:09
+,10/06/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,Head First Acrobats ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,FALSE,1130,30/09/2025 15:32:41
+,17/06/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Acosta Danza Yunior ,Sophia.Ikirmawi@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:33:37
+,24/06/2026,FALSE,Sadler’s Wells East,,,,FALSE,,TRUE,Phoenix Dance Theatre ,will.ferreiradyke@sadlerswells.com,,FALSE,TRUE,1130,30/09/2025 15:35:36
+,15/10/2026,FALSE,,,Peacock Theatre,,FALSE,,TRUE,RB Dance Company ,Sophia.Ikirmawi@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 15:37:43
+,12/03/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,,TRUE,Tiler Peck  ,Sophia.Ikirmawi@sadlerswells.com ,,FALSE,TRUE,1130,30/09/2025 15:39:58
+,27/02/2026,TRUE,The Old Vic,,,,FALSE,,TRUE,EC OV,elin.cain@oldvictheatre.com,,FALSE,FALSE,1714,1/10/2025 15:46
+,10/06/2026,FALSE,Sadler’s Wells Theatre,,,,FALSE,TBA,TRUE,Rambert ,rosie.robinson-wood@multitudemedia.co.uk,,FALSE,FALSE,1449,1/10/2025 16:31
+,31/03/2026,FALSE,Harold Pinter Theatre,,,,TRUE,,TRUE,TBA,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1219,2/10/2025 12:17
+,20/05/2026,FALSE,National Theatre Olivier,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,9/10/2025 14:15
+,09/02/2026,FALSE,#NAME?,,,,FALSE,Women's Prize for Playwriting - Awards Ceremony,FALSE,Women's Prize for Playwriting,cameron@katemorleypr.com,,FALSE,FALSE,1183,6/10/2025 14:32
+,04/03/2026,FALSE,,Wilton's Music Hall,,,FALSE,Do I Love You?,FALSE,John Godber Company ,liv@katemorleypr.com,,FALSE,FALSE,1889,15/10/2025 15:16:33
+,26/01/2026,FALSE,,,,Marylebone Theatre,FALSE,Cable Street,FALSE,10 to 4 Productions,phoebe@chloenelkinconsulting.com,,FALSE,FALSE,1416,6/10/2025 15:26
+,30/04/2026,FALSE,Shakespeare's Globe,,,,FALSE,,TRUE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,8/10/2025 10:38
+,15/05/2026,FALSE,Shakespeare's Globe,,,,FALSE,,TRUE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,8/10/2025 10:39
+,19/06/2026,FALSE,Shakespeare's Globe,,,,FALSE,,TRUE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,8/10/2025 10:39
+,29/07/2026,FALSE,Shakespeare's Globe,,,,FALSE,,TRUE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,8/10/2025 10:40
+,21/08/2026,FALSE,Shakespeare's Globe,,,,FALSE,,TRUE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,FALSE,FALSE,1140,8/10/2025 10:41
+,07/04/2026,FALSE,Wyndham's Theatre,,,,FALSE,,TRUE,TBA,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1215,11/10/2025 10:19
+,13/02/2026,FALSE,Aldwych Theatre,,,,FALSE,Shadowlands,FALSE,Jonathan Church Theatre Productions,lewis.jenkins@storyhousepr.co.uk,,FALSE,FALSE,1343,13/10/2025 16:14:52
+,17/03/2026,FALSE,,,,Jermyn Street Theatre,FALSE,Aether,FALSE,TheatreGoose,cameron@katemorleypr.com,,FALSE,FALSE,1183,13/10/2025 18:03:00
+,07/01/2026,FALSE,,,,Jermyn Street Theatre,FALSE,Orphans,FALSE,Jermyn Street Theatre,cameron@katemorleypr.com,,FALSE,FALSE,1183,13/10/2025 18:08:51
+,30/01/2026,FALSE,,,Almeida Theatre,,FALSE,American Psycho ,FALSE,Almedia Theatre ,zinnes@almeida.co.uk,,FALSE,FALSE,1496,14/10/2025 11:10:56
+,28/05/2026,FALSE,Prince Edward Theatre,,,,FALSE,Beetlejuice The Musical,FALSE,Crossroads Live and Warner Bros. Theatre Ventures.,rebecca.byers@storyhousepr.co.uk,,FALSE,FALSE,1434,15/10/2025 11:28:05
+,07/07/2026,FALSE,,,,,TRUE,,TRUE,TBA,ellie.maltby@storyhousepr.co.uk,,FALSE,FALSE,1219,15/10/2025 13:04:03
+,12/05/2026,FALSE,,,Arcola Theatre,,FALSE,TBA,TRUE,Arcola Theatre,press@arcolatheatre.com,,FALSE,FALSE,1991,15/10/2025 14:24:37
+,22/01/2026,FALSE,Shakespeare's Globe,,,,FALSE,,FALSE,Shakespeare's Globe,alice.r@shakespearesglobe.com,,TRUE,FALSE,1140,16/10/2025 10:11:54
+,02/12/2026,FALSE,,Sheffield Theatres,,,FALSE,Singin' in the Rain,FALSE,Sheffield Theatres / Jonathan Church Theatre Productions,benw@breadandbutterpr.uk,,FALSE,FALSE,1175,16/10/2025 12:56:38
+,03/12/2026,FALSE,,Sheffield Theatres,,,FALSE,Singin' in the Rain,FALSE,Sheffield Theatres / Jonathan Church Theatre Productions,benw@breadandbutterpr.uk,,FALSE,FALSE,1175,16/10/2025 12:58:23
+,29/06/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,17/10/2025 11:22:16
+,16/04/2026,FALSE,Shaftesbury Theatre,,,,FALSE,,TRUE,JWP/ Kevin McCollum ,simon@rawpr.co.uk,,FALSE,FALSE,1211,17/10/2025 16:17:43
+,05/02/2026,FALSE,,,Arcola Theatre,,FALSE,Monstering The Rocketman,FALSE,Henry Naylor,paul@paulsullivan.info,,FALSE,FALSE,1415,20/10/2025 13:21:35
+,24/02/2026,FALSE,,Oxford Playhouse,,,FALSE,Edward Albee's Who's Afraid of Virginia Woolf?,FALSE,Oxford Playhouse,tom.legg@oxfordplayhouse.com,,FALSE,FALSE,2130,21/10/2025 14:30:04
+,23/06/2026,TRUE,National Theatre Lyttelton,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,22/10/2025 14:50:30
+,29/01/2026,FALSE,,,,,TRUE,Season Announcement,FALSE,TBA,jo@joallanpr.com,,TRUE,FALSE,1303,22/10/2025 17:54:25
+,24/10/2025,FALSE,,Derby Theatre,,,FALSE,NT Connections Festival,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:47:48
+,25/04/2026,FALSE,,Derby Theatre,,,FALSE,NT Connections Festival,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:48:58
+,12/05/2026,TRUE,Ambassadors Theatre,,,,FALSE,,TRUE,Sonia Friedman Productions ,emma@emmahollandpr.com,,FALSE,FALSE,1221,23/10/2025 12:49:49
+,24/04/2026,FALSE,,Derby Theatre,,,FALSE,NT Connections Festival,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:50:36
+,02/07/2026,FALSE,,Derby Theatre,,,FALSE,Departure Lounge Festival ,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:51:21
+,03/07/2026,FALSE,,Derby Theatre,,,FALSE,Departure Lounge Festival ,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:52:10
+,04/07/2026,FALSE,,Derby Theatre,,,FALSE,Departure Lounge Festival ,FALSE,Derby Theatre,k.mcintosh@derby.ac.uk,,FALSE,FALSE,1718,23/10/2025 12:52:36
+,22/09/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:37:01
+,23/09/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:37:40
+,13/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:51:49
+,15/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:52:17
+,22/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:53:11
+,21/10/2026,TRUE,National Theatre Dorfman,,,,FALSE,,TRUE,National Theatre,scornell@nationaltheatre.org.uk,,FALSE,FALSE,1459,23/10/2025 13:53:56
+,21/01/2026,FALSE,,,,Uptsairs At The Gatehouse,FALSE,"Cohen, Bernstein, Joni & Me",FALSE,Deb Filler,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 20:52:23
+,19/03/2026,FALSE,,,,Wilton's Music Hall,FALSE,Ruth - The Musical,FALSE,Ruth Theatre Productions in association with Cahoots Theatre Company,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:08:19
+,30/03/2026,FALSE,,,,King's Head,FALSE,In The Print,FALSE,The Spontaneity Shop and James Quaife Productions ,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:09:47
+,18/03/2026,FALSE,,Nottingham Playhouse,,,FALSE,Punch,FALSE,Nottingham Playhouse,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:17:08
+,19/03/2026,FALSE,,Theatr Clwyd,,,FALSE,Under Milk Wood,FALSE,Theatr Clwyd,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:36:38
+,29/04/2026,FALSE,,Theatr Clwyd,,,FALSE,Twelfth Night,FALSE,Theatr Clwyd,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:38:07
+,10/06/2026,FALSE,,Theatr Clwyd,,,FALSE,Atlantis,FALSE, Theatr Clwyd and Chichester Festival Theatre,david@davidburnspr.com,,FALSE,FALSE,1216,25/10/2025 21:40:52
+,23/01/2026,TRUE,,,Arcola Theatre,,FALSE,,TRUE,TBA,Laura@aboutgracepr.com,,FALSE,FALSE,1339,28/10/2025 08:35:21
+,27/01/2026,FALSE,,,Arcola Theatre,,FALSE,,TRUE,TBA,Laura@aboutgracepr.com,,FALSE,FALSE,1339,29/10/2025 08:05:52
+,27/01/2026,FALSE,,Sherman Cymru,,,FALSE,Meet Fred,FALSE,Hijinx,elaine@mobiusindustries.com,,FALSE,FALSE,1226,28/10/2025 10:45:22
+,30/04/2026,FALSE,,,,,TRUE,,TRUE,TBA,jo@joallanpr.com,,FALSE,FALSE,1303,29/10/2025 20:47:03
+,01/05/2026,FALSE,,,,,TRUE,,TRUE,TBA,jo@joallanpr.com,,FALSE,FALSE,1303,29/10/2025 20:48:18
+,04/06/2026,FALSE,,Watermill Theatre,,,FALSE,,TRUE,Watermill Theatre,max@anrpr.co.uk,,FALSE,FALSE,1165,30/10/2025 10:17:57
+,09/04/2026,FALSE,,Royal & Derngate Northampton,,,FALSE,Party Season,FALSE,"Wardrobe Ensemble, Royal & Derngate Northampton and Lowry",amanda.howson@royalandderngate.co.uk,,FALSE,FALSE,1148,30/10/2025 11:28:39
+,16/04/2026,FALSE,,,,Royal and Deansgate,FALSE,Frankie Goes to Bollywood,FALSE,Rifco Theatre,mia@miawalkerpr.com,,FALSE,FALSE,1908,31/10/2025 10:49:24
+,06/03/2026,FALSE,,,,Chickenshed,FALSE,,TRUE,Chickenshed,susanj@chickenshed.org.uk,,FALSE,FALSE,1797,31/10/2025 13:43:24

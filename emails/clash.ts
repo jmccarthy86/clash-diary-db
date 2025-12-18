@@ -23,7 +23,7 @@ export function getClashEmailContent(params: EmailData["params"]): string {
             ${renderShowCategory(params)}
             </br>
 		    <p style="margin: 0;">You are receiving this email because you have a booking in the SOLT & UK Theatre First Night Diary on the above date.</p>
-            <p style="margin: 0;">Full clash details are attached as an Excel file (.xls), with press contacts included. If information in the spreadsheet shows as ######, please expand that column and full details will appear.</p>
+            <p style="margin: 0;">Full clash details are attached as an Excel file (.xls), with press contacts included.</p>
             <p style="margin: 0;">Follow this link to see the full diary: <a href="https://solt.co.uk/first-night-diary?selectedDate=${params?.rawDate}">SOLT First Night Diary</a>. You can also edit or delete your entry on the diary itself.</p>
             <p style="margin: 0;">See a full User Guide for the diary here: <a href="https://res.cloudinary.com/solt/image/upload/v1727697464/SOLT_First_Night_Diary_User_Guide_yejiqw.pdf">First Night Diary User Guide</a>
             </br>

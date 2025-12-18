@@ -87,6 +87,16 @@ function fnd_should_skip_clash_webhook()
     return !empty($GLOBALS['fnd_skip_clash_webhook']);
 }
 
+function fnd_should_preserve_timestamps()
+{
+    return !empty($GLOBALS['fnd_preserve_timestamps']);
+}
+
+function fnd_should_skip_log()
+{
+    return !empty($GLOBALS['fnd_skip_log']);
+}
+
 function fnd_get_clash_webhook_config()
 {
     $url = defined('FND_CLASH_WEBHOOK_URL') ? FND_CLASH_WEBHOOK_URL : '';
@@ -283,6 +293,10 @@ function fnd_get_booking_meta_snapshot($post_id)
 
 function fnd_bookings_log_action($action, array $data = [])
 {
+    if (fnd_should_skip_log()) {
+        return;
+    }
+
     $ip = null;
     if (isset($_SERVER['REMOTE_ADDR'])) {
         $validated_ip = filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP);
@@ -376,6 +390,127 @@ function fnd_date_str_from_ms($ms)
     return function_exists('wp_date') ? wp_date('Y-m-d', $sec, $tz) : date('Y-m-d', $sec);
 }
 
+function fnd_ms_to_mysql_datetime($ms, $tz = null)
+{
+    $sec = (int) floor(((int)$ms) / 1000);
+    $tz = $tz ?: fnd_wp_tz();
+    if (function_exists('wp_date')) {
+        return wp_date('Y-m-d H:i:s', $sec, $tz);
+    }
+    $dt = new DateTime('@' . $sec);
+    $dt->setTimezone($tz);
+    return $dt->format('Y-m-d H:i:s');
+}
+
+function fnd_ms_to_mysql_gmt($ms)
+{
+    $sec = (int) floor(((int)$ms) / 1000);
+    if (function_exists('wp_date')) {
+        return wp_date('Y-m-d H:i:s', $sec, new DateTimeZone('UTC'));
+    }
+    return gmdate('Y-m-d H:i:s', $sec);
+}
+
+function fnd_create_booking_from_payload(array $p, array $opts = [])
+{
+    $now = time() * 1000;
+    $tz = fnd_wp_tz();
+    $raw_title = isset($p['title_of_show']) ? sanitize_text_field($p['title_of_show']) : '';
+    if ($raw_title === '') $raw_title = 'TBC';
+
+    $created_ms = isset($p['created_at']) && $p['created_at'] !== ''
+        ? intval($p['created_at'])
+        : (isset($p['time_stamp']) && $p['time_stamp'] !== '' ? intval($p['time_stamp']) : $now);
+    $updated_ms = isset($p['time_stamp']) && $p['time_stamp'] !== ''
+        ? intval($p['time_stamp'])
+        : $created_ms;
+
+    $post_args = [
+        'post_type' => 'fnd_booking',
+        'post_status' => 'publish',
+        // Keep title as show title or TBC
+        'post_title' => $raw_title,
+    ];
+
+    if (!empty($opts['preserve_timestamps'])) {
+        $post_args['post_date'] = fnd_ms_to_mysql_datetime($created_ms, $tz);
+        $post_args['post_date_gmt'] = fnd_ms_to_mysql_gmt($created_ms);
+        $post_args['post_modified'] = fnd_ms_to_mysql_datetime($updated_ms, $tz);
+        $post_args['post_modified_gmt'] = fnd_ms_to_mysql_gmt($updated_ms);
+    }
+
+    $prev_preserve = fnd_should_preserve_timestamps();
+    if (!empty($opts['preserve_timestamps'])) {
+        $GLOBALS['fnd_preserve_timestamps'] = true;
+    }
+
+    $post_id = wp_insert_post($post_args, true);
+    if (is_wp_error($post_id)) {
+        if ($prev_preserve) {
+            $GLOBALS['fnd_preserve_timestamps'] = true;
+        } else {
+            unset($GLOBALS['fnd_preserve_timestamps']);
+        }
+        return $post_id;
+    }
+
+    $incoming = isset($p['date']) ? $p['date'] : (isset($p['date_ms']) ? $p['date_ms'] : $now);
+    $normalized_ms = fnd_normalize_ms_to_site_midnight($incoming);
+    $date_str = fnd_date_str_from_ms($normalized_ms);
+    $meta = [
+        // Store human/ACF field as Y-m-d and numeric as ms
+        'date' => $date_str,
+        'date_ms' => (string) $normalized_ms,
+        // Compute day from timestamp using site timezone to avoid client tz drift
+        'day'  => function () use ($normalized_ms, $tz) {
+            $ts = $normalized_ms;
+            if (function_exists('wp_date')) return wp_date('l', intval($ts / 1000), $tz);
+            return date('l', intval($ts / 1000));
+        },
+        'p'    => (string) fnd_bool_int($p['p'] ?? 0),
+        'venue' => sanitize_text_field($p['venue'] ?? ''),
+        'ukt_venue' => sanitize_text_field($p['ukt_venue'] ?? ''),
+        'affiliate_venue' => sanitize_text_field($p['affiliate_venue'] ?? ''),
+        'other_venue' => sanitize_text_field($p['other_venue'] ?? ''),
+        'venue_is_tba' => (string) fnd_bool_int($p['venue_is_tba'] ?? 0),
+        'solt_member_non_solt_venue' => (string) fnd_bool_int($p['solt_member_non_solt_venue'] ?? 0),
+        'title_of_show' => sanitize_text_field($p['title_of_show'] ?? ''),
+        'show_title_is_tba' => (string) fnd_bool_int($p['show_title_is_tba'] ?? 0),
+        'producer' => sanitize_text_field($p['producer'] ?? ''),
+        'press_contact' => sanitize_email($p['press_contact'] ?? ''),
+        'date_bkd' => sanitize_text_field($p['date_bkd'] ?? ''),
+        'is_season_gala' => (string) fnd_bool_int($p['is_season_gala'] ?? 0),
+        'is_opera_dance' => (string) fnd_bool_int($p['is_opera_dance'] ?? 0),
+        'user_id' => sanitize_text_field($p['user_id'] ?? ''),
+        'time_stamp' => (string) $updated_ms,
+        'created_at' => (string) $created_ms,
+    ];
+    foreach ($meta as $k => $v) {
+        // Evaluate closures (for 'day')
+        if ($v instanceof Closure) {
+            $v = $v();
+            $meta[$k] = $v;
+        }
+        update_post_meta($post_id, $k, $v);
+    }
+
+    if (empty($opts['skip_log'])) {
+        $context = isset($opts['log_context']) && is_array($opts['log_context']) ? $opts['log_context'] : [];
+        $context['post_id'] = $post_id;
+        $context['request'] = $p;
+        $context['stored_meta'] = fnd_get_booking_meta_snapshot($post_id);
+        fnd_bookings_log_action('create', $context);
+    }
+
+    if ($prev_preserve) {
+        $GLOBALS['fnd_preserve_timestamps'] = true;
+    } else {
+        unset($GLOBALS['fnd_preserve_timestamps']);
+    }
+
+    return $post_id;
+}
+
 add_action('rest_api_init', function () {
     register_rest_route('fnd/v1', '/bookings', [
         [
@@ -385,65 +520,15 @@ add_action('rest_api_init', function () {
             },
             'callback' => function (WP_REST_Request $req) {
                 $p = $req->get_json_params();
-                $raw_title = isset($p['title_of_show']) ? sanitize_text_field($p['title_of_show']) : '';
-                if ($raw_title === '') $raw_title = 'TBC';
-                $post_id = wp_insert_post([
-                    'post_type' => 'fnd_booking',
-                    'post_status' => 'publish',
-                    // Keep title as show title or TBC
-                    'post_title' => $raw_title,
-                ], true);
-                if (is_wp_error($post_id)) return $post_id;
-
-                $now = time() * 1000;
-                $tz = fnd_wp_tz();
-                $incoming = isset($p['date']) ? $p['date'] : (isset($p['date_ms']) ? $p['date_ms'] : $now);
-                $normalized_ms = fnd_normalize_ms_to_site_midnight($incoming);
-                $date_str = fnd_date_str_from_ms($normalized_ms);
-                $meta = [
-                    // Store human/ACF field as Y-m-d and numeric as ms
-                    'date' => $date_str,
-                    'date_ms' => (string) $normalized_ms,
-                    // Compute day from timestamp using site timezone to avoid client tz drift
-                    'day'  => function () use ($normalized_ms, $tz) {
-                        $ts = $normalized_ms;
-                        if (function_exists('wp_date')) return wp_date('l', intval($ts / 1000), $tz);
-                        return date('l', intval($ts / 1000));
-                    },
-                    'p'    => (string) fnd_bool_int($p['p'] ?? 0),
-                    'venue' => sanitize_text_field($p['venue'] ?? ''),
-                    'ukt_venue' => sanitize_text_field($p['ukt_venue'] ?? ''),
-                    'affiliate_venue' => sanitize_text_field($p['affiliate_venue'] ?? ''),
-                    'other_venue' => sanitize_text_field($p['other_venue'] ?? ''),
-                    'venue_is_tba' => (string) fnd_bool_int($p['venue_is_tba'] ?? 0),
-                    'solt_member_non_solt_venue' => (string) fnd_bool_int($p['solt_member_non_solt_venue'] ?? 0),
-                    'title_of_show' => sanitize_text_field($p['title_of_show'] ?? ''),
-                    'show_title_is_tba' => (string) fnd_bool_int($p['show_title_is_tba'] ?? 0),
-                    'producer' => sanitize_text_field($p['producer'] ?? ''),
-                    'press_contact' => sanitize_email($p['press_contact'] ?? ''),
-                    'date_bkd' => sanitize_text_field($p['date_bkd'] ?? ''),
-                    'is_season_gala' => (string) fnd_bool_int($p['is_season_gala'] ?? 0),
-                    'is_opera_dance' => (string) fnd_bool_int($p['is_opera_dance'] ?? 0),
-                    'user_id' => sanitize_text_field($p['user_id'] ?? ''),
-                    'time_stamp' => isset($p['time_stamp']) ? (string) intval($p['time_stamp']) : (string) $now,
-                    'created_at' => (string) $now,
-                ];
-                foreach ($meta as $k => $v) {
-                    // Evaluate closures (for 'day')
-                    if ($v instanceof Closure) {
-                        $v = $v();
-                        $meta[$k] = $v;
-                    }
-                    update_post_meta($post_id, $k, $v);
-                }
-                $stored_meta = fnd_get_booking_meta_snapshot($post_id);
-                fnd_bookings_log_action('create', [
-                    'route' => $req->get_route(),
-                    'method' => $req->get_method(),
-                    'post_id' => $post_id,
-                    'request' => $p,
-                    'stored_meta' => $stored_meta,
+                $preserve = array_key_exists('created_at', $p) || array_key_exists('time_stamp', $p);
+                $post_id = fnd_create_booking_from_payload($p, [
+                    'preserve_timestamps' => $preserve,
+                    'log_context' => [
+                        'route' => $req->get_route(),
+                        'method' => $req->get_method(),
+                    ],
                 ]);
+                if (is_wp_error($post_id)) return $post_id;
                 return new WP_REST_Response(['id' => $post_id], 201);
             }
         ],
@@ -463,6 +548,11 @@ add_action('rest_api_init', function () {
                 $p = $req->get_json_params();
                 $prev_skip = !empty($GLOBALS['fnd_skip_clash_webhook']);
                 $GLOBALS['fnd_skip_clash_webhook'] = true;
+                $preserve_timestamps = array_key_exists('created_at', $p) || array_key_exists('time_stamp', $p);
+                $prev_preserve = fnd_should_preserve_timestamps();
+                if ($preserve_timestamps) {
+                    $GLOBALS['fnd_preserve_timestamps'] = true;
+                }
 
                 try {
                     $updates = [];
@@ -522,6 +612,11 @@ add_action('rest_api_init', function () {
                     return ['id' => $id];
                 } finally {
                     $GLOBALS['fnd_skip_clash_webhook'] = $prev_skip;
+                    if ($prev_preserve) {
+                        $GLOBALS['fnd_preserve_timestamps'] = true;
+                    } else {
+                        unset($GLOBALS['fnd_preserve_timestamps']);
+                    }
                 }
             }
         ],
@@ -760,6 +855,795 @@ add_action('rest_api_init', function () {
     ]);
 });
 
+function fnd_import_normalize_key($value)
+{
+    $value = (string) $value;
+    $value = preg_replace('/^\xEF\xBB\xBF/', '', $value);
+    $value = strtolower($value);
+    return preg_replace('/[^a-z0-9]+/', '', $value);
+}
+
+function fnd_import_ascii_clean($value)
+{
+    if ($value === null) return '';
+    $s = (string) $value;
+    $s = str_replace(
+        ["\xE2\x80\x98", "\xE2\x80\x99", "\xE2\x80\xB2", "\xE2\x80\x9C", "\xE2\x80\x9D", "\xE2\x80\xB3", "\xE2\x80\x93", "\xE2\x80\x94"],
+        ["'", "'", "'", '"', '"', '"', '-', '-'],
+        $s
+    );
+    $s = preg_replace('/\x{00A0}/u', ' ', $s);
+    $s = preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $s);
+    if (function_exists('iconv')) {
+        $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
+        if ($converted !== false) {
+            $s = $converted;
+        }
+    }
+    $s = preg_replace('/\s+/', ' ', $s);
+    return trim($s);
+}
+
+function fnd_import_map_header_to_key($header)
+{
+    $key = fnd_import_normalize_key($header);
+    $map = [
+        'date' => 'date',
+        'day' => 'day',
+        'titleofshow' => 'title_of_show',
+        'showtitle' => 'title_of_show',
+        'showtitleoftheproduction' => 'title_of_show',
+        'venue' => 'venue',
+        'ukvenue' => 'ukt_venue',
+        'uktvenue' => 'ukt_venue',
+        'affiliatevenue' => 'affiliate_venue',
+        'othervenue' => 'other_venue',
+        'p' => 'p',
+        'pencilled' => 'p',
+        'penciled' => 'p',
+        'venueistba' => 'venue_is_tba',
+        'showtitleistba' => 'show_title_is_tba',
+        'isseasongala' => 'is_season_gala',
+        'seasongala' => 'is_season_gala',
+        'isoperadance' => 'is_opera_dance',
+        'operadance' => 'is_opera_dance',
+        'producer' => 'producer',
+        'presscontact' => 'press_contact',
+        'email' => 'press_contact',
+        'datebkd' => 'date_bkd',
+        'datebooked' => 'date_bkd',
+        'userid' => 'user_id',
+        'timestamp' => 'time_stamp',
+        'updatedat' => 'time_stamp',
+        'createdat' => 'created_at',
+    ];
+    return $map[$key] ?? null;
+}
+
+function fnd_import_to_boolean($value)
+{
+    if ($value === null || $value === '') return 0;
+    if (is_bool($value)) return $value ? 1 : 0;
+    if (is_numeric($value)) return intval($value) ? 1 : 0;
+    $s = strtolower(trim((string) $value));
+    return in_array($s, ['1', 'y', 'yes', 'true'], true) ? 1 : 0;
+}
+
+function fnd_import_to_timestamp($value)
+{
+    if ($value === null || $value === '') return null;
+    $build_ts = function ($year, $month, $day, $hour = 0, $minute = 0, $second = 0) {
+        if (!checkdate($month, $day, $year)) return null;
+        try {
+            $dt = new DateTimeImmutable(
+                sprintf('%04d-%02d-%02d %02d:%02d:%02d', $year, $month, $day, $hour, $minute, $second),
+                fnd_wp_tz()
+            );
+        } catch (Exception $e) {
+            return null;
+        }
+        return $dt->getTimestamp() * 1000;
+    };
+
+    if (is_numeric($value)) {
+        $num_str = trim((string) $value);
+        if (preg_match('/^\d{8}$/', $num_str)) {
+            $year = (int) substr($num_str, 0, 4);
+            $month = (int) substr($num_str, 4, 2);
+            $day = (int) substr($num_str, 6, 2);
+            $ts = $build_ts($year, $month, $day);
+            if ($ts !== null) return $ts;
+        }
+        $num = (float) $value;
+        if ($num < 10000000) {
+            $excel_epoch = gmmktime(0, 0, 0, 1, 1, 1900) * 1000;
+            $days = floor($num);
+            return (int) ($excel_epoch + ($days - 2) * 86400 * 1000);
+        }
+        if ($num < 1e12) {
+            return (int) round($num * 1000);
+        }
+        return (int) round($num);
+    }
+    $s = trim((string) $value);
+    if ($s === '') return null;
+
+    if (preg_match('/^(\d{4})[\/-](\d{2})[\/-](\d{2})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $s, $m)) {
+        $year = (int) $m[1];
+        $a = (int) $m[2];
+        $b = (int) $m[3];
+        $hour = isset($m[4]) ? (int) $m[4] : 0;
+        $minute = isset($m[5]) ? (int) $m[5] : 0;
+        $second = isset($m[6]) ? (int) $m[6] : 0;
+        $month = $a;
+        $day = $b;
+        if ($a > 12 && $b <= 12) {
+            $month = $b;
+            $day = $a;
+        }
+        $ts = $build_ts($year, $month, $day, $hour, $minute, $second);
+        if ($ts !== null) return $ts;
+        if ($a <= 12 && $b <= 12) {
+            $ts = $build_ts($year, $b, $a, $hour, $minute, $second);
+            if ($ts !== null) return $ts;
+        }
+        return null;
+    }
+
+    if (preg_match('/^(\d{2})[\/-](\d{2})[\/-](\d{4})(?:\s+(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $s, $m)) {
+        $a = (int) $m[1];
+        $b = (int) $m[2];
+        $year = (int) $m[3];
+        $hour = isset($m[4]) ? (int) $m[4] : 0;
+        $minute = isset($m[5]) ? (int) $m[5] : 0;
+        $second = isset($m[6]) ? (int) $m[6] : 0;
+        $month = $b;
+        $day = $a;
+        if ($a <= 12 && $b > 12) {
+            $month = $a;
+            $day = $b;
+        } elseif ($a > 12 && $b <= 12) {
+            $month = $b;
+            $day = $a;
+        }
+        $ts = $build_ts($year, $month, $day, $hour, $minute, $second);
+        if ($ts !== null) return $ts;
+        $ts = $build_ts($year, $day, $month, $hour, $minute, $second);
+        if ($ts !== null) return $ts;
+        return null;
+    }
+
+    $ts = strtotime($s);
+    if ($ts === false) return null;
+    return $ts * 1000;
+}
+
+function fnd_import_coerce_row(array $row, array $header_map)
+{
+    $out = [];
+    foreach ($header_map as $index => $key) {
+        if ($key === null) continue;
+        $out[$key] = isset($row[$index]) ? $row[$index] : '';
+    }
+
+    $date_ts = fnd_import_to_timestamp($out['date'] ?? null);
+    if (!$date_ts) return null;
+
+    $day = $out['day'] ?? '';
+    if ($day === '' || $day === null) {
+        $day = function_exists('wp_date')
+            ? wp_date('l', intval($date_ts / 1000), fnd_wp_tz())
+            : date('l', intval($date_ts / 1000));
+    }
+
+    $venue = isset($out['venue']) ? fnd_import_ascii_clean($out['venue']) : '';
+    $title = isset($out['title_of_show']) ? fnd_import_ascii_clean($out['title_of_show']) : '';
+    $time_stamp = fnd_import_to_timestamp($out['time_stamp'] ?? null);
+    $created_at = fnd_import_to_timestamp($out['created_at'] ?? null);
+    $date_bkd_ts = fnd_import_to_timestamp($out['date_bkd'] ?? null);
+    if ($created_at === null) {
+        if ($date_bkd_ts !== null) {
+            $created_at = $date_bkd_ts;
+        } elseif ($time_stamp !== null) {
+            $created_at = $time_stamp;
+        }
+    }
+
+    $payload = [
+        'date' => $date_ts,
+        'day' => $day,
+        'p' => fnd_import_to_boolean($out['p'] ?? null),
+        'venue' => $venue,
+        'ukt_venue' => isset($out['ukt_venue']) ? fnd_import_ascii_clean($out['ukt_venue']) : '',
+        'affiliate_venue' => isset($out['affiliate_venue']) ? fnd_import_ascii_clean($out['affiliate_venue']) : '',
+        'other_venue' => isset($out['other_venue']) ? fnd_import_ascii_clean($out['other_venue']) : '',
+        'venue_is_tba' => fnd_import_to_boolean($out['venue_is_tba'] ?? null),
+        'solt_member_non_solt_venue' => fnd_import_to_boolean($out['solt_member_non_solt_venue'] ?? null),
+        'title_of_show' => $title,
+        'show_title_is_tba' => fnd_import_to_boolean($out['show_title_is_tba'] ?? null),
+        'producer' => isset($out['producer']) ? fnd_import_ascii_clean($out['producer']) : '',
+        'press_contact' => isset($out['press_contact']) ? fnd_import_ascii_clean($out['press_contact']) : '',
+        'date_bkd' => isset($out['date_bkd']) ? (string) $out['date_bkd'] : '',
+        'is_season_gala' => fnd_import_to_boolean($out['is_season_gala'] ?? null),
+        'is_opera_dance' => fnd_import_to_boolean($out['is_opera_dance'] ?? null),
+        'user_id' => isset($out['user_id']) ? (string) $out['user_id'] : '',
+    ];
+
+    if ($time_stamp !== null) $payload['time_stamp'] = $time_stamp;
+    if ($created_at !== null) $payload['created_at'] = $created_at;
+
+    return $payload;
+}
+
+function fnd_import_build_header_map(array $headers)
+{
+    $header_map = [];
+    $has_date = false;
+    foreach ($headers as $index => $header) {
+        $key = fnd_import_map_header_to_key($header);
+        if ($key === 'date') $has_date = true;
+        $header_map[$index] = $key;
+    }
+    return [$header_map, $has_date];
+}
+
+function fnd_import_get_row_value(array $row, array $header_map, $key)
+{
+    foreach ($header_map as $index => $mapped_key) {
+        if ($mapped_key === $key) {
+            return array_key_exists($index, $row) ? $row[$index] : null;
+        }
+    }
+    return null;
+}
+
+function fnd_import_is_blank_row(array $row)
+{
+    if (empty($row)) return true;
+    foreach ($row as $cell) {
+        if ($cell !== null && trim((string) $cell) !== '') {
+            return false;
+        }
+    }
+    return true;
+}
+
+function fnd_import_is_locked_row(array $row, array $header_map)
+{
+    $day = fnd_import_get_row_value($row, $header_map, 'day');
+    if ($day === null && isset($row[0])) {
+        $day = $row[0];
+    }
+    return is_string($day) && strcasecmp(trim($day), 'LOCKED') === 0;
+}
+
+function fnd_import_add_skip_message(array &$job, $file_name, $row_number, $reason, $value = null)
+{
+    if (!isset($job['skip_messages']) || !is_array($job['skip_messages'])) {
+        $job['skip_messages'] = [];
+    }
+    if (count($job['skip_messages']) >= 15) {
+        return;
+    }
+    $file_label = sanitize_text_field((string) $file_name);
+    $reason_label = sanitize_text_field((string) $reason);
+    $message = sprintf('%s row %d: %s', $file_label !== '' ? $file_label : 'file', (int) $row_number, $reason_label);
+    if ($value !== null && trim((string) $value) !== '') {
+        $value_label = sanitize_text_field((string) $value);
+        $message .= sprintf(' (%s)', $value_label);
+    }
+    $job['skip_messages'][] = $message;
+}
+
+function fnd_import_is_csv_upload(array $file)
+{
+    $filename = trim((string) ($file['name'] ?? ''));
+    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if ($ext === 'csv') return true;
+
+    $tmp_name = $file['tmp_name'] ?? '';
+    if ($tmp_name && file_exists($tmp_name)) {
+        $filetype = wp_check_filetype_and_ext($tmp_name, $filename);
+        $detected_ext = strtolower($filetype['ext'] ?? '');
+        $detected_type = strtolower($filetype['type'] ?? '');
+        if ($detected_ext === 'csv') return true;
+        if (in_array($detected_type, ['text/csv', 'text/plain', 'application/vnd.ms-excel'], true)) return true;
+    }
+
+    return false;
+}
+
+function fnd_import_delete_existing_bookings_chunk($limit = 100)
+{
+    $query = new WP_Query([
+        'post_type' => 'fnd_booking',
+        'post_status' => 'any',
+        'posts_per_page' => $limit,
+        'fields' => 'ids',
+    ]);
+    if (empty($query->posts)) return 0;
+    $count = 0;
+    foreach ($query->posts as $post_id) {
+        wp_delete_post($post_id, true);
+        $count++;
+    }
+    return $count;
+}
+
+function fnd_import_store_job(array $job)
+{
+    set_transient('fnd_import_job_' . $job['id'], $job, 2 * HOUR_IN_SECONDS);
+}
+
+function fnd_import_load_job($job_id)
+{
+    $job_id = sanitize_text_field($job_id);
+    return get_transient('fnd_import_job_' . $job_id);
+}
+
+function fnd_import_delete_job($job_id)
+{
+    $job_id = sanitize_text_field($job_id);
+    delete_transient('fnd_import_job_' . $job_id);
+}
+
+function fnd_import_process_file_batch(array &$file, array &$job, $batch_size = 50)
+{
+    if (!isset($file['path']) || !file_exists($file['path'])) {
+        $job['errors'] += 1;
+        if (count($job['error_messages']) < 5) {
+            $job['error_messages'][] = 'Missing file: ' . ($file['name'] ?? 'unknown');
+        }
+        $file['done'] = true;
+        return;
+    }
+
+    $handle = fopen($file['path'], 'r');
+    if (!$handle) {
+        $job['errors'] += 1;
+        if (count($job['error_messages']) < 5) {
+            $job['error_messages'][] = 'Unable to read CSV: ' . ($file['name'] ?? 'unknown');
+        }
+        $file['done'] = true;
+        return;
+    }
+
+    $headers = fgetcsv($handle);
+    if (!$headers) {
+        fclose($handle);
+        $job['errors'] += 1;
+        if (count($job['error_messages']) < 5) {
+            $job['error_messages'][] = 'CSV is empty: ' . ($file['name'] ?? 'unknown');
+        }
+        $file['done'] = true;
+        return;
+    }
+
+    $header_map = isset($file['header_map']) ? $file['header_map'] : null;
+    if (!is_array($header_map) || empty($header_map)) {
+        [$header_map, $has_date] = fnd_import_build_header_map($headers);
+        if (!$has_date) {
+            fclose($handle);
+            $job['errors'] += 1;
+            if (count($job['error_messages']) < 5) {
+                $job['error_messages'][] = 'Date column not found: ' . ($file['name'] ?? 'unknown');
+            }
+            $file['done'] = true;
+            return;
+        }
+        $file['header_map'] = $header_map;
+    }
+
+    $skip = isset($file['row_index']) ? (int) $file['row_index'] : 0;
+    $skipped = 0;
+    while ($skipped < $skip && ($row = fgetcsv($handle)) !== false) {
+        $skipped++;
+    }
+
+    $processed = 0;
+    $row = null;
+    while ($processed < $batch_size && ($row = fgetcsv($handle)) !== false) {
+        $row_number = (int) $file['row_index'] + 2;
+        if ($row === [null] || $row === false || fnd_import_is_blank_row($row)) {
+            $file['row_index'] += 1;
+            $processed++;
+            continue;
+        }
+        if (fnd_import_is_locked_row($row, $header_map)) {
+            $file['row_index'] += 1;
+            $processed++;
+            continue;
+        }
+
+        $date_value = fnd_import_get_row_value($row, $header_map, 'date');
+        if ($date_value === null || trim((string) $date_value) === '') {
+            $job['skipped'] += 1;
+            fnd_import_add_skip_message($job, $file['name'] ?? 'file', $row_number, 'Missing Date');
+            $file['row_index'] += 1;
+            $processed++;
+            continue;
+        }
+        if (fnd_import_to_timestamp($date_value) === null) {
+            $job['skipped'] += 1;
+            fnd_import_add_skip_message($job, $file['name'] ?? 'file', $row_number, 'Invalid Date', $date_value);
+            $file['row_index'] += 1;
+            $processed++;
+            continue;
+        }
+
+        try {
+            $payload = fnd_import_coerce_row($row, $header_map);
+        } catch (Throwable $e) {
+            $job['errors'] += 1;
+            if (count($job['error_messages']) < 5) {
+                $job['error_messages'][] = 'Row parse failed in ' . ($file['name'] ?? 'file') . ': ' . $e->getMessage();
+            }
+            $file['row_index'] += 1;
+            $processed++;
+            continue;
+        }
+        if ($payload === null) {
+            $job['skipped'] += 1;
+            fnd_import_add_skip_message($job, $file['name'] ?? 'file', $row_number, 'Skipped row');
+        } else {
+            $result = fnd_create_booking_from_payload($payload, [
+                'preserve_timestamps' => true,
+                'skip_log' => true,
+            ]);
+            if (is_wp_error($result)) {
+                $job['errors'] += 1;
+                if (count($job['error_messages']) < 5) {
+                    $job['error_messages'][] = $result->get_error_message();
+                }
+            } else {
+                $job['inserted'] += 1;
+            }
+        }
+        $file['row_index'] += 1;
+        $processed++;
+    }
+
+    $done = feof($handle);
+    fclose($handle);
+
+    if ($done) {
+        $file['done'] = true;
+        if (!empty($file['path']) && file_exists($file['path'])) {
+            @unlink($file['path']);
+        }
+    }
+}
+
+function fnd_import_process_job_batch(array &$job, $batch_size = 50, $delete_batch = 50)
+{
+    if (!empty($job['reset']) && empty($job['reset_done'])) {
+        $deleted = fnd_import_delete_existing_bookings_chunk($delete_batch);
+        $job['deleted'] += $deleted;
+        if ($deleted < $delete_batch) {
+            $job['reset_done'] = true;
+        }
+        return;
+    }
+
+    $total_files = count($job['files']);
+    if ($job['current_file'] >= $total_files) {
+        $job['done'] = true;
+        return;
+    }
+
+    $file_index = (int) $job['current_file'];
+    $file = &$job['files'][$file_index];
+    if (!empty($file['done'])) {
+        $job['current_file'] += 1;
+        return;
+    }
+
+    fnd_import_process_file_batch($file, $job, $batch_size);
+    if (!empty($file['done'])) {
+        $job['current_file'] += 1;
+    }
+}
+
+function fnd_import_create_job(array $entries, $reset)
+{
+    $files = [];
+    $errors = [];
+
+    foreach ($entries as $file) {
+        if (($file['error'] ?? 0) !== UPLOAD_ERR_OK) {
+            $errors[] = sprintf('Upload error for %s.', esc_html($file['name'] ?? 'file'));
+            continue;
+        }
+
+        $filename = trim((string) ($file['name'] ?? 'file'));
+        if (!fnd_import_is_csv_upload($file)) {
+            $errors[] = sprintf('File %s is not a CSV.', esc_html($filename));
+            continue;
+        }
+
+        $upload = wp_handle_upload($file, ['test_form' => false, 'test_type' => false]);
+        if (isset($upload['error'])) {
+            $errors[] = sprintf('Upload failed for %s: %s', esc_html($filename), esc_html($upload['error']));
+            continue;
+        }
+
+        $path = $upload['file'] ?? '';
+        if (!$path || !file_exists($path)) {
+            $errors[] = sprintf('File %s could not be stored.', esc_html($filename));
+            continue;
+        }
+
+        $handle = fopen($path, 'r');
+        if (!$handle) {
+            $errors[] = sprintf('File %s could not be read.', esc_html($filename));
+            @unlink($path);
+            continue;
+        }
+        $headers = fgetcsv($handle);
+        fclose($handle);
+        if (!$headers) {
+            $errors[] = sprintf('File %s is empty.', esc_html($filename));
+            @unlink($path);
+            continue;
+        }
+        [$header_map, $has_date] = fnd_import_build_header_map($headers);
+        if (!$has_date) {
+            $errors[] = sprintf('File %s is missing a Date column.', esc_html($filename));
+            @unlink($path);
+            continue;
+        }
+
+        $files[] = [
+            'name' => $filename,
+            'path' => $path,
+            'header_map' => $header_map,
+            'row_index' => 0,
+            'done' => false,
+        ];
+    }
+
+    if (empty($files)) {
+        return [null, $errors];
+    }
+
+    $job_id = wp_generate_uuid4();
+    $job = [
+        'id' => $job_id,
+        'files' => $files,
+        'current_file' => 0,
+        'inserted' => 0,
+        'skipped' => 0,
+        'skip_messages' => [],
+        'errors' => 0,
+        'error_messages' => [],
+        'reset' => (bool) $reset,
+        'reset_done' => !(bool) $reset,
+        'deleted' => 0,
+        'done' => false,
+        'started_at' => time(),
+    ];
+    fnd_import_store_job($job);
+    return [$job_id, $errors];
+}
+
+function fnd_render_import_page()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have permission to access this page.'));
+    }
+
+    $errors = [];
+    $job_id = null;
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fnd_import_nonce'])) {
+        check_admin_referer('fnd_import_action', 'fnd_import_nonce');
+
+        if (empty($_FILES['fnd_import_files'])) {
+            $errors[] = 'No files uploaded.';
+        } else {
+            $files = $_FILES['fnd_import_files'];
+            $entries = [];
+            if (is_array($files['name'])) {
+                foreach ($files['name'] as $i => $name) {
+                    $entries[] = [
+                        'name' => $name,
+                        'type' => $files['type'][$i] ?? '',
+                        'tmp_name' => $files['tmp_name'][$i] ?? '',
+                        'error' => $files['error'][$i] ?? 0,
+                        'size' => $files['size'][$i] ?? 0,
+                    ];
+                }
+            } else {
+                $entries[] = $files;
+            }
+
+            $reset = !empty($_POST['fnd_import_reset']);
+            [$job_id, $job_errors] = fnd_import_create_job($entries, $reset);
+            if (!empty($job_errors)) {
+                $errors = array_merge($errors, $job_errors);
+            }
+        }
+    }
+
+    echo '<div class="wrap">';
+    echo '<h1>First Night Diary Import</h1>';
+    echo '<p>Upload one or more CSV files to import bookings. Use reset to replace existing bookings.</p>';
+
+    if (!empty($errors)) {
+        echo '<div class="notice notice-error"><p>' . esc_html(implode(' ', $errors)) . '</p></div>';
+    }
+    if (!empty($job_id)) {
+        echo '<div class="notice notice-info"><p>Import started. This page will update as it runs.</p></div>';
+        echo '<div id="fnd-import-status" class="notice notice-info"><p>Preparing import...</p></div>';
+    }
+
+    echo '<form method="post" enctype="multipart/form-data">';
+    wp_nonce_field('fnd_import_action', 'fnd_import_nonce');
+    echo '<table class="form-table"><tbody>';
+    echo '<tr><th scope="row"><label for="fnd_import_files">CSV Files</label></th>';
+    echo '<td><input type="file" id="fnd_import_files" name="fnd_import_files[]" multiple accept=".csv" required></td></tr>';
+    echo '<tr><th scope="row">Reset existing</th>';
+    echo '<td><label><input type="checkbox" name="fnd_import_reset" value="1"> Delete all existing bookings before import</label></td></tr>';
+    echo '</tbody></table>';
+    submit_button('Run Import');
+    echo '</form>';
+    if (!empty($job_id)) {
+        $ajax_nonce = wp_create_nonce('fnd_import_ajax');
+        echo '<script>
+        (function() {
+            var jobId = ' . json_encode($job_id) . ';
+            var ajaxNonce = ' . json_encode($ajax_nonce) . ';
+            var statusEl = document.getElementById("fnd-import-status");
+            if (!jobId || !statusEl || typeof ajaxurl === "undefined") return;
+
+            function setStatus(html) {
+                statusEl.innerHTML = html;
+            }
+
+            function tick() {
+                var data = new FormData();
+                data.append("action", "fnd_import_process");
+                data.append("job_id", jobId);
+                data.append("nonce", ajaxNonce);
+                fetch(ajaxurl, { method: "POST", credentials: "same-origin", body: data })
+                    .then(function(response) {
+                        return response.text().then(function(text) {
+                            var parsed = null;
+                            try { parsed = JSON.parse(text); } catch (e) {}
+                            return { ok: response.ok, status: response.status, parsed: parsed };
+                        });
+                    })
+                    .then(function(result) {
+                        var resp = result.parsed;
+                        if (!resp || !resp.success) {
+                            var msg = (resp && resp.data && resp.data.message)
+                                ? resp.data.message
+                                : ("Import failed. HTTP " + result.status + ".");
+                            setStatus("<p>" + msg + "</p>");
+                            return;
+                        }
+                        var info = resp.data || {};
+                        var fileInfo = info.file_name ? (" File: " + info.file_name + ".") : "";
+                        var phase = info.reset_done ? "Importing" : "Deleting existing bookings";
+                        var summary = phase + ". Inserted " + (info.inserted || 0) +
+                            ", skipped " + (info.skipped || 0) + ", errors " + (info.errors || 0) +
+                            ". Deleted " + (info.deleted || 0) + "." + fileInfo;
+                        var skipHtml = "";
+                        if (info.skip_messages && info.skip_messages.length) {
+                            var items = info.skip_messages.map(function(msg) {
+                                return "<li>" + msg + "</li>";
+                            }).join("");
+                            skipHtml = "<p>Skip report (first " + info.skip_messages.length + "):</p><ul>" + items + "</ul>";
+                        }
+                        setStatus("<p>" + summary + "</p>" + skipHtml);
+                        if (info.done) {
+                            var finalMsg = "Import complete. Inserted " + (info.inserted || 0) +
+                                ", skipped " + (info.skipped || 0) + ", errors " + (info.errors || 0) +
+                                ". Deleted " + (info.deleted || 0) + ".";
+                            setStatus("<p>" + finalMsg + "</p>" + skipHtml);
+                            return;
+                        }
+                        setTimeout(tick, 400);
+                    })
+                    .catch(function() {
+                        setStatus("<p>Import failed. Please reload the page and check server logs.</p>");
+                    });
+            }
+
+            tick();
+        })();
+        </script>';
+    }
+    echo '</div>';
+}
+
+function fnd_import_process_ajax()
+{
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Unauthorized'], 403);
+    }
+
+    check_ajax_referer('fnd_import_ajax', 'nonce');
+
+    $job_id = isset($_POST['job_id']) ? sanitize_text_field(wp_unslash($_POST['job_id'])) : '';
+    if ($job_id === '') {
+        wp_send_json_error(['message' => 'Missing job id'], 400);
+    }
+
+    $job = fnd_import_load_job($job_id);
+    if (empty($job) || !is_array($job)) {
+        wp_send_json_error(['message' => 'Import job not found'], 404);
+    }
+
+    $prev_skip = fnd_should_skip_clash_webhook();
+    $prev_log = fnd_should_skip_log();
+    $prev_preserve = fnd_should_preserve_timestamps();
+    $GLOBALS['fnd_skip_clash_webhook'] = true;
+    $GLOBALS['fnd_skip_log'] = true;
+    $GLOBALS['fnd_preserve_timestamps'] = true;
+
+    try {
+        fnd_import_process_job_batch($job, 50, 50);
+    } finally {
+        if ($prev_skip) {
+            $GLOBALS['fnd_skip_clash_webhook'] = true;
+        } else {
+            unset($GLOBALS['fnd_skip_clash_webhook']);
+        }
+        if ($prev_log) {
+            $GLOBALS['fnd_skip_log'] = true;
+        } else {
+            unset($GLOBALS['fnd_skip_log']);
+        }
+        if ($prev_preserve) {
+            $GLOBALS['fnd_preserve_timestamps'] = true;
+        } else {
+            unset($GLOBALS['fnd_preserve_timestamps']);
+        }
+    }
+
+    $done = !empty($job['done']);
+    if (!$done) {
+        fnd_import_store_job($job);
+    } else {
+        fnd_import_delete_job($job_id);
+    }
+
+    $current_file = (int) ($job['current_file'] ?? 0);
+    $total_files = count($job['files'] ?? []);
+    $file_name = '';
+    if ($current_file < $total_files && !empty($job['files'][$current_file]['name'])) {
+        $file_name = $job['files'][$current_file]['name'];
+    }
+
+    wp_send_json_success([
+        'done' => $done,
+        'inserted' => (int) ($job['inserted'] ?? 0),
+        'skipped' => (int) ($job['skipped'] ?? 0),
+        'skip_messages' => array_map('esc_html', $job['skip_messages'] ?? []),
+        'errors' => (int) ($job['errors'] ?? 0),
+        'error_messages' => $job['error_messages'] ?? [],
+        'deleted' => (int) ($job['deleted'] ?? 0),
+        'reset_done' => !empty($job['reset_done']),
+        'current_file' => $current_file + 1,
+        'total_files' => $total_files,
+        'file_name' => $file_name,
+    ]);
+}
+
+add_action('admin_menu', function () {
+    add_submenu_page(
+        'edit.php?post_type=fnd_booking',
+        'FND Import',
+        'Import',
+        'manage_options',
+        'fnd-import',
+        'fnd_render_import_page'
+    );
+});
+
+add_action('wp_ajax_fnd_import_process', 'fnd_import_process_ajax');
+
 // ACF: load JSON field groups from this plugin's acf-json directory (if ACF is active)
 add_filter('acf/settings/load_json', function ($paths) {
     $paths[] = plugin_dir_path(__FILE__) . 'acf-json';
@@ -815,11 +1699,13 @@ add_action('save_post_fnd_booking', function ($post_id, $post, $update) {
     if ($current !== $t) {
         update_post_meta($post_id, 'title_of_show', sanitize_text_field($t));
     }
-    // Touch the updated timestamp
-    update_post_meta($post_id, 'time_stamp', (string)(time() * 1000));
-    // Ensure created_at exists
-    if (!get_post_meta($post_id, 'created_at', true)) {
-        update_post_meta($post_id, 'created_at', (string)(time() * 1000));
+    if (!fnd_should_preserve_timestamps()) {
+        // Touch the updated timestamp
+        update_post_meta($post_id, 'time_stamp', (string)(time() * 1000));
+        // Ensure created_at exists
+        if (!get_post_meta($post_id, 'created_at', true)) {
+            update_post_meta($post_id, 'created_at', (string)(time() * 1000));
+        }
     }
 }, 10, 3);
 
@@ -846,9 +1732,11 @@ function fnd_meta_sync_callback($meta_id, $post_id, $meta_key, $meta_value)
             $day = function_exists('wp_date') ? wp_date('l', intval($ms / 1000), $tz) : date('l', intval($ms / 1000));
             update_post_meta($post_id, 'day', $day);
         }
-        // Bump updated timestamp on any change
-        update_post_meta($post_id, 'time_stamp', (string)(time() * 1000));
-        if (!get_post_meta($post_id, 'created_at', true)) update_post_meta($post_id, 'created_at', (string)(time() * 1000));
+        if (!fnd_should_preserve_timestamps()) {
+            // Bump updated timestamp on any change
+            update_post_meta($post_id, 'time_stamp', (string)(time() * 1000));
+            if (!get_post_meta($post_id, 'created_at', true)) update_post_meta($post_id, 'created_at', (string)(time() * 1000));
+        }
     } finally {
         $in = false;
     }
