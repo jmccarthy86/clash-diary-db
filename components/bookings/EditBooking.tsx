@@ -6,7 +6,7 @@ import { useApp } from "@/context/AppContext";
 import { updateBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import BookingForm from "./BookingForm";
-import { handleClashEmails } from "@/lib/utils";
+import { handleClashEmails, toBooleanLike } from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import venues from "@/lib/venues";
 
@@ -66,6 +66,16 @@ export default function EditBooking({
             const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
             await updateBooking(rowRange, { ...data, dateYmd: ymd });
 
+            const wasPencilled = toBooleanLike(
+                (currentDetail as any).p ??
+                    (currentDetail as any).P ??
+                    (currentDetail as any).pencilled ??
+                    (currentDetail as any).Pencilled
+            );
+            const isPencilled = toBooleanLike((data as any).p);
+            const didUnpencil = wasPencilled && !isPencilled;
+            let shouldSendClashEmails = didUnpencil;
+
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
                 const newDateFormatted = format(new Date(data.date), "dd/MM/yyyy");
@@ -83,14 +93,18 @@ export default function EditBooking({
                         const dataDate: Date = new Date(data.date);
 
                         if (dateBeforeEdit && !isSameDay(dateBeforeEdit, dataDate)) {
-                            handleClashEmails(currentSelectedDate, data);
+                            shouldSendClashEmails = true;
                         }
                     }
-                } else {
+                } else if (!didUnpencil) {
                     console.log("No bookings found for the new date. Skipping email check.");
                 }
-            } else {
+            } else if (!didUnpencil) {
                 console.log("No year data available. Skipping email check.");
+            }
+
+            if (shouldSendClashEmails) {
+                handleClashEmails(currentSelectedDate, data);
             }
 
             await refreshData();
