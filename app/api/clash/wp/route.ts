@@ -37,6 +37,20 @@ function parseDateLiteral(value: string): Date | null {
         const [day, month, year] = trimmed.split("/").map(Number);
         return new Date(year, month - 1, day);
     }
+    if (/^\d{8}$/.test(trimmed)) {
+        const year = Number(trimmed.slice(0, 4));
+        const month = Number(trimmed.slice(4, 6));
+        const day = Number(trimmed.slice(6, 8));
+        if (year >= 1900 && year <= 2100) {
+            return new Date(year, month - 1, day);
+        }
+    }
+    if (/^\d+$/.test(trimmed)) {
+        const numeric = Number(trimmed);
+        const ms = trimmed.length >= 13 ? numeric : numeric * 1000;
+        const parsed = new Date(ms);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
     const parsed = new Date(trimmed);
     return isNaN(parsed.getTime()) ? null : parsed;
 }
