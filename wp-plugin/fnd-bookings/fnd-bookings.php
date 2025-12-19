@@ -104,6 +104,49 @@ function fnd_get_clash_webhook_config()
     return [$url, $secret];
 }
 
+function fnd_get_frontend_diary_url()
+{
+    if (defined('FND_FRONTEND_DIARY_URL')) {
+        return FND_FRONTEND_DIARY_URL;
+    }
+    return 'https://solt.co.uk/first-night-diary';
+}
+
+function fnd_frontend_url_with_date($date_str)
+{
+    $base = rtrim(fnd_get_frontend_diary_url(), '/');
+    $raw = '';
+    if (preg_match('/^(\\d{2})\\/(\\d{2})\\/(\\d{4})$/', $date_str, $m)) {
+        $raw = sprintf('%04d-%02d-%02d', intval($m[3]), intval($m[2]), intval($m[1]));
+    } elseif (preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})$/', $date_str, $m)) {
+        $raw = $date_str;
+    }
+    if ($raw === '') return $base;
+    $sep = strpos($base, '?') === false ? '?' : '&';
+    return $base . $sep . 'selectedDate=' . rawurlencode($raw);
+}
+
+function fnd_tba_reminders_enabled()
+{
+    $opt = get_option('fnd_tba_reminders_enabled', '0');
+    return $opt === '1' || $opt === 1 || $opt === true;
+}
+
+function fnd_get_tba_webhook_config()
+{
+    $secret = defined('FND_CLASH_WEBHOOK_SECRET') ? FND_CLASH_WEBHOOK_SECRET : '';
+    if (defined('FND_TBA_WEBHOOK_URL')) {
+        return [FND_TBA_WEBHOOK_URL, $secret];
+    }
+    if (defined('FND_CLASH_WEBHOOK_URL')) {
+        $clash = FND_CLASH_WEBHOOK_URL;
+        // Attempt to derive sibling route
+        $derived = str_replace('/api/clash/wp', '/api/reminder/tba/wp', $clash);
+        return [$derived, $secret];
+    }
+    return ['', ''];
+}
+
 function fnd_get_booking_snapshot($post_id)
 {
     $date = get_post_meta($post_id, 'date', true);
@@ -862,6 +905,100 @@ function fnd_import_normalize_key($value)
     $value = strtolower($value);
     return preg_replace('/[^a-z0-9]+/', '', $value);
 }
+
+function fnd_tba_reminder_window_ms($days_ahead = 30)
+{
+    $tz = fnd_wp_tz();
+    $start = new DateTimeImmutable('today +' . intval($days_ahead) . ' days', $tz);
+    $end = $start->setTime(23, 59, 59);
+    return [
+        intval($start->getTimestamp() * 1000),
+        intval($end->getTimestamp() * 1000),
+    ];
+}
+
+function fnd_tba_collect_bookings_for_window($start_ms, $end_ms)
+{
+    $q = new WP_Query([
+        'post_type' => 'fnd_booking',
+        'posts_per_page' => -1,
+        'fields' => 'ids',
+        'meta_query' => [
+            'relation' => 'AND',
+            [
+                'key' => 'date_ms',
+                'value' => [$start_ms, $end_ms],
+                'compare' => 'BETWEEN',
+                'type' => 'NUMERIC',
+            ],
+            [
+                'relation' => 'OR',
+                [
+                    'key' => 'show_title_is_tba',
+                    'value' => '1',
+                    'compare' => '=',
+                ],
+                [
+                    'key' => 'venue_is_tba',
+                    'value' => '1',
+                    'compare' => '=',
+                ],
+            ],
+        ],
+    ]);
+    if (empty($q->posts)) {
+        return [];
+    }
+
+    $out = [];
+    foreach ($q->posts as $post_id) {
+        $email = get_post_meta($post_id, 'press_contact', true);
+        if (!$email || !is_email($email)) continue;
+        $title = get_post_meta($post_id, 'title_of_show', true);
+        $venue = get_post_meta($post_id, 'venue', true);
+        $other_venue = get_post_meta($post_id, 'other_venue', true);
+        $affiliate = get_post_meta($post_id, 'affiliate_venue', true);
+        $date_str = get_post_meta($post_id, 'date', true);
+        $date_ms = get_post_meta($post_id, 'date_ms', true);
+        $display_date = $date_str ?: fnd_date_str_from_ms($date_ms);
+        $needs_title = fnd_bool_int(get_post_meta($post_id, 'show_title_is_tba', true)) === 1;
+        $needs_venue = fnd_bool_int(get_post_meta($post_id, 'venue_is_tba', true)) === 1;
+
+        $out[$email][] = [
+            'date' => $display_date ?: '(no date)',
+            'title' => $title ?: 'TBA',
+            'venue' => $venue ?: ($other_venue ?: $affiliate ?: 'TBA'),
+            'needsTitle' => $needs_title,
+            'needsVenue' => $needs_venue,
+        ];
+    }
+    return $out;
+}
+
+function fnd_tba_send_reminders()
+{
+    if (!fnd_tba_reminders_enabled()) {
+        return;
+    }
+
+    [$start_ms, $end_ms] = fnd_tba_reminder_window_ms(30);
+    $by_email = fnd_tba_collect_bookings_for_window($start_ms, $end_ms);
+    if (empty($by_email)) return;
+
+    foreach ($by_email as $email => $items) {
+        foreach ($items as $item) {
+            // send one email per booking for this press contact
+            fnd_send_tba_webhook($email, [$item]);
+        }
+    }
+}
+
+add_action('init', function () {
+    if (!wp_next_scheduled('fnd_tba_reminder_daily')) {
+        wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'fnd_tba_reminder_daily');
+    }
+});
+add_action('fnd_tba_reminder_daily', 'fnd_tba_send_reminders');
 
 function fnd_import_ascii_clean($value)
 {
@@ -1640,9 +1777,51 @@ add_action('admin_menu', function () {
         'fnd-import',
         'fnd_render_import_page'
     );
+
+    add_submenu_page(
+        'edit.php?post_type=fnd_booking',
+        'FND Settings',
+        'Settings',
+        'manage_options',
+        'fnd-settings',
+        'fnd_render_settings_page'
+    );
 });
 
 add_action('wp_ajax_fnd_import_process', 'fnd_import_process_ajax');
+
+function fnd_render_settings_page()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(__('You do not have permission to access this page.'));
+    }
+
+    $enabled = fnd_tba_reminders_enabled();
+    $message = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['fnd_settings_nonce'])) {
+        check_admin_referer('fnd_settings_action', 'fnd_settings_nonce');
+        $enabled = !empty($_POST['fnd_tba_reminders_enabled']) ? '1' : '0';
+        update_option('fnd_tba_reminders_enabled', $enabled);
+        $message = 'Settings saved.';
+    }
+
+    echo '<div class="wrap">';
+    echo '<h1>First Night Diary Settings</h1>';
+    if ($message) {
+        echo '<div class="notice notice-success"><p>' . esc_html($message) . '</p></div>';
+    }
+    echo '<form method="post">';
+    wp_nonce_field('fnd_settings_action', 'fnd_settings_nonce');
+    echo '<table class="form-table"><tbody>';
+    echo '<tr>';
+    echo '<th scope="row"><label for="fnd_tba_reminders_enabled">TBA reminders</label></th>';
+    echo '<td><label><input type="checkbox" name="fnd_tba_reminders_enabled" id="fnd_tba_reminders_enabled" value="1"' . checked($enabled, true, false) . '> Enable TBA reminder emails (30 days before booking date)</label></td>';
+    echo '</tr>';
+    echo '</tbody></table>';
+    submit_button('Save Settings');
+    echo '</form>';
+    echo '</div>';
+}
 
 // ACF: load JSON field groups from this plugin's acf-json directory (if ACF is active)
 add_filter('acf/settings/load_json', function ($paths) {
@@ -1856,3 +2035,38 @@ add_action('pre_get_posts', function ($query) {
             break;
     }
 });
+function fnd_send_tba_webhook($email, array $items)
+{
+    [$url, $secret] = fnd_get_tba_webhook_config();
+    if (!$url || !$secret) {
+        error_log('FND TBA webhook not configured.');
+        return;
+    }
+
+    $first_date = isset($items[0]['date']) ? (string)$items[0]['date'] : '';
+    $payload = [
+        'email' => $email,
+        'items' => $items,
+        'loginUrl' => $first_date ? fnd_frontend_url_with_date($first_date) : fnd_get_frontend_diary_url(),
+        'siteName' => wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES),
+    ];
+
+    $response = wp_remote_post($url, [
+        'timeout' => 15,
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $secret,
+        ],
+        'body' => wp_json_encode($payload),
+    ]);
+
+    if (is_wp_error($response)) {
+        error_log('FND TBA webhook failed: ' . $response->get_error_message());
+        return;
+    }
+
+    $code = wp_remote_retrieve_response_code($response);
+    if ($code < 200 || $code >= 300) {
+        error_log('FND TBA webhook returned HTTP ' . $code);
+    }
+}
