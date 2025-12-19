@@ -74,7 +74,15 @@ export default function EditBooking({
             );
             const isPencilled = toBooleanLike((data as any).p);
             const didUnpencil = wasPencilled && !isPencilled;
-            let shouldSendClashEmails = didUnpencil;
+            const wasTitleTba = toBooleanLike(
+                (currentDetail as any).showTitleIsTba ??
+                    (currentDetail as any).show_title_is_tba ??
+                    (currentDetail as any).ShowTitleIsTba
+            );
+            const isTitleTba = toBooleanLike((data as any).showTitleIsTba);
+            const didRevealTitle = wasTitleTba && !isTitleTba;
+
+            let shouldSendClashEmails = didUnpencil || didRevealTitle;
 
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
