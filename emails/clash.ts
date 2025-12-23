@@ -26,8 +26,6 @@ export function getClashEmailContent(params: EmailData["params"]): string {
             <p style="margin: 0;">Full clash details are attached as an Excel file (.xls), with press contacts included.</p>
             <p style="margin: 0;">Follow this link to see the full diary: <a href="https://solt.co.uk/first-night-diary?selectedDate=${params?.rawDate}">SOLT First Night Diary</a>. You can also edit or delete your entry on the diary itself.</p>
             <p style="margin: 0;">See a full User Guide for the diary here: <a href="https://res.cloudinary.com/solt/image/upload/v1727697464/SOLT_First_Night_Diary_User_Guide_yejiqw.pdf">First Night Diary User Guide</a>
-            </br>
-		    <p style="margin: 0;">If you have any questions, please contact Jen: <a href="mailto:Jen.dicksonpurdy@soltukt.co.uk?subject=First%20Night%20Diary%20query">Jen.dicksonpurdy@soltukt.co.uk</a></p>
 		    <br/>
 		    <p style="margin: 0;">Best wishes,</p>
 		    <p style="margin: 0;">SOLT & UK Theatre</p>
