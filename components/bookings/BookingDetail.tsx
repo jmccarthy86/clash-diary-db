@@ -53,6 +53,9 @@ export default function BookingDetail({
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
     const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
+    const debugAuth =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("debugAuth");
 
     const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
     const normalizedTitle = coalesceString(
@@ -98,6 +101,13 @@ export default function BookingDetail({
                 "https://soltukt.test",
             ]);
             if (!allowed.has(event.origin)) return;
+            if (debugAuth) {
+                console.log("[FND auth] BookingDetail message", {
+                    origin: event.origin,
+                    data: event.data,
+                    referrer: document.referrer,
+                });
+            }
             const { clashId } = (event.data ?? {}) as { clashId?: string | number };
             if (clashId == null) return;
             setHasAuthCookie(String(clashId));
@@ -142,6 +152,17 @@ export default function BookingDetail({
             hasAuthCookie === userId &&
             (isAfter(currentSelectedDate, new Date()) ||
                 isSameDay(currentSelectedDate, new Date())));
+
+    React.useEffect(() => {
+        if (!debugAuth) return;
+        console.log("[FND auth] BookingDetail state", {
+            hasAuthCookie,
+            userId,
+            showEditOptions,
+            isDev,
+            currentSelectedDate: currentSelectedDate?.toISOString?.() ?? null,
+        });
+    }, [debugAuth, hasAuthCookie, userId, showEditOptions, isDev, currentSelectedDate]);
 
     return (
         <Card className="w-full pt-6" data-relation={userId || undefined}>

@@ -51,6 +51,9 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [hasAuthCookie, setHasAuthCookie] = React.useState("0");
+    const debugAuth =
+        typeof window !== "undefined" &&
+        new URLSearchParams(window.location.search).has("debugAuth");
 
     const handleViewClick = () => {
         setIsOpen(false);
@@ -100,6 +103,13 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
                 "https://soltukt.test",
             ]);
             if (!allowed.has(event.origin)) return;
+            if (debugAuth) {
+                console.log("[FND auth] RowActions message", {
+                    origin: event.origin,
+                    data: event.data,
+                    referrer: document.referrer,
+                });
+            }
             const { clashId } = (event.data ?? {}) as { clashId?: string | number };
             if (clashId == null) return;
             setHasAuthCookie(String(clashId)); // RowActions uses a number state
@@ -142,6 +152,17 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
             hasAuthCookie === String(subRow.UserId) &&
             (isAfter(currentSelectedDate, new Date()) ||
                 isSameDay(currentSelectedDate, new Date())));
+
+    React.useEffect(() => {
+        if (!debugAuth) return;
+        console.log("[FND auth] RowActions state", {
+            hasAuthCookie,
+            rowUserId: subRow.UserId,
+            showEditOptions,
+            isDev,
+            currentSelectedDate: currentSelectedDate?.toISOString?.() ?? null,
+        });
+    }, [debugAuth, hasAuthCookie, subRow.UserId, showEditOptions, isDev, currentSelectedDate]);
 
     return (
         <>
