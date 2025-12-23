@@ -147,6 +147,20 @@ function fnd_get_tba_webhook_config()
     return ['', ''];
 }
 
+function fnd_get_pencil_webhook_config()
+{
+    $secret = defined('FND_CLASH_WEBHOOK_SECRET') ? FND_CLASH_WEBHOOK_SECRET : '';
+    if (defined('FND_PENCIL_WEBHOOK_URL')) {
+        return [FND_PENCIL_WEBHOOK_URL, $secret];
+    }
+    if (defined('FND_CLASH_WEBHOOK_URL')) {
+        $clash = FND_CLASH_WEBHOOK_URL;
+        $derived = str_replace('/api/clash/wp', '/api/pencil/wp', $clash);
+        return [$derived, $secret];
+    }
+    return ['', ''];
+}
+
 function fnd_get_booking_snapshot($post_id)
 {
     $date = get_post_meta($post_id, 'date', true);
@@ -215,6 +229,42 @@ function fnd_send_clash_webhook($post_id)
     $code = wp_remote_retrieve_response_code($response);
     if ($code < 200 || $code >= 300) {
         error_log('FND clash webhook returned HTTP ' . $code);
+    }
+}
+
+function fnd_send_pencil_confirmed_webhook($post_id)
+{
+    if (fnd_should_skip_clash_webhook()) return;
+
+    [$url, $secret] = fnd_get_pencil_webhook_config();
+    if (!$url || !$secret) {
+        error_log('FND pencil webhook not configured.');
+        return;
+    }
+
+    $payload = fnd_get_booking_snapshot($post_id);
+    if (empty($payload['date'])) {
+        error_log('FND pencil webhook skipped: missing date.');
+        return;
+    }
+
+    $response = wp_remote_post($url, [
+        'timeout' => 10,
+        'headers' => [
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer ' . $secret,
+        ],
+        'body' => wp_json_encode($payload),
+    ]);
+
+    if (is_wp_error($response)) {
+        error_log('FND pencil webhook failed: ' . $response->get_error_message());
+        return;
+    }
+
+    $code = wp_remote_retrieve_response_code($response);
+    if ($code < 200 || $code >= 300) {
+        error_log('FND pencil webhook returned HTTP ' . $code);
     }
 }
 
@@ -1945,7 +1995,7 @@ add_action('updated_post_meta', function ($meta_id, $object_id, $meta_key, $meta
         static $sent = [];
         if (!empty($sent[$object_id])) return;
         $sent[$object_id] = true;
-        fnd_send_clash_webhook($object_id);
+        fnd_send_pencil_confirmed_webhook($object_id);
     }
 }, 10, 4);
 

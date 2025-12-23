@@ -6,7 +6,7 @@ import { useApp } from "@/context/AppContext";
 import { updateBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import BookingForm from "./BookingForm";
-import { handleClashEmails, toBooleanLike } from "@/lib/utils";
+import { handleClashEmails, handlePencilConfirmedEmails, toBooleanLike } from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import venues from "@/lib/venues";
 
@@ -82,7 +82,8 @@ export default function EditBooking({
             const isTitleTba = toBooleanLike((data as any).showTitleIsTba);
             const didRevealTitle = wasTitleTba && !isTitleTba;
 
-            let shouldSendClashEmails = didUnpencil || didRevealTitle;
+            const shouldSendPencilConfirmed = didUnpencil;
+            let shouldSendClashEmails = didRevealTitle;
 
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
@@ -113,6 +114,9 @@ export default function EditBooking({
 
             if (shouldSendClashEmails) {
                 handleClashEmails(currentSelectedDate, data);
+            }
+            if (shouldSendPencilConfirmed) {
+                handlePencilConfirmedEmails(currentSelectedDate, data);
             }
 
             await refreshData();

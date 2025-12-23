@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import * as brevo from "@getbrevo/brevo";
 import { EmailData } from "@/lib/types";
 import { getClashEmailContent } from "@/emails/clash";
+import { getPencilConfirmedEmailContent } from "@/emails/pencilConfirmed";
 import * as XLSX from "xlsx";
 import { buildWorkbook } from "@/lib/export/xlsx";
 
@@ -16,6 +17,7 @@ apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
 const emailTemplates: Record<string, (params?: Record<string, any>) => string> = {
   clash: getClashEmailContent,
+  pencilConfirmed: getPencilConfirmedEmailContent,
 };
 
 export async function POST(request: Request) {
@@ -23,7 +25,12 @@ export async function POST(request: Request) {
     const emailData: EmailData = await request.json();
     const { to, subject, templateName, sender, replyTo, params } = emailData;
 
-    const htmlContent = emailTemplates[templateName](params);
+    const templateFn = emailTemplates[templateName];
+    if (!templateFn) {
+      throw new Error(`Email template '${templateName}' not found`);
+    }
+
+    const htmlContent = templateFn(params);
     if (!htmlContent) {
       throw new Error(`Email template '${templateName}' not found`);
     }
@@ -32,13 +39,6 @@ export async function POST(request: Request) {
       throw new Error("No params provided");
     }
 
-    const rowsObj = JSON.parse(params.dateEntries);
-    const rows = Object.values(rowsObj ?? {});
-    if (!rows.length) throw new Error("No rows to attach");
-
-    const wb = buildWorkbook(rowsObj);
-    const xlsxBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
-
     const sendSmtpEmail = new brevo.SendSmtpEmail();
     sendSmtpEmail.to = to;
     sendSmtpEmail.subject = subject;
@@ -46,12 +46,22 @@ export async function POST(request: Request) {
     sendSmtpEmail.sender = sender;
     sendSmtpEmail.replyTo = replyTo;
     sendSmtpEmail.params = params;
-    sendSmtpEmail.attachment = [
-      {
-        name: "first-night-diary.xlsx",
-        content: Buffer.from(xlsxBuffer).toString("base64"),
-      },
-    ];
+
+    if (templateName === "clash") {
+      const rowsObj = JSON.parse(params.dateEntries);
+      const rows = Object.values(rowsObj ?? {});
+      if (!rows.length) throw new Error("No rows to attach");
+
+      const wb = buildWorkbook(rowsObj);
+      const xlsxBuffer = XLSX.write(wb, { bookType: "xlsx", type: "buffer" });
+
+      sendSmtpEmail.attachment = [
+        {
+          name: "first-night-diary.xlsx",
+          content: Buffer.from(xlsxBuffer).toString("base64"),
+        },
+      ];
+    }
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
     return NextResponse.json({ success: true, data }, { status: 200 });
@@ -63,4 +73,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

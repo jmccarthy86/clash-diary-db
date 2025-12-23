@@ -52,10 +52,10 @@ export function getTbaReminderEmailContent(params: ReminderParams): string {
     const body = `<div style="font-family:Arial,sans-serif;font-size:14px;color:#202124;">
         <p style="margin:0 0 12px 0;">Hi,</p>
         <p style="margin:0 0 12px 0;">${summary} It is happening in about 30 days. Please update the missing ${escapeHtml(
-        needsStr
-    )}.</p>
+            needsStr
+        )}.</p>
         ${cta}
-        <p style="margin:0 0 12px 0;">Thanks,<br>${escapeHtml(siteName || "SOLT & UK Theatre")}</p>
+        <p style="margin:0 0 12px 0;">Thanks,<br>SOLT & UK Theatre team</p>
     </div>`;
 
     return body;

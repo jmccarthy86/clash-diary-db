@@ -372,6 +372,77 @@ export async function handleClashEmails(currentSelectedDate: Date, newData: Fiel
     }
 }
 
+export async function handlePencilConfirmedEmails(
+    currentSelectedDate: Date,
+    newData: FieldValues
+) {
+    const currentYear = currentSelectedDate.getFullYear();
+    const yearData = await getYearData(currentYear);
+
+    // Guard against undefined yearData (e.g., db error)
+    if (!yearData || !yearData.Dates) {
+        return false;
+    }
+
+    const dateString = format(currentSelectedDate, "dd/MM/yyyy");
+    const dateEntries = yearData.Dates[dateString];
+
+    if (
+        !dateEntries ||
+        typeof dateEntries === "undefined" ||
+        (dateEntries && Object.keys(dateEntries).length < 2)
+    ) {
+        return false;
+    }
+
+    const emails: string[] = [];
+
+    // Add the new entry's email from DB-style key
+    const newEmail = (newData as any).pressContact as string | undefined;
+    if (newEmail) emails.push(newEmail);
+
+    // Add emails from existing entries
+    Object.values(dateEntries).forEach((entry: any) => {
+        const pc = entry.pressContact as string | undefined;
+        if (pc) emails.push(pc);
+    });
+
+    const uniqueEmails = emails.filter(
+        (email, index, self) => self.indexOf(email) === index
+    );
+
+    const paramsBase = {
+        date: format(currentSelectedDate, "dd/MM/yyyy"),
+        rawDate: format(currentSelectedDate, "yyyy-MM-dd"),
+        venue: resolveVenueDisplay({
+            venue: (newData as any).venue,
+            otherVenue: (newData as any).otherVenue,
+            affiliateVenue: (newData as any).affiliateVenue,
+            uktVenue: (newData as any).uktVenue,
+            venueIsTba: (newData as any).venueIsTba,
+            soltMemberNonSoltVenue:
+                (newData as any).soltMemberNonSoltVenue ??
+                (newData as any).SoltMemberNonSoltVenue ??
+                (newData as any).solt_member_non_solt_venue,
+        }),
+        titleOfShow: resolveTitleOfShow(
+            (newData as any).titleOfShow,
+            (newData as any).showTitleIsTba
+        ),
+    } as Record<string, any>;
+
+    for (const email of uniqueEmails) {
+        const params = { ...paramsBase, name: email, email };
+        await sendEmail({
+            to: [{ email, name: email }],
+            subject: "SOLT & UK Theatre First Night Diary update",
+            templateName: "pencilConfirmed",
+            sender: { name: "SOLT", email: "noreply@solt.co.uk" },
+            params,
+        });
+    }
+}
+
 export async function handleClashEmail(
     user: EmailSender,
     data: FieldValues,
