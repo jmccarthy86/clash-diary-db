@@ -10,7 +10,12 @@ if (!defined('ABSPATH')) exit;
 
 add_action('init', function () {
     register_post_type('fnd_booking', [
-        'label' => 'Bookings',
+        'label' => 'FND Bookings',
+        'labels' => [
+            'name' => 'FND Bookings',
+            'singular_name' => 'FND Booking',
+            'menu_name' => 'FND Bookings',
+        ],
         'public' => false,
         'show_ui' => true,
         'show_in_menu' => true,
