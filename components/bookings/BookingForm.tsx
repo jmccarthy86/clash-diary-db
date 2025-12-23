@@ -187,6 +187,7 @@ export default function BookingForm({
     const venueValue = form.watch("venue");
     const venueIsTbaValue = form.watch("venueIsTba");
     const soltMemberNonSoltVenueValue = form.watch("soltMemberNonSoltVenue");
+    const otherVenueValue = form.watch("otherVenue");
     React.useEffect(() => {
         if (titleOfShowValue && titleOfShowValue.trim().length > 0) {
             previousTitleRef.current = titleOfShowValue;
@@ -225,6 +226,17 @@ export default function BookingForm({
             form.setValue("soltMemberNonSoltVenue", false, { shouldDirty: true });
         }
     }, [venueValue, soltMemberNonSoltVenueValue, form]);
+
+    React.useEffect(() => {
+        if (
+            venueValue &&
+            otherVenueValue &&
+            venueValue === otherVenueValue &&
+            !soltMemberNonSoltVenueValue
+        ) {
+            form.setValue("otherVenue", "", { shouldDirty: true });
+        }
+    }, [venueValue, otherVenueValue, soltMemberNonSoltVenueValue, form]);
 
     React.useEffect(() => {
         if (venueIsTbaValue && soltMemberNonSoltVenueValue) {

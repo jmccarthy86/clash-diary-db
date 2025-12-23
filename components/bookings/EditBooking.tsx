@@ -27,16 +27,21 @@ export default function EditBooking({
     currentSelectedDate,
 }: EditBookingProps) {
     console.log(currentDetail);
-    // if Venue is not empty and is not in the venues list, it should be set in the otherVenue field.
-    const selectedVenue = venues.find((venue) => venue.value === currentDetail.Venue);
+    // If venue matches the SOLT list, keep it in venue; otherwise treat it as otherVenue.
+    const rawVenue = coalesceString(currentDetail.venue, currentDetail.Venue);
+    const selectedVenue = venues.find((venue) => venue.value === rawVenue);
 
-    let venue = currentDetail.venue;
+    let venue = rawVenue;
     let otherVenue = currentDetail.otherVenue;
 
-    if (currentDetail.venue !== "" && selectedVenue === undefined) {
-        otherVenue = currentDetail.venue;
-    } else if (currentDetail.venue !== "" && selectedVenue) {
-        venue = currentDetail.venue;
+    if (rawVenue !== "" && selectedVenue === undefined) {
+        otherVenue = rawVenue;
+        venue = "";
+    } else if (selectedVenue) {
+        venue = rawVenue;
+        if (otherVenue === rawVenue) {
+            otherVenue = "";
+        }
     }
 
     const initialValues = {
