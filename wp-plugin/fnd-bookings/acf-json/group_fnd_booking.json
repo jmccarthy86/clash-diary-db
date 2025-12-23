@@ -269,6 +269,14 @@
       "wrapper": { "width": "", "class": "", "id": "" }
     },
     {
+      "key": "field_fnd_user_id",
+      "label": "User ID",
+      "name": "user_id",
+      "type": "text",
+      "instructions": "Set by the diary app auth. Edit only if you need to correct ownership.",
+      "wrapper": { "width": "", "class": "", "id": "" }
+    },
+    {
       "key": "field_fnd_date_bkd",
       "label": "Date Booked (free text)",
       "name": "date_bkd",

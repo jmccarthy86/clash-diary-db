@@ -6,7 +6,12 @@ import { useApp } from "@/context/AppContext";
 import { updateBooking } from "@/lib/actions/bookings";
 import { toast } from "@/components/ui/use-toast";
 import BookingForm from "./BookingForm";
-import { handleClashEmails, handlePencilConfirmedEmails, toBooleanLike } from "@/lib/utils";
+import {
+    handleClashEmails,
+    handlePencilConfirmedEmails,
+    toBooleanLike,
+    coalesceString,
+} from "@/lib/utils";
 import { FieldValues } from "react-hook-form";
 import venues from "@/lib/venues";
 
@@ -54,7 +59,12 @@ export default function EditBooking({
         dateBkd: currentDetail.dateBkd || "",
         isSeasonGala: !!currentDetail.isSeasonGala,
         isOperaDance: !!currentDetail.isOperaDance,
-        userId: currentDetail.userId || "0",
+        userId:
+            coalesceString(
+                (currentDetail as any).userId,
+                (currentDetail as any).UserId,
+                (currentDetail as any).user_id
+            ) || "0",
     };
 
     // Context

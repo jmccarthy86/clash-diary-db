@@ -127,6 +127,11 @@ export function transformData(inputData: RequestData): Booking[] {
         for (const [range, data] of Object.entries(entries)) {
             //console.log(data);
             // Define the default values for missing fields
+            const normalizedUserId = coalesceString(
+                (data as any).UserId,
+                (data as any).userId,
+                (data as any).user_id
+            );
 
             // Ensure data is cast to Partial<SubRowData> and provide defaults for missing fields
             const subRow: SubRowData = {
@@ -141,8 +146,9 @@ export function transformData(inputData: RequestData): Booking[] {
                     data.IsSeasonGala !== undefined ? (data.IsSeasonGala as boolean) : false,
                 OtherVenue: (data.OtherVenue as string) || "",
                 P: data.P !== undefined ? (data.P as boolean) : false,
-                UserId: (data.UserId as string) || "",
                 ...data,
+                UserId: normalizedUserId,
+                userId: normalizedUserId,
             };
 
             booking.subRows.push(subRow);
