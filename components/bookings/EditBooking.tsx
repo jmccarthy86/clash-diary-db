@@ -91,9 +91,16 @@ export default function EditBooking({
             );
             const isTitleTba = toBooleanLike((data as any).showTitleIsTba);
             const didRevealTitle = wasTitleTba && !isTitleTba;
+            const wasVenueTba = toBooleanLike(
+                (currentDetail as any).venueIsTba ??
+                    (currentDetail as any).venue_is_tba ??
+                    (currentDetail as any).VenueIsTba
+            );
+            const isVenueTba = toBooleanLike((data as any).venueIsTba);
+            const didRevealVenue = wasVenueTba && !isVenueTba;
 
             const shouldSendPencilConfirmed = didUnpencil;
-            let shouldSendClashEmails = didRevealTitle;
+            let shouldSendClashEmails = didRevealTitle || didRevealVenue;
 
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
