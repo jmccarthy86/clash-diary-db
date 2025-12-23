@@ -1032,15 +1032,16 @@ function fnd_tba_collect_bookings_for_window($start_ms, $end_ms)
 
 function fnd_tba_send_reminders()
 {
-    if (!fnd_tba_reminders_enabled()) {
-        return;
-    }
+    $enabled = fnd_tba_reminders_enabled();
 
     [$start_ms, $end_ms] = fnd_tba_reminder_window_ms(30);
     $by_email = fnd_tba_collect_bookings_for_window($start_ms, $end_ms);
     if (empty($by_email)) return;
 
     foreach ($by_email as $email => $items) {
+        if (!$enabled && strcasecmp($email, 'john@lawrencedavis.co.uk') !== 0) {
+            continue;
+        }
         foreach ($items as $item) {
             // send one email per booking for this press contact
             fnd_send_tba_webhook($email, [$item]);
