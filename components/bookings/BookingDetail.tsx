@@ -57,7 +57,8 @@ export default function BookingDetail({
         typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).has("debugAuth");
 
-    const { userId, p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
+    const { p, GALA_NIGHT, OPERA_DANCE, ...otherDetails } = rowData;
+    const userId = coalesceString((rowData as any).userId, (rowData as any).UserId);
     const normalizedTitle = coalesceString(
         otherDetails.titleOfShow,
         otherDetails.TitleOfShow

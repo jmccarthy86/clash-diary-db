@@ -36,6 +36,7 @@ import { SubRowData } from "@/lib/types";
 import { useApp } from "@/context/AppContext";
 import { toast } from "@/components/ui/use-toast";
 import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
+import { coalesceString } from "@/lib/utils";
 
 interface TableRowActionsProps {
     subRow: SubRowData;
@@ -54,6 +55,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const debugAuth =
         typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).has("debugAuth");
+    const rowUserId = coalesceString(subRow.userId, subRow.UserId);
 
     const handleViewClick = () => {
         setIsOpen(false);
@@ -149,7 +151,7 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
     const showEditOptions =
         isDev ||
         (hasAuthCookie !== "0" &&
-            hasAuthCookie === String(subRow.UserId) &&
+            hasAuthCookie === rowUserId &&
             (isAfter(currentSelectedDate, new Date()) ||
                 isSameDay(currentSelectedDate, new Date())));
 
@@ -157,12 +159,12 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         if (!debugAuth) return;
         console.log("[FND auth] RowActions state", {
             hasAuthCookie,
-            rowUserId: subRow.UserId,
+            rowUserId,
             showEditOptions,
             isDev,
             currentSelectedDate: currentSelectedDate?.toISOString?.() ?? null,
         });
-    }, [debugAuth, hasAuthCookie, subRow.UserId, showEditOptions, isDev, currentSelectedDate]);
+    }, [debugAuth, hasAuthCookie, rowUserId, showEditOptions, isDev, currentSelectedDate]);
 
     return (
         <>
