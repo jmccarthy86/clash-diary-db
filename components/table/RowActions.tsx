@@ -101,7 +101,6 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         const handleMessage = (event: MessageEvent) => {
             const allowed = new Set([
                 "https://solt.co.uk",
-                "https://soltdigital.co.uk",
                 "https://soltukt.test",
             ]);
             if (!allowed.has(event.origin)) return;
@@ -126,7 +125,6 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
             const target =
                 ref &&
                 (ref === "https://solt.co.uk" ||
-                    ref === "https://soltdigital.co.uk" ||
                     ref === "https://soltukt.test")
                     ? ref
                     : "https://solt.co.uk";

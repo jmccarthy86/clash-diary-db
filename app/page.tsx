@@ -27,7 +27,6 @@ function MainContent() {
                 // Verify allowed parent origins
                 const allowed = new Set([
                     "https://solt.co.uk",
-                    "https://soltdigital.co.uk",
                     "https://soltukt.test",
                 ]);
                 if (!allowed.has(event.origin)) return;

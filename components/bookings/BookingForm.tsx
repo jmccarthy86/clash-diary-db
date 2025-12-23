@@ -237,7 +237,6 @@ export default function BookingForm({
         const handleMessage = (event: MessageEvent) => {
             const allowed = new Set([
                 "https://solt.co.uk",
-                "https://soltdigital.co.uk",
                 "https://soltukt.test",
             ]);
             if (!allowed.has(event.origin)) {

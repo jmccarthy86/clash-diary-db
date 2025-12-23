@@ -3,7 +3,6 @@ function getParentOrigin() {
         var ref = document.referrer ? new URL(document.referrer).origin : "";
         if (
             ref === "https://solt.co.uk" ||
-            ref === "https://soltdigital.co.uk" ||
             ref === "https://soltukt.test"
         )
             return ref;
