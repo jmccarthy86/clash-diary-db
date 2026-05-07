@@ -972,6 +972,17 @@ function fnd_tba_reminder_window_ms($days_ahead = 30)
     ];
 }
 
+function fnd_tba_future_window_ms($days_from_today = 0)
+{
+    $tz = fnd_wp_tz();
+    $start = new DateTimeImmutable('today +' . intval($days_from_today) . ' days', $tz);
+    $end = $start->modify('+10 years')->setTime(23, 59, 59);
+    return [
+        intval($start->getTimestamp() * 1000),
+        intval($end->getTimestamp() * 1000),
+    ];
+}
+
 function fnd_tba_collect_bookings_for_window($start_ms, $end_ms)
 {
     $q = new WP_Query([
@@ -1034,7 +1045,11 @@ function fnd_tba_send_reminders()
 {
     $enabled = fnd_tba_reminders_enabled();
 
-    [$start_ms, $end_ms] = fnd_tba_reminder_window_ms(30);
+    if ($enabled) {
+        [$start_ms, $end_ms] = fnd_tba_reminder_window_ms(30);
+    } else {
+        [$start_ms, $end_ms] = fnd_tba_future_window_ms(0);
+    }
     $by_email = fnd_tba_collect_bookings_for_window($start_ms, $end_ms);
     if (empty($by_email)) return;
 

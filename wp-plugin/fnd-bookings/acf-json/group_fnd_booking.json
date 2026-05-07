@@ -267,7 +267,7 @@
       "name": "press_contact",
       "type": "email",
       "wrapper": { "width": "", "class": "", "id": "" }
-    },
+    }, 
     {
       "key": "field_fnd_user_id",
       "label": "User ID",

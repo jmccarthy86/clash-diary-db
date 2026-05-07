@@ -57,10 +57,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
                         height={86}
                     />
                     <div className="header-actions flex flex-col gap-3 mt-4 lg:flex-row lg:mt-0 lg:gap-3">
-                        <a className="header-button" href="https://solt.co.uk">
+                        <a className="header-button" href="https://solt.co.uk" target="_top">
                             Return to SOLT website
                         </a>
-                        <a className="header-button" href="https://uktheatre.org">
+                        <a className="header-button" href="https://uktheatre.org" target="_top">
                             Return to UK Theatre website
                         </a>
                         <a
