@@ -59,6 +59,7 @@ const venues = [
     { value: "The Old Vic", label: "The Old Vic" },
     { value: "Theatre Royal Drury Lane", label: "Theatre Royal Drury Lane" },
     { value: "Theatre Royal Haymarket", label: "Theatre Royal Haymarket" },
+    { value: "Unicorn Theatre", label: "Unicorn Theatre" },
     { value: "Vaudeville", label: "Vaudeville" },
     { value: "Victoria Palace Theatre", label: "Victoria Palace Theatre" },
     { value: "Wyndham's Theatre", label: "Wyndham's Theatre" },
