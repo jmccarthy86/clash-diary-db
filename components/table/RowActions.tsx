@@ -35,7 +35,6 @@ import EditBooking from "@/components/bookings/EditBooking";
 import { SubRowData } from "@/lib/types";
 import { useApp } from "@/context/AppContext";
 import { toast } from "@/components/ui/use-toast";
-import { CookieListItem } from "next/dist/compiled/@edge-runtime/cookies";
 import { coalesceString } from "@/lib/utils";
 
 interface TableRowActionsProps {
@@ -44,14 +43,13 @@ interface TableRowActionsProps {
 
 export function TableRowActions({ subRow }: TableRowActionsProps) {
     //console.log("subRow:", subRow);
-    const { refreshData } = useApp();
+    const { refreshData, authUserId } = useApp();
 
     const [openView, setOpenView] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
     const [isOpen, setIsOpen] = React.useState(false);
     const [isDeleting, setIsDeleting] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState("0");
     const debugAuth =
         typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).has("debugAuth");
@@ -97,49 +95,6 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
         setIsDeleting(false);
     };
 
-    React.useEffect(() => {
-        const handleMessage = (event: MessageEvent) => {
-            const allowed = new Set([
-                "https://solt.co.uk",
-                "https://soltukt.test",
-            ]);
-            if (!allowed.has(event.origin)) return;
-            if (debugAuth) {
-                console.log("[FND auth] RowActions message", {
-                    origin: event.origin,
-                    data: event.data,
-                    referrer: document.referrer,
-                });
-            }
-            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
-            if (clashId == null) return;
-            setHasAuthCookie(String(clashId)); // RowActions uses a number state
-        };
-
-        window.addEventListener("message", handleMessage);
-
-        // Notify parent that iframe is ready
-        //console.log('Iframe is ready, notifying parent');
-        try {
-            const ref = document.referrer ? new URL(document.referrer).origin : undefined;
-            const target =
-                ref &&
-                (ref === "https://solt.co.uk" ||
-                    ref === "https://soltukt.test")
-                    ? ref
-                    : "https://solt.co.uk";
-            window.parent.postMessage("iframeReady", target);
-        } catch {
-            window.parent.postMessage("iframeReady", "https://solt.co.uk");
-        }
-
-        // Clean up the event listener on component unmount
-        return () => {
-            //console.log('Cleaning up message event listener in iframe');
-            window.removeEventListener("message", handleMessage);
-        };
-    }, []);
-
     const currentSelectedDate = parse(subRow.Date, "dd/MM/yyyy", new Date(), {
         locale: enGB,
     });
@@ -148,21 +103,21 @@ export function TableRowActions({ subRow }: TableRowActionsProps) {
 
     const showEditOptions =
         isDev ||
-        (hasAuthCookie !== "0" &&
-            hasAuthCookie === rowUserId &&
+        (authUserId !== "0" &&
+            authUserId === rowUserId &&
             (isAfter(currentSelectedDate, new Date()) ||
                 isSameDay(currentSelectedDate, new Date())));
 
     React.useEffect(() => {
         if (!debugAuth) return;
         console.log("[FND auth] RowActions state", {
-            hasAuthCookie,
+            authUserId,
             rowUserId,
             showEditOptions,
             isDev,
             currentSelectedDate: currentSelectedDate?.toISOString?.() ?? null,
         });
-    }, [debugAuth, hasAuthCookie, rowUserId, showEditOptions, isDev, currentSelectedDate]);
+    }, [debugAuth, authUserId, rowUserId, showEditOptions, isDev, currentSelectedDate]);
 
     return (
         <>

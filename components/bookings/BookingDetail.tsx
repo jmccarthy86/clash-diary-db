@@ -49,10 +49,9 @@ export default function BookingDetail({
     currentSelectedDate,
     allowEdit,
 }: BookingDetailProps) {
-    const { refreshData } = useApp();
+    const { refreshData, authUserId } = useApp();
     const [isDeleting, setIsDeleting] = React.useState(false);
     const [isAlertDialogOpen, setIsAlertDialogOpen] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
     const debugAuth =
         typeof window !== "undefined" &&
         new URLSearchParams(window.location.search).has("debugAuth");
@@ -93,33 +92,6 @@ export default function BookingDetail({
             (otherDetails as any).solt_member_non_solt_venue
     );
 
-    React.useEffect(() => {
-        // Listen for message from parent
-        const handleMessage = (event: MessageEvent) => {
-            const allowed = new Set([
-                "https://solt.co.uk",
-                "https://soltukt.test",
-            ]);
-            if (!allowed.has(event.origin)) return;
-            if (debugAuth) {
-                console.log("[FND auth] BookingDetail message", {
-                    origin: event.origin,
-                    data: event.data,
-                    referrer: document.referrer,
-                });
-            }
-            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
-            if (clashId == null) return;
-            setHasAuthCookie(String(clashId));
-        };
-
-        window.addEventListener("message", handleMessage);
-
-        return () => {
-            window.removeEventListener("message", handleMessage);
-        };
-    }, []);
-
     const handleDelete = async () => {
         setIsDeleting(true);
 
@@ -148,21 +120,21 @@ export default function BookingDetail({
 
     const showEditOptions =
         isDev ||
-        (hasAuthCookie !== "0" &&
-            hasAuthCookie === userId &&
+        (authUserId !== "0" &&
+            authUserId === userId &&
             (isAfter(currentSelectedDate, new Date()) ||
                 isSameDay(currentSelectedDate, new Date())));
 
     React.useEffect(() => {
         if (!debugAuth) return;
         console.log("[FND auth] BookingDetail state", {
-            hasAuthCookie,
+            authUserId,
             userId,
             showEditOptions,
             isDev,
             currentSelectedDate: currentSelectedDate?.toISOString?.() ?? null,
         });
-    }, [debugAuth, hasAuthCookie, userId, showEditOptions, isDev, currentSelectedDate]);
+    }, [debugAuth, authUserId, userId, showEditOptions, isDev, currentSelectedDate]);
 
     return (
         <Card className="w-full pt-6" data-relation={userId || undefined}>

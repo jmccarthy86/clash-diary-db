@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CheckedState } from "@radix-ui/react-checkbox";
+import { useApp } from "@/context/AppContext";
 
 export const FormSchema = z.object({
     day: z.string().optional(),
@@ -138,21 +139,22 @@ export default function BookingForm({
     isEdit: boolean;
     currentSelectedDate: Date;
 }) {
+    const { authUserId } = useApp();
     const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
     const [submitting, setSubmitting] = React.useState(false);
     const [showNoChangesAlert, setShowNoChangesAlert] = React.useState(false);
-    const [hasAuthCookie, setHasAuthCookie] = React.useState<string>("0");
     const [open, setOpen] = React.useState(false);
     const [openAffiliate, setOpenAffiliate] = React.useState(false);
     const [openUKTVenue, setOpenUKTVenue] = React.useState(false); // State for UKTVenue select
     const previousTitleRef = React.useRef<string>("");
 
     const defaultValues = React.useMemo(() => {
+        const effectiveUserId = authUserId !== "0" ? authUserId : undefined;
         if (initialData) {
             return {
                 ...initialData,
                 soltMemberNonSoltVenue: initialData.soltMemberNonSoltVenue ?? false,
-                userId: hasAuthCookie || initialData.userId || "0", // Ensure the correct value
+                userId: effectiveUserId || initialData.userId || "0",
             };
         } else {
             return {
@@ -173,11 +175,11 @@ export default function BookingForm({
                 dateBkd: "",
                 isSeasonGala: false,
                 isOperaDance: false,
-                userId: hasAuthCookie || "0", // Default to 0 or use hasAuthCookie
+                userId: effectiveUserId || "0",
                 timeStamp: Date.now(),
             };
         }
-    }, [initialData, hasAuthCookie, currentSelectedDate]);
+    }, [initialData, authUserId, currentSelectedDate]);
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -245,30 +247,6 @@ export default function BookingForm({
     }, [venueIsTbaValue, soltMemberNonSoltVenueValue, form]);
 
     React.useEffect(() => {
-        // Listen for message from parent
-        const handleMessage = (event: MessageEvent) => {
-            const allowed = new Set([
-                "https://solt.co.uk",
-                "https://soltukt.test",
-            ]);
-            if (!allowed.has(event.origin)) {
-                console.warn("Invalid origin:", event.origin);
-                return;
-            }
-
-            const { clashId } = (event.data ?? {}) as { clashId?: string | number };
-            if (clashId == null) return;
-            setHasAuthCookie(String(clashId));
-        };
-
-        window.addEventListener("message", handleMessage);
-
-        return () => {
-            window.removeEventListener("message", handleMessage);
-        };
-    }, []);
-
-    React.useEffect(() => {
         if (currentSelectedDate) {
             form.setValue("date", currentSelectedDate);
             form.setValue("day", format(currentSelectedDate, "EEEE"));
@@ -284,10 +262,10 @@ export default function BookingForm({
     }, [currentSelectedDate, form]);
 
     React.useEffect(() => {
-        if (hasAuthCookie && hasAuthCookie !== "0") {
-            form.setValue("userId", hasAuthCookie);
+        if (authUserId && authUserId !== "0") {
+            form.setValue("userId", authUserId);
         }
-    }, [hasAuthCookie, form]);
+    }, [authUserId, form]);
 
     const {
         formState: { isDirty },
