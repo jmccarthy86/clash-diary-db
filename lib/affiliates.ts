@@ -21,6 +21,8 @@ const affiliates = [
     { value: "Polka Theatre", label: "Polka Theatre" },
     { value: "Riverside Studios", label: "Riverside Studios" },
     { value: "Rose Theatre", label: "Rose Theatre" },
+    { value: "Soho Theatre – Downstairs", label: "Soho Theatre – Downstairs" },
+    { value: "Soho Theatre – Upstairs", label: "Soho Theatre – Upstairs" },
     { value: "The Other Palace", label: "The Other Palace" },
     { value: "Theatre Royal Stratford East", label: "Theatre Royal Stratford East" },
     { value: "Young Vic", label: "Young Vic" },
