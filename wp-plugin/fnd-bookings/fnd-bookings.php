@@ -69,6 +69,14 @@ add_action('init', function () {
         'menu_icon' => 'dashicons-media-text',
     ]);
 
+    register_post_type('fnd_notification', [
+        'label' => 'Booking Notifications',
+        'public' => false,
+        'show_ui' => false,
+        'show_in_rest' => false,
+        'supports' => ['title'],
+    ]);
+
     register_post_meta('fnd_log', '_fnd_log_entry', [
         'type' => 'string',
         'single' => true,
@@ -77,6 +85,31 @@ add_action('init', function () {
             return current_user_can('edit_posts');
         },
     ]);
+
+    $notification_meta_keys = [
+        '_fnd_booking_id',
+        '_fnd_notification_type',
+        '_fnd_recipient_email',
+        '_fnd_subject',
+        '_fnd_status',
+        '_fnd_provider',
+        '_fnd_provider_message_id',
+        '_fnd_error_message',
+        '_fnd_trigger',
+        '_fnd_created_at',
+        '_fnd_sent_at',
+    ];
+
+    foreach ($notification_meta_keys as $key) {
+        register_post_meta('fnd_notification', $key, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'auth_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+        ]);
+    }
 });
 
 function fnd_bool_int($v)
@@ -449,6 +482,131 @@ function fnd_bookings_log_action($action, array $data = [])
     }
 }
 
+function fnd_notification_allowed_value($value, array $allowed, $fallback)
+{
+    $value = sanitize_key((string)$value);
+    return in_array($value, $allowed, true) ? $value : $fallback;
+}
+
+function fnd_normalize_notification_activity($booking_id, array $data)
+{
+    $status = fnd_notification_allowed_value(
+        $data['status'] ?? '',
+        ['sent', 'failed', 'skipped'],
+        'skipped'
+    );
+    $type = fnd_notification_allowed_value(
+        $data['type'] ?? '',
+        ['clash', 'pencil_confirmed', 'tba_reminder'],
+        'clash'
+    );
+
+    $recipient = sanitize_email($data['recipient_email'] ?? '');
+    $subject = sanitize_text_field($data['subject'] ?? '');
+    $provider = sanitize_key($data['provider'] ?? 'brevo');
+    $provider_message_id = sanitize_text_field($data['provider_message_id'] ?? '');
+    $error_message = sanitize_textarea_field($data['error_message'] ?? '');
+    $trigger = sanitize_key($data['trigger'] ?? '');
+    $created_at = sanitize_text_field($data['created_at'] ?? gmdate('c'));
+    $sent_at = sanitize_text_field($data['sent_at'] ?? ($status === 'sent' ? gmdate('c') : ''));
+
+    return [
+        'booking_id' => (string)intval($booking_id),
+        'type' => $type,
+        'recipient_email' => $recipient,
+        'subject' => $subject,
+        'status' => $status,
+        'provider' => $provider ?: 'brevo',
+        'provider_message_id' => $provider_message_id,
+        'error_message' => $error_message,
+        'trigger' => $trigger,
+        'created_at' => $created_at,
+        'sent_at' => $sent_at,
+    ];
+}
+
+function fnd_record_notification_activity($booking_id, array $data)
+{
+    $booking_id = intval($booking_id);
+    $booking = get_post($booking_id);
+    if (!$booking || $booking->post_type !== 'fnd_booking') {
+        return new WP_Error('invalid_booking', 'Invalid booking ID.', ['status' => 404]);
+    }
+
+    $entry = fnd_normalize_notification_activity($booking_id, $data);
+    $title = sprintf(
+        '[%s] %s to %s',
+        strtoupper($entry['status']),
+        str_replace('_', ' ', $entry['type']),
+        $entry['recipient_email'] ?: 'unknown recipient'
+    );
+
+    $post_id = wp_insert_post([
+        'post_type' => 'fnd_notification',
+        'post_status' => 'publish',
+        'post_title' => $title,
+        'post_parent' => $booking_id,
+    ], true);
+
+    if (is_wp_error($post_id)) {
+        return $post_id;
+    }
+
+    $meta_map = [
+        '_fnd_booking_id' => $entry['booking_id'],
+        '_fnd_notification_type' => $entry['type'],
+        '_fnd_recipient_email' => $entry['recipient_email'],
+        '_fnd_subject' => $entry['subject'],
+        '_fnd_status' => $entry['status'],
+        '_fnd_provider' => $entry['provider'],
+        '_fnd_provider_message_id' => $entry['provider_message_id'],
+        '_fnd_error_message' => $entry['error_message'],
+        '_fnd_trigger' => $entry['trigger'],
+        '_fnd_created_at' => $entry['created_at'],
+        '_fnd_sent_at' => $entry['sent_at'],
+    ];
+
+    foreach ($meta_map as $key => $value) {
+        update_post_meta($post_id, $key, $value);
+    }
+
+    return $post_id;
+}
+
+function fnd_notification_to_array($post_id)
+{
+    return [
+        'id' => intval($post_id),
+        'booking_id' => intval(get_post_meta($post_id, '_fnd_booking_id', true)),
+        'type' => get_post_meta($post_id, '_fnd_notification_type', true),
+        'recipient_email' => get_post_meta($post_id, '_fnd_recipient_email', true),
+        'subject' => get_post_meta($post_id, '_fnd_subject', true),
+        'status' => get_post_meta($post_id, '_fnd_status', true),
+        'provider' => get_post_meta($post_id, '_fnd_provider', true),
+        'provider_message_id' => get_post_meta($post_id, '_fnd_provider_message_id', true),
+        'error_message' => get_post_meta($post_id, '_fnd_error_message', true),
+        'trigger' => get_post_meta($post_id, '_fnd_trigger', true),
+        'created_at' => get_post_meta($post_id, '_fnd_created_at', true),
+        'sent_at' => get_post_meta($post_id, '_fnd_sent_at', true),
+    ];
+}
+
+function fnd_get_booking_notifications($booking_id, $limit = 20)
+{
+    $posts = get_posts([
+        'post_type' => 'fnd_notification',
+        'post_status' => 'publish',
+        'post_parent' => intval($booking_id),
+        'posts_per_page' => max(1, min(100, intval($limit))),
+        'orderby' => 'date',
+        'order' => 'DESC',
+    ]);
+
+    return array_map(function ($post) {
+        return fnd_notification_to_array($post->ID);
+    }, $posts);
+}
+
 function fnd_render_log_entry_metabox($post)
 {
     $raw = get_post_meta($post->ID, '_fnd_log_entry', true);
@@ -470,6 +628,47 @@ function fnd_render_log_entry_metabox($post)
     echo '<textarea readonly style="width:100%;min-height:300px;font-family:monospace;">' . esc_textarea($display) . '</textarea>';
 }
 
+function fnd_format_notification_time($value)
+{
+    if (!$value) return '';
+    $timestamp = strtotime((string)$value);
+    if (!$timestamp) return (string)$value;
+    $tz = fnd_wp_tz();
+    return function_exists('wp_date') ? wp_date('d/m/Y H:i', $timestamp, $tz) : date('d/m/Y H:i', $timestamp);
+}
+
+function fnd_render_booking_notifications_metabox($post)
+{
+    $notifications = fnd_get_booking_notifications($post->ID, 20);
+    if (empty($notifications)) {
+        echo '<p>No notification activity recorded for this booking.</p>';
+        return;
+    }
+
+    echo '<div style="display:flex;flex-direction:column;gap:12px;">';
+    foreach ($notifications as $item) {
+        $status = (string)($item['status'] ?? 'skipped');
+        $color = $status === 'sent' ? '#15803d' : ($status === 'failed' ? '#b91c1c' : '#92400e');
+        $type = ucwords(str_replace('_', ' ', (string)($item['type'] ?? 'notification')));
+        $time = fnd_format_notification_time($item['sent_at'] ?: $item['created_at']);
+
+        echo '<div style="border:1px solid #dcdcde;border-radius:4px;padding:10px;background:#fff;">';
+        echo '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">';
+        echo '<strong>' . esc_html($type) . '</strong>';
+        echo '<span style="color:#fff;background:' . esc_attr($color) . ';border-radius:10px;padding:2px 7px;font-size:11px;text-transform:uppercase;">' . esc_html($status) . '</span>';
+        echo '</div>';
+        echo '<div style="font-size:12px;line-height:1.5;">';
+        if (!empty($item['recipient_email'])) echo '<div><strong>To:</strong> ' . esc_html($item['recipient_email']) . '</div>';
+        if (!empty($time)) echo '<div><strong>When:</strong> ' . esc_html($time) . '</div>';
+        if (!empty($item['trigger'])) echo '<div><strong>Trigger:</strong> ' . esc_html(str_replace('_', ' ', $item['trigger'])) . '</div>';
+        if (!empty($item['provider_message_id'])) echo '<div><strong>Brevo ID:</strong> ' . esc_html($item['provider_message_id']) . '</div>';
+        if (!empty($item['error_message'])) echo '<div style="margin-top:6px;color:#b91c1c;"><strong>Error:</strong> ' . esc_html($item['error_message']) . '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+    echo '</div>';
+}
+
 add_action('add_meta_boxes', function () {
     add_meta_box(
         'fnd_log_entry_payload',
@@ -477,6 +676,15 @@ add_action('add_meta_boxes', function () {
         'fnd_render_log_entry_metabox',
         'fnd_log',
         'normal',
+        'default'
+    );
+
+    add_meta_box(
+        'fnd_booking_notifications',
+        'Notifications',
+        'fnd_render_booking_notifications_metabox',
+        'fnd_booking',
+        'side',
         'default'
     );
 });
@@ -770,6 +978,51 @@ add_action('rest_api_init', function () {
                 ]);
                 wp_trash_post($id);
                 return new WP_REST_Response(null, 204);
+            }
+        ],
+    ]);
+
+    register_rest_route('fnd/v1', '/bookings/(?P<id>\d+)/notifications', [
+        [
+            'methods' => 'GET',
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+            'callback' => function (WP_REST_Request $req) {
+                $id = intval($req['id']);
+                $post = get_post($id);
+                if (!$post || $post->post_type !== 'fnd_booking') {
+                    return new WP_Error('not_found', 'Not found', ['status' => 404]);
+                }
+
+                $limit = intval($req->get_param('limit') ?: 20);
+                return [
+                    'booking_id' => $id,
+                    'notifications' => fnd_get_booking_notifications($id, $limit),
+                ];
+            }
+        ],
+        [
+            'methods' => 'POST',
+            'permission_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+            'callback' => function (WP_REST_Request $req) {
+                $id = intval($req['id']);
+                $params = $req->get_json_params();
+                if (!is_array($params)) {
+                    $params = [];
+                }
+
+                $notification_id = fnd_record_notification_activity($id, $params);
+                if (is_wp_error($notification_id)) {
+                    return $notification_id;
+                }
+
+                return new WP_REST_Response([
+                    'id' => intval($notification_id),
+                    'notification' => fnd_notification_to_array($notification_id),
+                ], 201);
             }
         ],
     ]);
