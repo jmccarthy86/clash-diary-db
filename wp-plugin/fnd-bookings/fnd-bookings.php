@@ -2,7 +2,7 @@
 /*
 Plugin Name: FND Bookings API
 Description: Custom post type and REST API for First Night Diary bookings.
-Version: 0.1.1
+Version: 0.1.2
 Author: LD
 */
 
