@@ -328,7 +328,16 @@ function formatDate(date: Date): string {
     return `${day}/${month}/${year}`;
 }
 
-export async function handleClashEmails(currentSelectedDate: Date, newData: FieldValues) {
+type NotificationEmailOptions = {
+    bookingId?: string | number | null;
+    trigger?: string;
+};
+
+export async function handleClashEmails(
+    currentSelectedDate: Date,
+    newData: FieldValues,
+    notificationOptions: NotificationEmailOptions = {}
+) {
     const currentYear = currentSelectedDate.getFullYear();
     const yearData = await getYearData(currentYear);
 
@@ -373,14 +382,22 @@ export async function handleClashEmails(currentSelectedDate: Date, newData: Fiel
                 email: email,
                 name: email, // Using email as name since we don't have separate names
             };
-            await handleClashEmail(user, newData, currentSelectedDate, filteredEmails, dateEntries);
+            await handleClashEmail(
+                user,
+                newData,
+                currentSelectedDate,
+                filteredEmails,
+                dateEntries,
+                notificationOptions
+            );
         }
     }
 }
 
 export async function handlePencilConfirmedEmails(
     currentSelectedDate: Date,
-    newData: FieldValues
+    newData: FieldValues,
+    notificationOptions: NotificationEmailOptions = {}
 ) {
     const currentYear = currentSelectedDate.getFullYear();
     const yearData = await getYearData(currentYear);
@@ -420,6 +437,8 @@ export async function handlePencilConfirmedEmails(
     const paramsBase = {
         date: format(currentSelectedDate, "dd/MM/yyyy"),
         rawDate: format(currentSelectedDate, "yyyy-MM-dd"),
+        notificationBookingId: notificationOptions.bookingId,
+        notificationTrigger: notificationOptions.trigger ?? "pencil_confirmed",
         venue: resolveVenueDisplay({
             venue: (newData as any).venue,
             otherVenue: (newData as any).otherVenue,
@@ -454,7 +473,8 @@ export async function handleClashEmail(
     data: FieldValues,
     currentSelectedDate: Date,
     filteredEmails: string[],
-    dateEntries: object
+    dateEntries: object,
+    notificationOptions: NotificationEmailOptions = {}
 ) {
     console.log("dateEntries: ", dateEntries);
     console.log("filteredEmails: ", filteredEmails);
@@ -465,6 +485,8 @@ export async function handleClashEmail(
         email: user.email,
         date: format(currentSelectedDate, "dd/MM/yyyy"),
         rawDate: format(currentSelectedDate, "yyyy-MM-dd"),
+        notificationBookingId: notificationOptions.bookingId,
+        notificationTrigger: notificationOptions.trigger ?? "booking_created",
         venue: resolveVenueDisplay({
             venue: (data as any).venue,
             otherVenue: (data as any).otherVenue,

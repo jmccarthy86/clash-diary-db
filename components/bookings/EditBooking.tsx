@@ -106,6 +106,7 @@ export default function EditBooking({
 
             const shouldSendPencilConfirmed = didUnpencil;
             let shouldSendClashEmails = didRevealTitle || didRevealVenue;
+            let didChangeDate = false;
 
             if (yearData) {
                 const originalDateFormatted = format(currentSelectedDate, "dd/MM/yyyy");
@@ -125,6 +126,7 @@ export default function EditBooking({
 
                         if (dateBeforeEdit && !isSameDay(dateBeforeEdit, dataDate)) {
                             shouldSendClashEmails = true;
+                            didChangeDate = true;
                         }
                     }
                 } else if (!didUnpencil) {
@@ -135,10 +137,22 @@ export default function EditBooking({
             }
 
             if (shouldSendClashEmails) {
-                handleClashEmails(currentSelectedDate, data);
+                await handleClashEmails(currentSelectedDate, data, {
+                    bookingId: rowRange,
+                    trigger: didChangeDate
+                        ? "date_changed"
+                        : didRevealVenue
+                          ? "venue_revealed"
+                          : didRevealTitle
+                            ? "title_revealed"
+                            : "booking_updated",
+                });
             }
             if (shouldSendPencilConfirmed) {
-                handlePencilConfirmedEmails(currentSelectedDate, data);
+                await handlePencilConfirmedEmails(currentSelectedDate, data, {
+                    bookingId: rowRange,
+                    trigger: "pencil_confirmed",
+                });
             }
 
             await refreshData();

@@ -176,7 +176,7 @@ export async function createBooking(raw: unknown) {
         user_id: data.userId ?? "",
         time_stamp: data.timeStamp ?? Date.now(),
     };
-    await wpFetch("/wp-json/fnd/v1/bookings", {
+    return wpFetch("/wp-json/fnd/v1/bookings", {
         method: "POST",
         body: JSON.stringify(payload),
     });
@@ -229,7 +229,7 @@ export async function updateBooking(id: string, raw: unknown) {
     if (data.userId !== undefined) payload.user_id = data.userId;
     if (data.timeStamp !== undefined) payload.time_stamp = data.timeStamp;
 
-    await wpFetch(`/wp-json/fnd/v1/bookings/${id}`, {
+    return wpFetch(`/wp-json/fnd/v1/bookings/${id}`, {
         // Use POST for broader host compatibility; plugin accepts POST or PATCH
         method: "POST",
         body: JSON.stringify(payload),

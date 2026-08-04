@@ -217,8 +217,11 @@ function fnd_get_booking_snapshot($post_id)
     }
 
     return [
+        'bookingId' => $post_id,
         'date' => $date,
         'booking' => [
+            'id' => $post_id,
+            'bookingId' => $post_id,
             'pressContact' => get_post_meta($post_id, 'press_contact', true),
             'titleOfShow' => get_post_meta($post_id, 'title_of_show', true),
             'showTitleIsTba' => fnd_bool_int(get_post_meta($post_id, 'show_title_is_tba', true)),
@@ -234,7 +237,7 @@ function fnd_get_booking_snapshot($post_id)
     ];
 }
 
-function fnd_send_clash_webhook($post_id)
+function fnd_send_clash_webhook($post_id, $trigger = 'booking_created')
 {
     if (fnd_should_skip_clash_webhook()) return;
 
@@ -245,6 +248,7 @@ function fnd_send_clash_webhook($post_id)
     }
 
     $payload = fnd_get_booking_snapshot($post_id);
+    $payload['trigger'] = sanitize_key($trigger);
     if (empty($payload['date'])) {
         error_log('FND clash webhook skipped: missing date.');
         return;

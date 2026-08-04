@@ -19,11 +19,15 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
 
     const handleSubmit = async (data: FieldValues) => {
         console.log(data);
+        let bookingId: string | number | null = null;
+        let shouldSendClashEmails = false;
         try {
             // Build a literal YYYY-MM-DD from the selected calendar day
             const d: Date = data.date instanceof Date ? (data.date as Date) : currentSelectedDate;
             const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-            await createBooking({ ...data, dateYmd: ymd });
+            const createdBooking = await createBooking({ ...data, dateYmd: ymd });
+            bookingId = (createdBooking as any)?.id ?? null;
+            shouldSendClashEmails = true;
 
             toast({
                 title: "Booking created successfully",
@@ -39,7 +43,12 @@ export default function CreateBooking({ currentSelectedDate }: CreateBookingProp
                 variant: "destructive",
             });
         } finally {
-            handleClashEmails(currentSelectedDate, data);
+            if (shouldSendClashEmails) {
+                await handleClashEmails(currentSelectedDate, data, {
+                    bookingId,
+                    trigger: "booking_created",
+                });
+            }
         }
     };
 
