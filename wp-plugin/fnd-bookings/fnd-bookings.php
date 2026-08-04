@@ -87,6 +87,23 @@ add_action('init', function () {
         },
     ]);
 
+    $log_meta_keys = [
+        '_fnd_log_booking_id',
+        '_fnd_log_action',
+        '_fnd_log_timestamp',
+    ];
+
+    foreach ($log_meta_keys as $key) {
+        register_post_meta('fnd_log', $key, [
+            'type' => 'string',
+            'single' => true,
+            'show_in_rest' => false,
+            'auth_callback' => function () {
+                return current_user_can('edit_posts');
+            },
+        ]);
+    }
+
     $notification_meta_keys = [
         '_fnd_booking_id',
         '_fnd_notification_type',
@@ -485,6 +502,21 @@ function fnd_bookings_log_action($action, array $data = [])
     if ($encoded !== false) {
         update_post_meta($post_id, '_fnd_log_entry', $encoded);
     }
+
+    fnd_update_log_relationship_meta($post_id, $entry);
+}
+
+function fnd_update_log_relationship_meta($log_id, array $entry)
+{
+    $booking_id = intval($entry['data']['post_id'] ?? 0);
+    if ($booking_id <= 0) {
+        return false;
+    }
+
+    update_post_meta($log_id, '_fnd_log_booking_id', (string)$booking_id);
+    update_post_meta($log_id, '_fnd_log_action', sanitize_key($entry['action'] ?? ''));
+    update_post_meta($log_id, '_fnd_log_timestamp', sanitize_text_field($entry['timestamp'] ?? ''));
+    return true;
 }
 
 function fnd_notification_allowed_value($value, array $allowed, $fallback)
