@@ -39,8 +39,9 @@ function notificationBookingId(params: Record<string, any> | undefined): string 
 export async function POST(request: Request) {
   let emailData: EmailData | null = null;
   try {
-    emailData = await request.json();
-    const { to, subject, templateName, sender, replyTo, params } = emailData;
+    const parsedEmailData: EmailData = await request.json();
+    emailData = parsedEmailData;
+    const { to, subject, templateName, sender, replyTo, params } = parsedEmailData;
 
     const templateFn = emailTemplates[templateName];
     if (!templateFn) {
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
     const notificationType = notificationTypeForTemplate(templateName);
     if (notificationType) {
       await Promise.all(
-        to.map((recipient) =>
+        to.map((recipient: EmailData["to"][number]) =>
           recordBookingNotificationActivity({
             bookingId: notificationBookingId(params),
             type: notificationType,
