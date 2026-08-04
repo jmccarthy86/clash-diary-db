@@ -519,6 +519,53 @@ function fnd_update_log_relationship_meta($log_id, array $entry)
     return true;
 }
 
+function fnd_backfill_booking_log_links($limit = 500)
+{
+    $posts = get_posts([
+        'post_type' => 'fnd_log',
+        'post_status' => 'publish',
+        'posts_per_page' => max(1, min(2000, intval($limit))),
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'meta_query' => [
+            [
+                'key' => '_fnd_log_booking_id',
+                'compare' => 'NOT EXISTS',
+            ],
+        ],
+    ]);
+
+    $result = [
+        'scanned' => 0,
+        'linked' => 0,
+        'skipped' => 0,
+        'failed' => 0,
+    ];
+
+    foreach ($posts as $post) {
+        $result['scanned']++;
+        $raw = get_post_meta($post->ID, '_fnd_log_entry', true);
+        if (!$raw) {
+            $result['skipped']++;
+            continue;
+        }
+
+        $entry = json_decode($raw, true);
+        if (!is_array($entry)) {
+            $result['failed']++;
+            continue;
+        }
+
+        if (fnd_update_log_relationship_meta($post->ID, $entry)) {
+            $result['linked']++;
+        } else {
+            $result['skipped']++;
+        }
+    }
+
+    return $result;
+}
+
 function fnd_notification_allowed_value($value, array $allowed, $fallback)
 {
     $value = sanitize_key((string)$value);
@@ -644,6 +691,50 @@ function fnd_get_booking_notifications($booking_id, $limit = 20)
     }, $posts);
 }
 
+function fnd_log_to_array($post_id)
+{
+    $raw = get_post_meta($post_id, '_fnd_log_entry', true);
+    $entry = $raw ? json_decode($raw, true) : [];
+    if (!is_array($entry)) {
+        $entry = [];
+    }
+
+    $data = isset($entry['data']) && is_array($entry['data']) ? $entry['data'] : [];
+
+    return [
+        'id' => intval($post_id),
+        'timestamp' => get_post_meta($post_id, '_fnd_log_timestamp', true) ?: ($entry['timestamp'] ?? ''),
+        'action' => get_post_meta($post_id, '_fnd_log_action', true) ?: ($entry['action'] ?? ''),
+        'user_id' => intval($entry['user_id'] ?? 0),
+        'method' => $data['method'] ?? '',
+        'route' => $data['route'] ?? '',
+        'summary' => get_post_field('post_content', $post_id),
+        'edit_link' => get_edit_post_link($post_id, ''),
+    ];
+}
+
+function fnd_get_booking_logs($booking_id, $limit = 50)
+{
+    $posts = get_posts([
+        'post_type' => 'fnd_log',
+        'post_status' => 'publish',
+        'posts_per_page' => max(1, min(100, intval($limit))),
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'meta_query' => [
+            [
+                'key' => '_fnd_log_booking_id',
+                'value' => (string)intval($booking_id),
+                'compare' => '=',
+            ],
+        ],
+    ]);
+
+    return array_map(function ($post) {
+        return fnd_log_to_array($post->ID);
+    }, $posts);
+}
+
 function fnd_render_log_entry_metabox($post)
 {
     $raw = get_post_meta($post->ID, '_fnd_log_entry', true);
@@ -663,6 +754,58 @@ function fnd_render_log_entry_metabox($post)
     }
 
     echo '<textarea readonly style="width:100%;min-height:300px;font-family:monospace;">' . esc_textarea($display) . '</textarea>';
+}
+
+function fnd_format_log_time($value)
+{
+    if (!$value) return '';
+    $timestamp = strtotime((string)$value);
+    if (!$timestamp) return (string)$value;
+    $tz = fnd_wp_tz();
+    return function_exists('wp_date') ? wp_date('d/m/Y H:i', $timestamp, $tz) : date('d/m/Y H:i', $timestamp);
+}
+
+function fnd_render_booking_logs_metabox($post)
+{
+    $logs = fnd_get_booking_logs($post->ID, 50);
+    if (empty($logs)) {
+        echo '<p>No booking logs linked to this booking.</p>';
+        echo '<p class="description">Run the log-link backfill from FND Bookings tools to link historical logs.</p>';
+        return;
+    }
+
+    echo '<table class="widefat striped" style="font-size:12px;">';
+    echo '<thead><tr>';
+    echo '<th>Time</th>';
+    echo '<th>Action</th>';
+    echo '<th>User</th>';
+    echo '<th>Method</th>';
+    echo '<th>Route</th>';
+    echo '<th>Details</th>';
+    echo '</tr></thead><tbody>';
+
+    foreach ($logs as $log) {
+        $action = sanitize_key($log['action'] ?? '');
+        $color = $action === 'create' ? '#15803d' : ($action === 'delete' ? '#b91c1c' : '#1d4ed8');
+        $edit_link = (string)($log['edit_link'] ?? '');
+
+        echo '<tr>';
+        echo '<td>' . esc_html(fnd_format_log_time($log['timestamp'] ?? '')) . '</td>';
+        echo '<td><span style="color:#fff;background:' . esc_attr($color) . ';border-radius:10px;padding:2px 7px;font-size:11px;text-transform:uppercase;">' . esc_html($action ?: 'log') . '</span></td>';
+        echo '<td>' . esc_html((string)($log['user_id'] ?? 0)) . '</td>';
+        echo '<td>' . esc_html(strtoupper((string)($log['method'] ?? ''))) . '</td>';
+        echo '<td><code>' . esc_html((string)($log['route'] ?? '')) . '</code></td>';
+        echo '<td>';
+        if ($edit_link !== '') {
+            echo '<a href="' . esc_url($edit_link) . '">View log</a>';
+        } else {
+            echo esc_html(wp_trim_words((string)($log['summary'] ?? ''), 12));
+        }
+        echo '</td>';
+        echo '</tr>';
+    }
+
+    echo '</tbody></table>';
 }
 
 function fnd_format_notification_time($value)
@@ -722,6 +865,15 @@ add_action('add_meta_boxes', function () {
         'fnd_render_booking_notifications_metabox',
         'fnd_booking',
         'side',
+        'default'
+    );
+
+    add_meta_box(
+        'fnd_booking_logs',
+        'Booking Logs',
+        'fnd_render_booking_logs_metabox',
+        'fnd_booking',
+        'normal',
         'default'
     );
 });
@@ -2129,6 +2281,60 @@ function fnd_import_process_ajax()
     ]);
 }
 
+function fnd_render_log_tools_page()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Insufficient permissions.', 'fnd-bookings'));
+    }
+
+    $result = null;
+    if (isset($_GET['fnd_backfill_result'])) {
+        $decoded = json_decode(base64_decode((string)$_GET['fnd_backfill_result']), true);
+        if (is_array($decoded)) {
+            $result = $decoded;
+        }
+    }
+
+    echo '<div class="wrap">';
+    echo '<h1>FND Log Tools</h1>';
+    echo '<p>Link historical booking logs to their booking posts so they appear in the Booking Logs metabox.</p>';
+
+    if (is_array($result)) {
+        echo '<div class="notice notice-success is-dismissible"><p>';
+        echo esc_html(sprintf(
+            'Backfill complete. Scanned: %d. Linked: %d. Skipped: %d. Failed: %d.',
+            intval($result['scanned'] ?? 0),
+            intval($result['linked'] ?? 0),
+            intval($result['skipped'] ?? 0),
+            intval($result['failed'] ?? 0)
+        ));
+        echo '</p></div>';
+    }
+
+    echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+    echo '<input type="hidden" name="action" value="fnd_backfill_booking_log_links">';
+    wp_nonce_field('fnd_backfill_booking_log_links');
+    submit_button('Backfill Booking Log Links');
+    echo '</form>';
+    echo '</div>';
+}
+
+function fnd_handle_backfill_booking_log_links()
+{
+    if (!current_user_can('manage_options')) {
+        wp_die(esc_html__('Insufficient permissions.', 'fnd-bookings'));
+    }
+    check_admin_referer('fnd_backfill_booking_log_links');
+
+    $result = fnd_backfill_booking_log_links(2000);
+    $encoded = base64_encode(wp_json_encode($result));
+    wp_safe_redirect(add_query_arg(
+        ['page' => 'fnd-log-tools', 'fnd_backfill_result' => $encoded],
+        admin_url('edit.php?post_type=fnd_booking')
+    ));
+    exit;
+}
+
 add_action('admin_menu', function () {
     add_submenu_page(
         'edit.php?post_type=fnd_booking',
@@ -2147,9 +2353,19 @@ add_action('admin_menu', function () {
         'fnd-settings',
         'fnd_render_settings_page'
     );
+
+    add_submenu_page(
+        'edit.php?post_type=fnd_booking',
+        'FND Log Tools',
+        'Log Tools',
+        'manage_options',
+        'fnd-log-tools',
+        'fnd_render_log_tools_page'
+    );
 });
 
 add_action('wp_ajax_fnd_import_process', 'fnd_import_process_ajax');
+add_action('admin_post_fnd_backfill_booking_log_links', 'fnd_handle_backfill_booking_log_links');
 
 function fnd_render_settings_page()
 {
