@@ -5,6 +5,12 @@ import { getClashEmailContent } from "@/emails/clash";
 import { getPencilConfirmedEmailContent } from "@/emails/pencilConfirmed";
 import * as XLSX from "xlsx";
 import { buildWorkbook } from "@/lib/export/xlsx";
+import {
+  extractBrevoMessageId,
+  extractErrorMessage,
+  recordBookingNotificationActivity,
+  type NotificationType,
+} from "@/lib/notifications";
 
 const apiKey = process.env.BREVO_API_KEY;
 
@@ -20,9 +26,20 @@ const emailTemplates: Record<string, (params?: Record<string, any>) => string> =
   pencilConfirmed: getPencilConfirmedEmailContent,
 };
 
+function notificationTypeForTemplate(templateName: string): NotificationType | null {
+  if (templateName === "clash") return "clash";
+  if (templateName === "pencilConfirmed") return "pencil_confirmed";
+  return null;
+}
+
+function notificationBookingId(params: Record<string, any> | undefined): string | number | null {
+  return params?.notificationBookingId ?? params?.bookingId ?? null;
+}
+
 export async function POST(request: Request) {
+  let emailData: EmailData | null = null;
   try {
-    const emailData: EmailData = await request.json();
+    emailData = await request.json();
     const { to, subject, templateName, sender, replyTo, params } = emailData;
 
     const templateFn = emailTemplates[templateName];
@@ -64,9 +81,45 @@ export async function POST(request: Request) {
     }
 
     const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    const notificationType = notificationTypeForTemplate(templateName);
+    if (notificationType) {
+      await Promise.all(
+        to.map((recipient) =>
+          recordBookingNotificationActivity({
+            bookingId: notificationBookingId(params),
+            type: notificationType,
+            recipientEmail: recipient.email,
+            subject,
+            status: "sent",
+            providerMessageId: extractBrevoMessageId(data),
+            trigger: params?.notificationTrigger ?? "",
+          })
+        )
+      );
+    }
+
     return NextResponse.json({ success: true, data }, { status: 200 });
   } catch (error) {
     console.error("Error sending email:", error);
+    const notificationType = emailData
+      ? notificationTypeForTemplate(emailData.templateName)
+      : null;
+    if (emailData && notificationType) {
+      await Promise.all(
+        emailData.to.map((recipient) =>
+          recordBookingNotificationActivity({
+            bookingId: notificationBookingId(emailData?.params),
+            type: notificationType,
+            recipientEmail: recipient.email,
+            subject: emailData?.subject ?? "",
+            status: "failed",
+            errorMessage: extractErrorMessage(error),
+            trigger: emailData?.params?.notificationTrigger ?? "",
+          })
+        )
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: "Failed to send email" },
       { status: 500 }

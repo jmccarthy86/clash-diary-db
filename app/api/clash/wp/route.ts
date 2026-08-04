@@ -12,6 +12,11 @@ import {
     resolveVenueMembership,
     toBooleanLike,
 } from "@/lib/utils";
+import {
+    extractBrevoMessageId,
+    extractErrorMessage,
+    recordBookingNotificationActivity,
+} from "@/lib/notifications";
 
 const apiKey = process.env.BREVO_API_KEY;
 
@@ -24,6 +29,8 @@ apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, apiKey);
 
 type ClashWebhookPayload = {
     date: string;
+    bookingId?: number | string;
+    trigger?: string;
     booking: Record<string, any>;
 };
 
@@ -92,6 +99,8 @@ export async function POST(request: Request) {
 
     const dateValue = typeof payload?.date === "string" ? payload.date : "";
     const booking = payload?.booking ?? null;
+    const bookingId = payload?.bookingId ?? booking?.bookingId ?? booking?.id ?? null;
+    const trigger = typeof payload?.trigger === "string" ? payload.trigger : "booking_created";
     if (!dateValue || !booking || typeof booking !== "object") {
         return NextResponse.json(
             { success: false, error: "Missing date or booking payload" },
@@ -168,6 +177,7 @@ export async function POST(request: Request) {
 
     let sent = 0;
     const failed: string[] = [];
+    const subject = "SOLT & UK Theatre First Night Diary clash";
 
     for (const email of uniqueEmails) {
         const params = { ...paramsBase, name: email, email };
@@ -175,7 +185,7 @@ export async function POST(request: Request) {
 
         const sendSmtpEmail = new brevo.SendSmtpEmail();
         sendSmtpEmail.to = [{ email, name: email }];
-        sendSmtpEmail.subject = "SOLT & UK Theatre First Night Diary clash";
+        sendSmtpEmail.subject = subject;
         sendSmtpEmail.htmlContent = htmlContent;
         sendSmtpEmail.sender = { name: "SOLT", email: "noreply@solt.co.uk" };
         sendSmtpEmail.params = params;
@@ -187,11 +197,29 @@ export async function POST(request: Request) {
         ];
 
         try {
-            await apiInstance.sendTransacEmail(sendSmtpEmail);
+            const sendResult = await apiInstance.sendTransacEmail(sendSmtpEmail);
             sent += 1;
+            await recordBookingNotificationActivity({
+                bookingId,
+                type: "clash",
+                recipientEmail: email,
+                subject,
+                status: "sent",
+                providerMessageId: extractBrevoMessageId(sendResult),
+                trigger,
+            });
         } catch (error) {
             console.error("Error sending clash email:", error);
             failed.push(email);
+            await recordBookingNotificationActivity({
+                bookingId,
+                type: "clash",
+                recipientEmail: email,
+                subject,
+                status: "failed",
+                errorMessage: extractErrorMessage(error),
+                trigger,
+            });
         }
     }
 
