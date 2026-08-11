@@ -817,33 +817,6 @@ function fnd_format_notification_time($value)
     return function_exists('wp_date') ? wp_date('d/m/Y H:i', $timestamp, $tz) : date('d/m/Y H:i', $timestamp);
 }
 
-function fnd_notification_action_label($trigger)
-{
-    $labels = [
-        'title_revealed' => 'Show title confirmed',
-        'venue_revealed' => 'Venue confirmed',
-        'pencil_confirmed' => 'Booking confirmed',
-        'booking_created' => 'Booking created',
-        'date_changed' => 'Date changed',
-        'booking_updated' => 'Booking updated',
-    ];
-
-    $key = sanitize_key((string)$trigger);
-    return $labels[$key] ?? ($key ? ucwords(str_replace('_', ' ', $key)) : 'Notification sent');
-}
-
-function fnd_notification_type_label($type)
-{
-    $labels = [
-        'clash' => 'Clash',
-        'pencil_confirmed' => 'Booking confirmed',
-        'tba_reminder' => 'TBA reminder',
-    ];
-
-    $key = sanitize_key((string)$type);
-    return $labels[$key] ?? ($key ? ucwords(str_replace('_', ' ', $key)) : 'Notification');
-}
-
 function fnd_render_booking_notifications_metabox($post)
 {
     $notifications = fnd_get_booking_notifications($post->ID, 20);
@@ -852,34 +825,28 @@ function fnd_render_booking_notifications_metabox($post)
         return;
     }
 
-    echo '<table class="widefat striped" style="font-size:12px;">';
-    echo '<thead><tr>';
-    echo '<th>Action</th>';
-    echo '<th>Email</th>';
-    echo '<th>Notification</th>';
-    echo '<th>Status</th>';
-    echo '</tr></thead><tbody>';
-
+    echo '<div style="display:flex;flex-direction:column;gap:12px;">';
     foreach ($notifications as $item) {
         $status = (string)($item['status'] ?? 'skipped');
         $color = $status === 'sent' ? '#15803d' : ($status === 'failed' ? '#b91c1c' : '#92400e');
-        $status_label = $status ? ucwords(str_replace('_', ' ', $status)) : 'Unknown';
-        $title = '';
-        if (!empty($item['provider_message_id'])) {
-            $title = 'Brevo ID: ' . (string)$item['provider_message_id'];
-        } elseif (!empty($item['error_message'])) {
-            $title = (string)$item['error_message'];
-        }
+        $type = ucwords(str_replace('_', ' ', (string)($item['type'] ?? 'notification')));
+        $time = fnd_format_notification_time($item['sent_at'] ?: $item['created_at']);
 
-        echo '<tr>';
-        echo '<td>' . esc_html(fnd_notification_action_label($item['trigger'] ?? '')) . '</td>';
-        echo '<td>' . esc_html((string)($item['recipient_email'] ?? '')) . '</td>';
-        echo '<td>' . esc_html(fnd_notification_type_label($item['type'] ?? '')) . '</td>';
-        echo '<td><span title="' . esc_attr($title) . '" style="color:#fff;background:' . esc_attr($color) . ';border-radius:10px;padding:2px 7px;font-size:11px;text-transform:uppercase;">' . esc_html($status_label) . '</span></td>';
-        echo '</tr>';
+        echo '<div style="border:1px solid #dcdcde;border-radius:4px;padding:10px;background:#fff;">';
+        echo '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;">';
+        echo '<strong>' . esc_html($type) . '</strong>';
+        echo '<span style="color:#fff;background:' . esc_attr($color) . ';border-radius:10px;padding:2px 7px;font-size:11px;text-transform:uppercase;">' . esc_html($status) . '</span>';
+        echo '</div>';
+        echo '<div style="font-size:12px;line-height:1.5;">';
+        if (!empty($item['recipient_email'])) echo '<div><strong>To:</strong> ' . esc_html($item['recipient_email']) . '</div>';
+        if (!empty($time)) echo '<div><strong>When:</strong> ' . esc_html($time) . '</div>';
+        if (!empty($item['trigger'])) echo '<div><strong>Trigger:</strong> ' . esc_html(str_replace('_', ' ', $item['trigger'])) . '</div>';
+        if (!empty($item['provider_message_id'])) echo '<div><strong>Brevo ID:</strong> ' . esc_html($item['provider_message_id']) . '</div>';
+        if (!empty($item['error_message'])) echo '<div style="margin-top:6px;color:#b91c1c;"><strong>Error:</strong> ' . esc_html($item['error_message']) . '</div>';
+        echo '</div>';
+        echo '</div>';
     }
-
-    echo '</tbody></table>';
+    echo '</div>';
 }
 
 add_action('add_meta_boxes', function () {
